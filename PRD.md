@@ -1,96 +1,37 @@
 # 📊 Mood Tracker App — Product Requirements Document (PRD)
 
-## 1. 🧩 Ürün Tanımı (Overview)
-Mood Tracker, kullanıcıların günlük ruh hali ve enerji seviyelerini kaydetmelerini sağlayan, bu verileri anlamlı ve estetik grafiklere dönüştüren minimal bir veri görselleştirme uygulamasıdır.
+## 1. Ürün Tanımı
+Mood Tracker, kullanıcıların günlük ruh hali ve enerji seviyelerini kaydetmesini sağlayan, bu verileri grafiklere dönüştüren minimal bir veri görselleştirme uygulamasıdır.
 
-Amaç:  
-Kullanıcının duygu durumunu zaman içinde analiz etmesini sağlamak ve veri görselleştirme tekniklerini şık bir UI ile sunmak.
-
----
-
-## 2. 🎯 Hedefler (Goals)
-
-### Ana Hedefler
+## 2. Hedefler
 - Günlük mood verisi toplamak
-- Veriyi görselleştirmek (trend + dağılım + yoğunluk)
-- Basit ama estetik bir dashboard sunmak
+- Veriyi line chart, heatmap ve pie chart ile görselleştirmek
+- Basit ama şık bir dashboard sunmak
 
-### Başarı Kriterleri
-- Kullanıcı 5 saniye içinde veri girişi yapabilmeli
-- Grafikler anında güncellenmeli
-- UI “clean & modern” hissi vermeli
+## 3. Hedef Kullanıcı
+- Veri görselleştirme dersi öğrencileri
+- Ruh hali takibi yapmak isteyen kullanıcılar
+- Minimal dashboard uygulamalarını seven kullanıcılar
 
----
-
-## 3. 👤 Hedef Kullanıcı (Target User)
-
-- Öğrenciler (veri görselleştirme dersi)
-- Kendi alışkanlıklarını takip etmek isteyen bireyler
-- Minimal uygulama deneyimi isteyen kullanıcılar
-
----
-
-## 4. ✨ Özellikler (Features)
+## 4. Özellikler
 
 ### 4.1 Günlük Mood Girişi
-Kullanıcı:
-- Gün seçer (default: bugün)
-- Mood seçer:
+Kullanıcı her gün:
+- Tarih seçer
+- Ruh hali seçer:
   - 🙂 Mutlu
   - 😐 Nötr
   - 😞 Üzgün
   - 😡 Sinirli
-- Enerji seviyesi seçer (1–5)
+- Enerji seviyesini 1-5 arasında belirler
 
-#### UI:
-- Büyük emoji butonlar
-- Slider veya pill selector (enerji)
+### 4.2 Dashboard
+Dashboard üzerinde:
+- Ruh hali zaman içindeki değişimi
+- Haftalık duygu yoğunluğu
+- Genel mood dağılımı gösterilir
 
----
-
-### 4.2 Dashboard (Veri Görselleştirme)
-
-#### 📈 Line Chart (Zaman Serisi)
-- X: Gün
-- Y: Mood değeri (sayısal map)
-  - 🙂 = 4
-  - 😐 = 3
-  - 😞 = 2
-  - 😡 = 1
-
-Ek:
-- Enerji seviyesi secondary line olabilir
-
----
-
-#### 🔥 Heatmap (Haftalık Yoğunluk)
-- X: Günler (Pzt–Paz)
-- Y: Haftalar
-- Renk: Mood yoğunluğu
-
-Örnek:
-- Yeşil = pozitif
-- Kırmızı = negatif
-
----
-
-#### 🥧 Pie Chart (Genel Dağılım)
-- Mood yüzdelik dağılımı
-- Kaç gün hangi mood seçilmiş
-
----
-
-### 4.3 Insight (Basit AI hissi)
-Sistem otomatik yorum üretir:
-
-Örnek:
-- “Son 7 günde genelde mutlusun 🙂”
-- “Enerjin hafta ortasında düşüyor”
-- “En stresli günün Pazartesi 😡”
-
----
-
-## 5. 🧱 Veri Modeli (Data Model)
+## 5. Veri Modeli
 
 ```json
 {
@@ -100,3 +41,100 @@ Sistem otomatik yorum üretir:
   "mood_score": 4,
   "energy": 3
 }
+```
+
+## 6. Mood Mapping
+
+```json
+{
+  "happy": 4,
+  "neutral": 3,
+  "sad": 2,
+  "angry": 1
+}
+```
+
+## 7. Görselleştirme Yapısı
+
+### Line Chart
+- X ekseni: Gün
+- Y ekseni: Mood score
+- Ek çizgi: Enerji seviyesi
+
+### Heatmap
+- X ekseni: Haftanın günleri
+- Y ekseni: Haftalar
+- Renk yoğunluğu: Mood score
+
+### Pie Chart
+- Mood kategorilerinin yüzdelik dağılımı
+
+## 8. Insight Alanı
+Uygulama basit analiz cümleleri üretir:
+
+'''txt
+Son 7 günde genel ruh halin pozitif görünüyor.
+Enerji seviyen hafta ortasında düşüş gösteriyor.
+En mutlu olduğun günler hafta sonları.
+'''
+
+## 9. Teknik Gereksinimler
+
+### Frontend
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+
+### Chart Library
+- Recharts veya Chart.js
+
+### Veri Saklama
+- MVP için LocalStorage
+- Gelişmiş sürüm için Supabase
+
+## 10. MVP Kapsamı
+
+Dahil:
+- Mood seçimi
+- Enerji seviyesi seçimi
+- LocalStorage kayıt
+- Line chart
+- Pie chart
+- Basit insight
+
+Dahil değil:
+- Kullanıcı girişi
+- Cloud sync
+- Bildirim sistemi
+- Sosyal paylaşım
+
+## 11. Kullanıcı Akışı
+
+1. Kullanıcı uygulamayı açar
+2. Günlük ruh halini seçer
+3. Enerji seviyesini belirler
+4. Kaydet butonuna basar
+5. Dashboard grafiklerle güncellenir
+6. Insight mesajı gösterilir
+
+## 12. Gelecek Geliştirmeler
+
+- AI destekli yorumlama
+- Haftalık PDF rapor
+- Dark mode
+- Bildirim sistemi
+- Takvim görünümü
+
+## 13. Projenin Veri Görselleştirme Değeri
+
+Bu proje:
+- Zaman serisi analizi
+- Kategorik dağılım analizi
+- Yoğunluk haritası
+
+gibi temel veri görselleştirme tekniklerini içerir.
+
+## 14. Sonuç
+
+Mood Tracker; basit veri yapısı, estetik arayüzü ve anlamlı grafik çıktılarıyla veri görselleştirme dersi için ideal bir mini uygulamadır.
