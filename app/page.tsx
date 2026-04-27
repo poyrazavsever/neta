@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
+import logo from "../assets/logo.png";
 import {
   Cell,
   Legend,
@@ -155,11 +157,14 @@ export default function Home() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <header className="flex flex-col gap-2 border-b border-ink/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-leaf">
-            Mood Tracker
-          </p>
-          <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">
+        <div className="flex items-center gap-4">
+          <Image
+            src={logo}
+            alt="Mood Tracker logo"
+            className="h-16 w-16 rounded-md object-contain sm:h-20 sm:w-20"
+            priority
+          />
+          <h1 className="text-3xl font-bold text-ink sm:text-4xl">
             Günlük ruh hali dashboard'u
           </h1>
         </div>
