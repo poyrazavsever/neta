@@ -5,7 +5,10 @@ export interface AIAnalysisResult {
   suggested_tasks: string[];
 }
 
-export async function analyzeJournalWithLocalAI(content: string, model: string = "llama3"): Promise<AIAnalysisResult | null> {
+export async function analyzeJournalWithLocalAI(
+  content: string,
+  model: string = "llama3",
+): Promise<AIAnalysisResult | null> {
   const prompt = `
   Sen şefkatli bir yapay zeka asistanı ve kişisel yansıma (reflection) yardımcısısın. 
   Aşağıdaki günlük girdisini analiz edip tam olarak belirtilen JSON formatında yanıt vermelisin. Düz metin kullanma, SADECE geçerli bir JSON objesi döndür.
@@ -29,8 +32,8 @@ export async function analyzeJournalWithLocalAI(content: string, model: string =
         model: model, // Gerekirse "gemini-3-flash-preview:latest" gibi kendi modeliniz de olabilir
         prompt: prompt,
         stream: false,
-        format: "json"
-      })
+        format: "json",
+      }),
     });
 
     if (!response.ok) {
@@ -40,9 +43,11 @@ export async function analyzeJournalWithLocalAI(content: string, model: string =
     const data = await response.json();
     const parsedResult = JSON.parse(data.response);
     return parsedResult as AIAnalysisResult;
-
   } catch (error) {
-    console.error("AI Analizi başarısız oldu (Ollama açık olmayabilir):", error);
+    console.error(
+      "AI Analizi başarısız oldu (Ollama açık olmayabilir):",
+      error,
+    );
     return null;
   }
 }

@@ -5,7 +5,14 @@ import { v4 as uuidv4 } from "uuid";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { analyzeJournalWithLocalAI } from "@/lib/ai";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,8 +32,8 @@ export default function JournalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Dexie.js üzerinden günlükleri tarih sırasına göre çekiyoruz (en yeni en üstte)
-  const journals = useLiveQuery(
-    () => db.journals.orderBy("date").reverse().toArray()
+  const journals = useLiveQuery(() =>
+    db.journals.orderBy("date").reverse().toArray(),
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,7 +90,6 @@ export default function JournalPage() {
       } catch (aiErr) {
         console.error("Arka plan AI analizi hatası:", aiErr);
       }
-
     } catch (error) {
       console.error("Günlük kaydedilemedi:", error);
     } finally {
@@ -92,7 +98,7 @@ export default function JournalPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if(confirm("Bu günlüğü silmek istediğinden emin misin?")) {
+    if (confirm("Bu günlüğü silmek istediğinden emin misin?")) {
       await db.journals.delete(id);
     }
   };
@@ -101,7 +107,9 @@ export default function JournalPage() {
     <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Günlük</h1>
-        <p className="text-muted-foreground">Zihnini boşalt, hislerini kaydet. Verilerin sadece cihazında kalır.</p>
+        <p className="text-muted-foreground">
+          Zihnini boşalt, hislerini kaydet. Verilerin sadece cihazında kalır.
+        </p>
       </div>
 
       <Card>
@@ -121,7 +129,9 @@ export default function JournalPage() {
                       type="button"
                       onClick={() => setMood(m.id)}
                       className={`flex-1 py-2 px-1 rounded-md border text-xl flex items-center justify-center transition-colors ${
-                        mood === m.id ? "bg-primary/20 border-primary" : "bg-card border-border hover:bg-muted"
+                        mood === m.id
+                          ? "bg-primary/20 border-primary"
+                          : "bg-card border-border hover:bg-muted"
                       }`}
                       title={m.label}
                     >
@@ -155,7 +165,11 @@ export default function JournalPage() {
               />
             </div>
 
-            <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full md:w-auto"
+            >
               {isSubmitting ? "Kaydediliyor..." : "Kaydet"}
             </Button>
           </form>
@@ -167,7 +181,9 @@ export default function JournalPage() {
         {!journals ? (
           <p className="text-sm text-muted-foreground">Yükleniyor...</p>
         ) : journals.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Henüz kayıt bulunmuyor.</p>
+          <p className="text-sm text-muted-foreground">
+            Henüz kayıt bulunmuyor.
+          </p>
         ) : (
           <div className="grid gap-4">
             {journals.map((journal) => (
@@ -175,7 +191,9 @@ export default function JournalPage() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base flex items-center gap-2">
-                      <span>{moods.find(m => m.id === journal.mood)?.emoji}</span>
+                      <span>
+                        {moods.find((m) => m.id === journal.mood)?.emoji}
+                      </span>
                       <span>{journal.date}</span>
                     </CardTitle>
                     <span className="text-xs px-2 py-1 bg-muted rounded-md font-medium text-muted-foreground">
@@ -184,13 +202,18 @@ export default function JournalPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="pt-2">
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{journal.content}</p>
-                  
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                    {journal.content}
+                  </p>
+
                   {/* AI Sonuçlarını Göster */}
                   {journal.ai_tags && (
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {journal.ai_tags.map(tag => (
-                        <span key={tag} className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-md">
+                      {journal.ai_tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-md"
+                        >
                           {tag}
                         </span>
                       ))}
@@ -203,7 +226,14 @@ export default function JournalPage() {
                   )}
 
                   <div className="flex justify-end mt-4">
-                    <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-500/10" onClick={() => handleDelete(journal.id)}>Sil</Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                      onClick={() => handleDelete(journal.id)}
+                    >
+                      Sil
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

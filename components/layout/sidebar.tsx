@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Book, CheckSquare, MessageCircle, Settings, BrainCircuit } from "lucide-react";
+import {
+  LayoutDashboard,
+  Book,
+  CheckSquare,
+  MessageCircle,
+  Settings,
+  BrainCircuit,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const routes = [
@@ -24,10 +31,12 @@ export function Sidebar() {
       </div>
       <nav className="flex-1 p-4 space-y-1">
         {routes.map((route) => {
-          const isActive = pathname === route.path || pathname?.startsWith(route.path + "/");
+          const isActive =
+            pathname === route.path || pathname?.startsWith(route.path + "/");
           // Home route exact match check
-          const isExactActive = route.path === "/" ? pathname === "/" : isActive;
-          
+          const isExactActive =
+            route.path === "/" ? pathname === "/" : isActive;
+
           return (
             <Link
               key={route.path}
@@ -36,7 +45,7 @@ export function Sidebar() {
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium",
                 isExactActive
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <route.icon className="h-5 w-5" />

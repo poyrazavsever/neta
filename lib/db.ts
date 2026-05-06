@@ -30,12 +30,12 @@ export class MindSpaceDB extends Dexie {
 
   constructor() {
     super("MindSpaceDatabase");
-    
-    // Schema tanımlamaları. 
+
+    // Schema tanımlamaları.
     // IndexedDB'de sadece indekslenecek (üzerinde arama/sıralama yapılacak) alanları belirtiriz.
     this.version(1).stores({
       journals: "id, date, mood",
-      tasks: "id, status, date, journal_id"
+      tasks: "id, status, date, journal_id",
     });
   }
 }
