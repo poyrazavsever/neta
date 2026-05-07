@@ -4,22 +4,23 @@
 
 @layer base {
   :root, .dark {
-    --background: #676278;
-    --background-dark: #605C71;
+    /* Deeper premium dark mode background */
+    --background: #120D1C; 
+    --background-dark: #0A0710;
     --foreground: #FBF9FE;
     
-    --card: #2B2538;
+    --card: #1F172B;
     --card-foreground: #FBF9FE;
     
-    --popover: #2B2538;
+    --popover: #1F172B;
     --popover-foreground: #FBF9FE;
     
     --primary: #6C5BB0;
-    --primary-foreground: #FBF9FE;
+    --primary-foreground: #FFFFFF;
     --primary-hover: #594D9F;
     --primary-pressed: #493D90;
     
-    --secondary: #1F172B;
+    --secondary: #2B2538;
     --secondary-foreground: #C0B8D6;
     
     --muted: #3B3448;
@@ -31,14 +32,14 @@
     --destructive: #d8644a;
     --destructive-foreground: #FBF9FE;
     
-    --border: #473F55;
-    --input: #473F55;
-    --input-bg: #150E21;
-    --overlay: #150E21;
+    --border: #3B3448;
+    --input: #3B3448;
+    --input-bg: #1A1325;
+    --overlay: #000000;
     
-    --ring: #594D9F;
+    --ring: #6C5BB0;
     
-    --radius: 0.625rem;
+    --radius: 0.75rem;
   }
 }
 
@@ -48,8 +49,18 @@
   }
   body {
     @apply text-foreground;
-    background: linear-gradient(to bottom right, var(--background), var(--background-dark));
+    background: linear-gradient(135deg, var(--background), var(--background-dark));
     background-attachment: fixed;
     min-height: 100vh;
+  }
+  
+  /* Fix for Chrome autofill turning inputs yellow/olive */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px var(--input-bg) inset !important;
+      -webkit-text-fill-color: var(--foreground) !important;
+      transition: background-color 5000s ease-in-out 0s;
   }
 }
