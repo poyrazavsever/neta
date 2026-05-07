@@ -1,4 +1,4 @@
-import { login } from './actions'
+import { signup } from '@/app/login/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Link from 'next/link'
 import { ErrorToaster } from '@/components/error-toaster'
 
-export default async function LoginPage({
+export default async function RegisterPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -22,7 +22,7 @@ export default async function LoginPage({
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">MindSpace</CardTitle>
           <CardDescription className="text-center">
-            Hesabınıza giriş yapın
+            Yeni bir hesap oluşturun
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -38,13 +38,13 @@ export default async function LoginPage({
               </div>
             </div>
             <div className="flex flex-col space-y-4 mt-6">
-              <Button formAction={login} className="w-full">
-                Giriş Yap
+              <Button formAction={signup} className="w-full">
+                Kayıt Ol
               </Button>
               <div className="text-center text-sm">
-                Hesabınız yok mu?{' '}
-                <Link href="/register" className="text-primary hover:underline">
-                  Kayıt Ol
+                Zaten hesabınız var mı?{' '}
+                <Link href="/login" className="text-primary hover:underline">
+                  Giriş Yap
                 </Link>
               </div>
             </div>

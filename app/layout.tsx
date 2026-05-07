@@ -3,8 +3,7 @@ import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
+import { Toaster } from "react-hot-toast";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -31,15 +30,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex min-h-screen bg-background text-foreground">
-            <Sidebar />
-            <div className="flex flex-col flex-1 h-screen overflow-hidden">
-              <Header />
-              <main className="flex-1 overflow-y-auto p-6 md:p-8">
-                {children}
-              </main>
-            </div>
-          </div>
+          {children}
+          <Toaster position="top-right" />
         </ThemeProvider>
       </body>
     </html>
