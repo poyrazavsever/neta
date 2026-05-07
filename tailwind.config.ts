@@ -18,12 +18,17 @@ const config: Config = {
         sky: "#4f7fbf",
         border: "var(--border)",
         input: "var(--input)",
+        "input-bg": "var(--input-bg)",
         ring: "var(--ring)",
         background: "var(--background)",
+        "background-dark": "var(--background-dark)",
         foreground: "var(--foreground)",
+        overlay: "var(--overlay)",
         primary: {
           DEFAULT: "var(--primary)",
           foreground: "var(--primary-foreground)",
+          hover: "var(--primary-hover)",
+          pressed: "var(--primary-pressed)",
         },
         secondary: {
           DEFAULT: "var(--secondary)",

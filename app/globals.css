@@ -3,48 +3,42 @@
 @import "tailwindcss/utilities";
 
 @layer base {
-  :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.985 0 0);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+  :root, .dark {
+    --background: #676278;
+    --background-dark: #605C71;
+    --foreground: #FBF9FE;
+    
+    --card: #2B2538;
+    --card-foreground: #FBF9FE;
+    
+    --popover: #2B2538;
+    --popover-foreground: #FBF9FE;
+    
+    --primary: #6C5BB0;
+    --primary-foreground: #FBF9FE;
+    --primary-hover: #594D9F;
+    --primary-pressed: #493D90;
+    
+    --secondary: #1F172B;
+    --secondary-foreground: #C0B8D6;
+    
+    --muted: #3B3448;
+    --muted-foreground: #8F89A5;
+    
+    --accent: #3B3448;
+    --accent-foreground: #FBF9FE;
+    
+    --destructive: #d8644a;
+    --destructive-foreground: #FBF9FE;
+    
+    --border: #473F55;
+    --input: #473F55;
+    --input-bg: #150E21;
+    --overlay: #150E21;
+    
+    --ring: #594D9F;
+    
     --radius: 0.625rem;
-  }
-  .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --destructive-foreground: oklch(0.985 0 0);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
   }
 }
 
@@ -53,6 +47,9 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: linear-gradient(to bottom right, var(--background), var(--background-dark));
+    background-attachment: fixed;
+    min-height: 100vh;
   }
 }
