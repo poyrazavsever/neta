@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/lib/db";
+import { v4 as uuidv4 } from "uuid";
+
 import { analyzeJournalWithLocalAI } from "@/lib/ai";
+import { db } from "@/lib/db";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardFooter,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,22 +31,23 @@ export default function JournalPage() {
   const [energy, setEnergy] = useState("3");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Dexie.js üzerinden günlükleri tarih sırasına göre çekiyoruz (en yeni en üstte)
+  // Dexie.js üzerinden günlükleri tarih sırasına göre çekiyoruz (en yeni en üstte).
   const journals = useLiveQuery(() =>
     db.journals.orderBy("date").reverse().toArray(),
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (!content.trim()) return;
 
     setIsSubmitting(true);
+
     const now = new Date().toISOString();
     const entryId = uuidv4();
-    const currentContent = content; // Analiz için metni kopyala
+    const currentContent = content;
 
     try {
-      // 1. Veriyi veritabanına hemen ekle (Kullanıcı beklemesin)
+      // Veriyi önce kaydet, AI analizini daha sonra arka planda tamamla.
       await db.journals.add({
         id: entryId,
         date: now.split("T")[0],
@@ -57,12 +58,10 @@ export default function JournalPage() {
         updated_at: now,
       });
 
-      // UI'ı Sıfırla
       setContent("");
       setEnergy("3");
       setMood("happy");
 
-      // 2. Arka planda AI Analizi başlat
       try {
         const aiResult = await analyzeJournalWithLocalAI(currentContent);
         if (aiResult) {
@@ -72,8 +71,7 @@ export default function JournalPage() {
             ai_summary: aiResult.ai_summary,
           });
 
-          // Eğer AI görev önerdiyse Görevler tablosuna at (pending / onay bekliyor yapısı eklenebilir ama direkt atalım)
-          if (aiResult.suggested_tasks && aiResult.suggested_tasks.length > 0) {
+          if (aiResult.suggested_tasks?.length) {
             for (const taskTitle of aiResult.suggested_tasks) {
               await db.tasks.add({
                 id: uuidv4(),
@@ -87,8 +85,8 @@ export default function JournalPage() {
             }
           }
         }
-      } catch (aiErr) {
-        console.error("Arka plan AI analizi hatası:", aiErr);
+      } catch (aiError) {
+        console.error("Arka plan AI analizi hatası:", aiError);
       }
     } catch (error) {
       console.error("Günlük kaydedilemedi:", error);
@@ -104,7 +102,7 @@ export default function JournalPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="mx-auto max-w-4xl animate-in space-y-6 fade-in slide-in-from-bottom-4 duration-500">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Günlük</h1>
         <p className="text-muted-foreground">
@@ -119,27 +117,28 @@ export default function JournalPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Ruh Hali</Label>
                 <div className="flex gap-2">
-                  {moods.map((m) => (
+                  {moods.map((currentMood) => (
                     <button
-                      key={m.id}
+                      key={currentMood.id}
                       type="button"
-                      onClick={() => setMood(m.id)}
-                      className={`flex-1 py-2 px-1 rounded-md border text-xl flex items-center justify-center transition-colors ${
-                        mood === m.id
-                          ? "bg-primary/20 border-primary"
-                          : "bg-card border-border hover:bg-muted"
+                      onClick={() => setMood(currentMood.id)}
+                      className={`flex flex-1 items-center justify-center rounded-md border px-1 py-2 text-xl transition-colors ${
+                        mood === currentMood.id
+                          ? "border-primary bg-primary/20"
+                          : "border-border bg-card hover:bg-muted"
                       }`}
-                      title={m.label}
+                      title={currentMood.label}
                     >
-                      {m.emoji}
+                      {currentMood.emoji}
                     </button>
                   ))}
                 </div>
               </div>
+
               <div className="space-y-2">
                 <Label>Enerji Seviyesi (1-5): {energy}</Label>
                 <Input
@@ -148,7 +147,7 @@ export default function JournalPage() {
                   max="5"
                   step="1"
                   value={energy}
-                  onChange={(e) => setEnergy(e.target.value)}
+                  onChange={(event) => setEnergy(event.target.value)}
                   className="w-full"
                 />
               </div>
@@ -159,7 +158,7 @@ export default function JournalPage() {
               <Textarea
                 id="content"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={(event) => setContent(event.target.value)}
                 className="min-h-[150px] resize-y"
                 placeholder="Örneğin: Bugün toplantıda işler ters gitti..."
               />
@@ -190,13 +189,14 @@ export default function JournalPage() {
               <Card key={journal.id}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-base">
                       <span>
-                        {moods.find((m) => m.id === journal.mood)?.emoji}
+                        {moods.find((currentMood) => currentMood.id === journal.mood)
+                          ?.emoji ?? "📝"}
                       </span>
                       <span>{journal.date}</span>
                     </CardTitle>
-                    <span className="text-xs px-2 py-1 bg-muted rounded-md font-medium text-muted-foreground">
+                    <span className="rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
                       Enerji: {journal.energy}/5
                     </span>
                   </div>
@@ -206,30 +206,30 @@ export default function JournalPage() {
                     {journal.content}
                   </p>
 
-                  {/* AI Sonuçlarını Göster */}
                   {journal.ai_tags && (
                     <div className="mt-4 flex flex-wrap gap-2">
                       {journal.ai_tags.map((tag) => (
                         <span
                           key={tag}
-                          className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-md"
+                          className="rounded-md bg-primary/10 px-2 py-1 text-xs text-primary"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
                   )}
+
                   {journal.ai_summary && (
-                    <div className="mt-3 p-3 bg-muted/40 rounded-lg border text-sm text-muted-foreground italic border-l-2 border-l-primary">
-                      " {journal.ai_summary} "
+                    <div className="mt-3 rounded-lg border border-l-2 border-l-primary bg-muted/40 p-3 text-sm italic text-muted-foreground">
+                      &ldquo;{journal.ai_summary}&rdquo;
                     </div>
                   )}
 
-                  <div className="flex justify-end mt-4">
+                  <div className="mt-4 flex justify-end">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                      className="text-red-500 hover:bg-red-500/10 hover:text-red-600"
                       onClick={() => handleDelete(journal.id)}
                     >
                       Sil

@@ -1,20 +1,51 @@
-import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
+import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { createClient } from "@/lib/supabase/server";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profile } = user
+    ? await supabase
+        .from("profiles")
+        .select("first_name, last_name, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle()
+    : { data: null };
+
+  const fallbackName = user?.email?.split("@")[0] ?? "MindSpace Kullanıcısı";
+  const displayName =
+    [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
+    fallbackName;
+
+  const shortName = displayName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("")
+    .slice(0, 2) || "MS";
+
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
-      <Sidebar />
-      <div className="flex flex-col flex-1 h-screen overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
-          {children}
-        </main>
-      </div>
-    </div>
+    <DashboardShell
+      user={{
+        email: user?.email ?? "bilinmiyor@mindspace.local",
+        displayName,
+        shortName,
+        avatarUrl:
+          profile?.avatar_url ||
+          user?.user_metadata?.avatar_url ||
+          user?.user_metadata?.picture ||
+          null,
+      }}
+    >
+      {children}
+    </DashboardShell>
   );
 }
