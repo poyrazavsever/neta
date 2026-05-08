@@ -1,291 +1,324 @@
 "use client";
 
 import { useMemo } from "react";
-import { useLiveQuery } from "dexie-react-hooks";
-import { Activity, Brain, CheckCircle, PenTool } from "lucide-react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  Legend,
+  Cell,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { LogOut, CheckSquare2, Droplets, Moon, Target, Activity, MoreHorizontal, PenTool } from "lucide-react";
 
-import { db, type Journal, type Task } from "@/lib/db";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// Mock Data
+const focusTrendData = [
+  { date: "May 12", value: 55 },
+  { date: "May 13", value: 42 },
+  { date: "May 14", value: 60 },
+  { date: "May 15", value: 85 },
+  { date: "May 16", value: 72 },
+  { date: "May 17", value: 87 },
+  { date: "May 18", value: 100 },
+];
 
-const EMPTY_JOURNALS: Journal[] = [];
-const EMPTY_TASKS: Task[] = [];
+const sleepData = [
+  { day: "M", value: 6.5 },
+  { day: "T", value: 7.2 },
+  { day: "W", value: 5.8 },
+  { day: "T", value: 6.1 },
+  { day: "F", value: 8.0 },
+  { day: "S", value: 7.5 },
+  { day: "S", value: 8.5 },
+];
 
-const moodScores: Record<string, number> = {
-  happy: 4,
-  neutral: 3,
-  sad: 2,
-  angry: 1,
-};
+const waterData = [
+  { day: "M", value: 1.5 },
+  { day: "T", value: 2.1 },
+  { day: "W", value: 1.8 },
+  { day: "T", value: 2.5 },
+  { day: "F", value: 2.0 },
+  { day: "S", value: 3.0 },
+  { day: "S", value: 2.8 },
+];
+
+const moodData = [
+  { day: "M", value: 60 },
+  { day: "T", value: 85 },
+  { day: "W", value: 70 },
+  { day: "T", value: 65 },
+  { day: "F", value: 80 },
+  { day: "S", value: 90 },
+  { day: "S", value: 95 },
+];
+
+const focusDistributionData = [
+  { name: "Deep Work", value: 45, color: "#6C5BB0" },
+  { name: "Shallow Work", value: 30, color: "#54468B" },
+  { name: "Meetings", value: 15, color: "#3B3161" },
+  { name: "Breaks", value: 10, color: "#221C38" },
+];
+
+const upcomingEvents = [
+  { time: "10:00 AM", title: "Deep Work Session", category: "FOCUS", color: "border-l-pink-500" },
+  { time: "12:30 PM", title: "Team Standup", category: "MEETING", color: "border-l-orange-500" },
+  { time: "02:00 PM", title: "Project Review", category: "WORK", color: "border-l-blue-500" },
+  { time: "04:00 PM", title: "Workout", category: "HEALTH", color: "border-l-emerald-500" },
+  { time: "07:00 PM", title: "Daily Reflection", category: "PERSONAL", color: "border-l-purple-500" },
+];
 
 export default function DashboardPage() {
-  const liveJournals = useLiveQuery<Journal[]>(() =>
-    db.journals.orderBy("date").toArray(),
-  );
-  const liveTasks = useLiveQuery<Task[]>(() => db.tasks.toArray());
-
-  const journals = liveJournals ?? EMPTY_JOURNALS;
-  const tasks = liveTasks ?? EMPTY_TASKS;
-
-  const pendingTasksCount = tasks.filter((task) => task.status === "todo").length;
-
-  const today = new Date().toISOString().split("T")[0];
-  const todaysJournal = journals.find((journal) => journal.date === today);
-  const todaysEnergy = todaysJournal ? todaysJournal.energy : "--";
-
-  const trendData = useMemo(() => {
-    const dataMap: Record<
-      string,
-      { date: string; moodSum: number; energySum: number; count: number }
-    > = {};
-
-    journals.forEach((journal) => {
-      if (!dataMap[journal.date]) {
-        dataMap[journal.date] = {
-          date: journal.date,
-          moodSum: 0,
-          energySum: 0,
-          count: 0,
-        };
-      }
-
-      dataMap[journal.date].moodSum += moodScores[journal.mood] || 3;
-      dataMap[journal.date].energySum += journal.energy;
-      dataMap[journal.date].count += 1;
-    });
-
-    return Object.values(dataMap)
-      .map((entry) => ({
-        date: entry.date.slice(5),
-        Mood: Number((entry.moodSum / entry.count).toFixed(1)),
-        Enerji: Number((entry.energySum / entry.count).toFixed(1)),
-      }))
-      .slice(-7);
-  }, [journals]);
-
-  const tagData = useMemo(() => {
-    const counts: Record<string, number> = {};
-
-    journals.forEach((journal) => {
-      journal.ai_tags?.forEach((tag) => {
-        counts[tag] = (counts[tag] || 0) + 1;
-      });
-    });
-
-    return Object.entries(counts)
-      .map(([name, value]) => ({ name, Değer: value }))
-      .sort((a, b) => b.Değer - a.Değer)
-      .slice(0, 5);
-  }, [journals]);
-
-  const lastInsight = [...journals]
-    .reverse()
-    .find((journal) => journal.ai_summary)?.ai_summary;
+  const currentDate = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="mx-auto max-w-6xl animate-in space-y-6 fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">Bugün Nasılsın?</h1>
-        <p className="text-muted-foreground">
-          Kişisel özetin ve yapay zeka analizlerin burada görünecek.
-        </p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Günlük Kayıtları</CardTitle>
-            <PenTool className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{journals.length}</div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {journals.length === 0
-                ? "Henüz kayıt girilmedi"
-                : "Toplam kayıt eklendi"}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aktif Görevler</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{pendingTasksCount}</div>
-            <p className="mt-1 text-xs text-muted-foreground">Bekleyen görev</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bugünkü Enerji</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{todaysEnergy}</div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {todaysJournal ? "/ 5 seviyesinde" : "Kayıt bekleniyor"}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Local AI Durumu</CardTitle>
-            <Brain className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-500">Hazır</div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Ollama / Veri bekliyor
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="flex flex-col justify-between p-6 lg:col-span-4">
-          <div className="mb-4">
-            <h3 className="mb-1 text-lg font-medium">Ruh Hali ve Enerji Trendi</h3>
-            <p className="text-sm text-muted-foreground">
-              Son 7 günlük ortalamalar (1-5 arası puanlama)
-            </p>
-          </div>
-          <div className="h-[250px] w-full">
-            {trendData.length > 0 ? (
+    <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6 text-foreground font-sans">
+      
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-4">
+        
+        {/* LEFT COLUMN: Focus Trend (Takes 2 columns on XL) */}
+        <div className="xl:col-span-2 flex flex-col gap-6">
+          <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex-1 min-h-[400px]">
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Focus Trend</h3>
+                <div className="text-5xl font-bold mb-1 text-primary">87<span className="text-2xl">%</span></div>
+                <div className="text-sm text-muted-foreground">Average Focus Score</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <select className="bg-transparent border border-white/10 rounded-sm text-xs px-3 py-1.5 outline-none focus:border-primary/50 cursor-pointer">
+                  <option className="bg-[#0A0710]">7 DAYS</option>
+                  <option className="bg-[#0A0710]">14 DAYS</option>
+                  <option className="bg-[#0A0710]">30 DAYS</option>
+                </select>
+                <button className="p-1.5 border border-white/10 rounded-sm hover:bg-white/5 transition-colors">
+                  <Activity className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={trendData}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="#88888833"
+                <LineChart data={focusTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
+                  <XAxis 
+                    dataKey="date" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 11, fill: '#8F89A5' }} 
+                    dy={10}
                   />
-                  <XAxis
-                    dataKey="date"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis
-                    domain={[1, 5]}
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12 }}
+                  <YAxis 
+                    domain={[0, 100]} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 11, fill: '#8F89A5' }} 
                     width={30}
+                    dx={-10}
                   />
                   <Tooltip
-                    contentStyle={{
-                      borderRadius: "8px",
-                      backgroundColor: "#fff",
-                      color: "#000",
-                      border: "none",
-                    }}
-                    itemStyle={{ fontWeight: "500" }}
+                    contentStyle={{ backgroundColor: "#1F172B", borderColor: "#3B3448", borderRadius: "4px", fontSize: "12px" }}
+                    itemStyle={{ color: "#6C5BB0" }}
                   />
-                  <Legend wrapperStyle={{ paddingTop: "10px", fontSize: "14px" }} />
-                  <Line
-                    type="monotone"
-                    dataKey="Mood"
-                    stroke="#3b82f6"
-                    strokeWidth={3}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="Enerji"
-                    stroke="#10b981"
-                    strokeWidth={3}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
+                  <Line 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="#6C5BB0" 
+                    strokeWidth={3} 
+                    dot={{ r: 4, fill: "#1F172B", strokeWidth: 2 }} 
+                    activeDot={{ r: 6, fill: "#6C5BB0", stroke: "#1F172B" }} 
                   />
                 </LineChart>
               </ResponsiveContainer>
-            ) : (
-              <div className="flex h-full items-center justify-center rounded-md border-2 border-dashed bg-muted/20">
-                <p className="text-sm text-muted-foreground">Veri bekleniyor...</p>
-              </div>
-            )}
+            </div>
           </div>
-        </Card>
+        </div>
 
-        <div className="flex flex-col space-y-4 lg:col-span-3">
-          <Card className="flex flex-1 flex-col p-6">
-            <div className="mb-4">
-              <h3 className="mb-1 text-lg font-medium">AI Konu Dağılımı</h3>
-              <p className="text-sm text-muted-foreground">
-                Günlüklerinden çıkarılan en sık 5 etiket
-              </p>
+        {/* RIGHT COLUMN: Quick Add & Upcoming */}
+        <div className="flex flex-col gap-6">
+          
+          {/* Quick Add */}
+          <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Quick Add</h3>
+            <div className="bg-[#150F1D] border border-white/5 rounded-sm p-3 mb-4">
+              <input 
+                type="text" 
+                placeholder="What's on your mind?" 
+                className="w-full bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50"
+              />
             </div>
-            <div className="mt-auto h-[150px] w-full">
-              {tagData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={tagData} layout="vertical" margin={{ left: -20 }}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      horizontal={false}
-                      stroke="#88888833"
-                    />
-                    <XAxis type="number" hide />
-                    <YAxis
-                      dataKey="name"
-                      type="category"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 13 }}
-                      width={90}
-                    />
-                    <Tooltip
-                      cursor={{ fill: "transparent" }}
-                      contentStyle={{
-                        borderRadius: "8px",
-                        backgroundColor: "#fff",
-                        color: "#000",
-                        border: "none",
-                      }}
-                    />
-                    <Bar
-                      dataKey="Değer"
-                      fill="#8b5cf6"
-                      radius={[0, 4, 4, 0]}
-                      barSize={20}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex h-full items-center justify-center rounded-md border-2 border-dashed bg-muted/20">
-                  <p className="text-sm text-muted-foreground">Yeterli etiket yok.</p>
+            <div className="grid grid-cols-3 gap-3">
+              <button className="flex flex-col items-center justify-center gap-2 border border-white/5 rounded-sm py-3 hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground">
+                <PenTool className="h-5 w-5" />
+                <span className="text-[10px] font-semibold tracking-wider">NOTE</span>
+              </button>
+              <button className="flex flex-col items-center justify-center gap-2 border border-white/5 rounded-sm py-3 hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground">
+                <Target className="h-5 w-5" />
+                <span className="text-[10px] font-semibold tracking-wider">HABIT</span>
+              </button>
+              <button className="flex flex-col items-center justify-center gap-2 border border-white/5 rounded-sm py-3 hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground">
+                <CheckSquare2 className="h-5 w-5" />
+                <span className="text-[10px] font-semibold tracking-wider">GOAL</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Upcoming */}
+          <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex-1">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Upcoming</h3>
+              <button className="text-[10px] uppercase font-semibold text-muted-foreground hover:text-foreground">View All</button>
+            </div>
+            <div className="space-y-4">
+              {upcomingEvents.map((event, idx) => (
+                <div key={idx} className="flex items-center text-sm py-1">
+                  <div className={`w-1 h-10 ${event.color} border-l-2 mr-4 rounded-full`}></div>
+                  <div className="w-20 text-muted-foreground text-xs">{event.time}</div>
+                  <div className="flex-1 font-medium">{event.title}</div>
+                  <div className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">{event.category}</div>
                 </div>
-              )}
+              ))}
             </div>
-          </Card>
+          </div>
 
-          <Card className="flex-1 border-primary/20 bg-primary/5 p-6">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-medium">
-              <Brain className="h-5 w-5 text-primary" />
-              Son AI İçgörüsü
-            </h3>
-            <p className="text-sm italic leading-relaxed text-foreground/80">
-              {lastInsight
-                ? `"${lastInsight}"`
-                : "Henüz bir içgörü oluşmadı. Biraz günlük yaz, AI analiz yapsın."}
-            </p>
-          </Card>
         </div>
       </div>
+
+      {/* BOTTOM ROW: Mini Charts & Donut */}
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
+        
+        {/* Sleep Hours */}
+        <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sleep Hours</h3>
+            <Moon className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <div className="flex items-baseline gap-1 mb-6">
+              <span className="text-4xl font-bold">7.2</span>
+              <span className="text-[10px] text-muted-foreground tracking-wider">HOURS</span>
+            </div>
+            <div className="h-[80px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={sleepData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8F89A5' }} dy={5} />
+                  <Tooltip cursor={{ fill: '#ffffff05' }} contentStyle={{ backgroundColor: "#1F172B", border: "none", fontSize: "12px" }} />
+                  <Bar dataKey="value" fill="#6C5BB0" radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 pt-4 border-t border-white/5 text-[11px] text-primary">Goal: 7-8 Hours</div>
+          </div>
+        </div>
+
+        {/* Water Intake */}
+        <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Water Intake</h3>
+            <Droplets className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <div className="flex items-baseline gap-1 mb-6">
+              <span className="text-4xl font-bold">2.1</span>
+              <span className="text-[10px] text-muted-foreground tracking-wider">LITERS</span>
+            </div>
+            <div className="h-[80px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={waterData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8F89A5' }} dy={5} />
+                  <Tooltip cursor={{ fill: '#ffffff05' }} contentStyle={{ backgroundColor: "#1F172B", border: "none", fontSize: "12px" }} />
+                  <Bar dataKey="value" fill="#6C5BB0" radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 pt-4 border-t border-white/5 text-[11px] text-primary">Goal: 2.5L</div>
+          </div>
+        </div>
+
+        {/* Mood Score */}
+        <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Mood Score</h3>
+            <Activity className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <div className="flex items-baseline gap-1 mb-6">
+              <span className="text-4xl font-bold">78</span>
+              <span className="text-[10px] text-muted-foreground tracking-wider">/100</span>
+            </div>
+            <div className="h-[80px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={moodData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8F89A5' }} dy={5} />
+                  <Tooltip cursor={{ fill: '#ffffff05' }} contentStyle={{ backgroundColor: "#1F172B", border: "none", fontSize: "12px" }} />
+                  <Bar dataKey="value" fill="#6C5BB0" radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 pt-4 border-t border-white/5 text-[11px] text-primary">Positive</div>
+          </div>
+        </div>
+
+        {/* Focus Distribution */}
+        <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-6">Focus Distribution</h3>
+          <div className="flex items-center justify-between h-[160px]">
+            <div className="w-[140px] h-full relative flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={focusDistributionData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={45}
+                    outerRadius={65}
+                    paddingAngle={2}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {focusDistributionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ backgroundColor: "#1F172B", border: "none", fontSize: "12px" }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex-1 ml-6 space-y-3">
+              {focusDistributionData.map((item, idx) => (
+                <div key={idx} className="flex justify-between items-center text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: item.color }}></div>
+                    <span className="text-muted-foreground">{item.name}</span>
+                  </div>
+                  <span className="font-semibold">{item.value}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quote Footer */}
+      <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex justify-between items-center">
+        <div className="flex gap-4 items-center">
+          <div className="bg-[#150F1D] text-muted-foreground border border-white/5 p-2 rounded-sm">
+            <MoreHorizontal className="h-4 w-4" />
+          </div>
+          <div>
+            <div className="text-[10px] font-semibold tracking-wider text-muted-foreground mb-1">SYSTEM REMINDER</div>
+            <div className="text-sm">"Discipline is the bridge between goals and accomplishment."</div>
+          </div>
+        </div>
+        <div className="text-sm text-muted-foreground italic">- Jim Rohn</div>
+      </div>
+
     </div>
   );
 }

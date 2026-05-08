@@ -13,11 +13,11 @@ import {
 import { sidebarData } from "@/config/sidebar";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, LogOut, Menu, Settings2 } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Settings2, Clock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type DashboardShellProps = {
   children: React.ReactNode;
@@ -32,6 +32,7 @@ type DashboardShellProps = {
 export function DashboardShell({ children, user }: DashboardShellProps) {
   const pathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isClockFullScreen, setIsClockFullScreen] = useState(false);
 
   const closeMobileSidebar = () => setIsMobileSidebarOpen(false);
 
@@ -39,10 +40,29 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     <div className="relative h-screen overflow-hidden bg-background text-foreground">
       <AmbientBackdrop />
 
+      {/* Full Screen Clock Overlay */}
+      <AnimatePresence>
+        {isClockFullScreen && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="fixed inset-0 z-[100] bg-[#0A0710] flex flex-col items-center justify-center cursor-pointer"
+            onClick={() => setIsClockFullScreen(false)}
+          >
+            <div className="absolute top-8 right-8 text-muted-foreground text-sm tracking-widest uppercase">
+              Click anywhere to close
+            </div>
+            <FullScreenClock />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="relative z-10 flex h-screen">
         {/* Desktop Sidebar */}
         <div className="hidden shrink-0 lg:block lg:w-[260px] h-screen border-r border-white/5 bg-[#0A0710]">
-          <SidebarPanel pathname={pathname} user={user} desktop />
+          <SidebarPanel pathname={pathname} user={user} desktop onClockClick={() => setIsClockFullScreen(true)} />
         </div>
 
         {/* Mobile Sidebar */}
@@ -71,6 +91,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                   pathname={pathname}
                   user={user}
                   onNavigate={closeMobileSidebar}
+                  onClockClick={() => setIsClockFullScreen(true)}
                 />
               </motion.div>
             </motion.div>
@@ -96,10 +117,8 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
             </Button>
           </div>
 
-          <main className="flex-1 p-4 lg:p-8">
-            <div className="min-h-[calc(100vh-2rem)] rounded-2xl border border-white/5 bg-[linear-gradient(180deg,rgba(31,23,43,0.3),rgba(18,13,28,0.1))] shadow-2xl ring-1 ring-white/5 backdrop-blur-xl">
-              <div className="h-full p-6 md:p-8">{children}</div>
-            </div>
+          <main className="flex-1 p-6 lg:p-10">
+            {children}
           </main>
         </div>
       </div>
@@ -112,22 +131,20 @@ function SidebarPanel({
   user,
   desktop = false,
   onNavigate,
+  onClockClick,
 }: {
   pathname: string;
   user: DashboardShellProps["user"];
   desktop?: boolean;
   onNavigate?: () => void;
+  onClockClick: () => void;
 }) {
   return (
     <aside className="flex h-full flex-col overflow-hidden">
-      {/* Header / Logo */}
-      <Link
-        href="/"
-        className="relative font-bold text-xl text-left py-4 pl-6 text-foreground"
-        onClick={onNavigate}
-      >
-        Hoş Geldin
-      </Link>
+      {/* Header / Time Badge */}
+      <div className="pt-8 pb-2 px-4 flex justify-start">
+        <ClockBadge onClick={onClockClick} />
+      </div>
 
       {/* Main Navigation Links */}
       <nav className="flex-1 space-y-4 px-3 overflow-y-auto tiny-scrollbar mt-4 pb-4">
@@ -234,18 +251,65 @@ function SidebarPanel({
               {user.email}
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-white/5" />
-            <form action={signOut}>
-              <button type="submit" className="w-full">
-                <DropdownMenuItem className="rounded-md px-2 py-1.5 text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer flex items-center gap-2 text-sm">
-                  <LogOut className="h-4 w-4" />
-                  Çıkış Yap
-                </DropdownMenuItem>
-              </button>
-            </form>
+            <DropdownMenuItem
+              className="rounded-md px-2 py-1.5 text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer flex items-center gap-2 text-sm"
+              onClick={async () => {
+                await signOut();
+              }}
+            >
+              <LogOut className="h-4 w-4" />
+              Çıkış Yap
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </aside>
+  );
+}
+
+function ClockBadge({ onClick }: { onClick: () => void }) {
+  const [time, setTime] = useState<string>("");
+
+  useEffect(() => {
+    const updateTime = () => {
+      setTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!time) {
+    return <div className="h-[34px] w-[100px] bg-white/5 animate-pulse rounded-sm" />;
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className="border border-white/5 bg-[#150F1D] px-3 py-2 text-xs font-semibold tracking-wider text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors rounded-sm flex items-center gap-2 group outline-none"
+    >
+      <Clock className="h-3.5 w-3.5 text-primary/70 group-hover:text-primary transition-colors" />
+      <span suppressHydrationWarning>{time}</span>
+    </button>
+  );
+}
+
+function FullScreenClock() {
+  const [time, setTime] = useState<string>("");
+  
+  useEffect(() => {
+    const updateTime = () => {
+      setTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="text-[12vw] font-black tracking-tighter text-primary/90 drop-shadow-[0_0_60px_rgba(108,91,176,0.3)] select-none tabular-nums">
+      <span suppressHydrationWarning>{time || "..."}</span>
+    </div>
   );
 }
 
