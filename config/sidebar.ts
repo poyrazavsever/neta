@@ -54,11 +54,11 @@ export const sidebarData: SidebarNavGroup[] = [
     ],
   },
   {
-    title: "ORGANİZASYON",
+    title: "FREELANCE",
     items: [
-      { title: "Ekip", href: "/team", icon: Users },
-      { title: "Müşteriler", href: "/clients", icon: Building2 },
-      { title: "Etiketler", href: "/tags", icon: Tags },
+      { title: "Müşteriler (CRM)", href: "/freelance/clients", icon: Building2 },
+      { title: "Teklifler & Sözleşmeler", href: "/freelance/proposals", icon: Tags },
+      { title: "Zaman Takibi", href: "/freelance/time-tracking", icon: Activity },
     ],
   },
   {

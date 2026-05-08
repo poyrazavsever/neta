@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "react-hot-toast";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
@@ -20,19 +19,12 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={cn("font-sans", geist.variable)}
+      className={cn("font-sans dark", geist.variable)}
       suppressHydrationWarning
     >
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster position="top-right" />
-        </ThemeProvider>
+        {children}
+        <Toaster position="top-right" />
       </body>
     </html>
   );
