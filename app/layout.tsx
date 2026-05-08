@@ -7,8 +7,8 @@ import { Toaster } from "react-hot-toast";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "MindSpace",
-  description: "AI Destekli Kişisel Yaşam ve Planlama Dashboard'u",
+  title: "Cognis - Your AI Assistant",
+  description: "Productivity Dashboard - AI-Powered Personal Life and Planning Dashboard",
 };
 
 export default function RootLayout({
