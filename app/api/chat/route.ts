@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-type ChatProvider = "groq" | "openai" | "ollama";
+type ChatProvider = "groq" | "openai" | "ollama" | "gemini";
 
 type ChatRequestBody = {
   provider?: ChatProvider;
@@ -46,7 +46,35 @@ export async function POST(request: Request) {
 
     let assistantReply = "";
 
-    if (provider === "groq") {
+    if (provider === "gemini") {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: "Sen MindSpace adlı kullanıcının kişisel yapay zeka terapistisin ve sırdaşısın. Şefkatli, yargılamayan ve destekleyici cevaplar ver. Kullanıcının iş süreçlerini asiste edebilirsin." }]
+            },
+            contents: [
+              {
+                parts: [{ text: userMessageContent }]
+              }
+            ]
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Gemini API hatası");
+      }
+
+      const data = await response.json();
+      assistantReply = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
+    } else if (provider === "groq") {
       const response = await fetch(
         "https://api.groq.com/openai/v1/chat/completions",
         {
