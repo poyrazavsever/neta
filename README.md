@@ -1,74 +1,102 @@
-<div align="center">
-  <img src="public/logo/logo.png" alt="Cognis Logo" width="160" />
+# Cognis - AI-Powered Strategic Productivity Dashboard
 
-  # Cognis
+![Cognis Banner](https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000)
 
-  AI Destekli Kişisel Yaşam ve Planlama Dashboard'u. Premium ve modern bir deneyim ile günlüklerinizi tutun, görevlerinizi planlayın ve yapay zeka ile sohbet edin.
+Cognis is a next-generation personal and professional productivity ecosystem designed to centralize your life's complexities into a single, high-performance interface. Built with a focus on "AI-Native" workflows, Cognis goes beyond simple tracking—it analyzes, suggests, and optimizes your strategic progress.
 
-  <p>
-    <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-111827?style=for-the-badge&logo=nextdotjs" />
-    <img alt="React" src="https://img.shields.io/badge/React-19-149eca?style=for-the-badge&logo=react&logoColor=white" />
-    <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178c6?style=for-the-badge&logo=typescript&logoColor=white" />
-    <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-3-38bdf8?style=for-the-badge&logo=tailwindcss&logoColor=white" />
-    <img alt="Supabase" src="https://img.shields.io/badge/Supabase-DB-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
-  </p>
-</div>
+## 🌌 Design Philosophy: The "Edge-to-Edge" Aesthetic
+Cognis utilizes a bespoke, premium dark-mode aesthetic centered around the color `#0A0710`.
+- **Flat Design:** Minimalist, sharp-cornered elements (`rounded-sm`) for a professional corporate feel.
+- **Visual Hierarchy:** Layered depth using `#150F1D` panels and subtle purple-tinted borders.
+- **Fluid Interactions:** Micro-animations powered by Framer Motion for a "living" interface.
 
-## Proje Özeti
+---
 
-Cognis, kullanıcıların yaşamlarını organize edebilecekleri ve yapay zeka entegrasyonuyla kişisel analizler elde edebilecekleri yeni nesil bir yaşam kontrol panelidir. 
+## 🚀 Key Feature Modules
 
-Önceki "Mood Tracker MVP" yapısı temel alınarak; tam kimlik doğrulama (Supabase), premium dark mode arayüzü ve akıllı görev yönetimi ile baştan aşağı modern bir şekilde yeniden geliştirilmiştir.
+### 1. Unified Dashboard (Command Center)
+Your tactical overview of current performance.
+- **KPI Visualization:** Real-time tracking of revenue, tasks completion, and deep-work hours.
+- **AI Strategic Insights:** A dedicated module that analyzes your data to provide proactive suggestions for your day.
+- **Activity Streams:** Visual chronological breakdown of your latest movements across all modules.
 
-## Temel Özellikler
+### 2. Freelance Management (Business OS)
+A professional-grade CRM and operations suite for the modern freelancer.
+- **Client Intelligence:** Manage your client base with AI-powered sentiment analysis and value-tracking.
+- **Proposals & Contracts:** High-conversion Kanban pipeline for managing leads to signed deals.
+- **Time Tracking:** Integrated live timers with the ability to "AI-Suggest" billable hours based on project activity.
 
-- **Güvenli Kimlik Doğrulama:** Supabase entegrasyonu ile korunan Kayıt Ol / Giriş Yap sistemi.
-- **Kişiselleştirilmiş Dashboard:** Ruh hali, enerji durumu ve yapay zeka etiketlerini görselleştiren interaktif grafikler (Recharts).
-- **Akıllı Günlük (Journal):** Yapay zeka ile günlüklerinizden duygu durumu analizi ve içgörüler çıkarma.
-- **Görev Yönetimi:** Günlüklerinizden otomatik olarak yapay zeka yardımıyla görevler oluşturabilme.
-- **Kişisel AI Asistan:** Hedefleriniz ve duygusal durumunuz hakkında yapay zeka ile konuşabileceğiniz özel sohbet arayüzü.
-- **Premium Dark Mode:** Göz yormayan, derin siyah-mor tonlarıyla harmanlanmış şık, modern ve "Glassmorphism" destekli arayüz tasarımı.
+### 3. Financial Intelligence
+A sophisticated financial tracking system that understands your cash flow.
+- **Cashflow Analysis:** Interactive Recharts visualizations of income vs. expenses.
+- **Smart Invoicing:** Draft professional invoices in seconds, with AI suggesting rates based on tracked time and market data.
+- **Subscription Management:** Keep track of overhead and recurring costs effortlessly.
 
-## Kullanılan Teknolojiler
+### 4. Personal Growth & Strategy
+- **Strategic Journaling:** A distraction-free markdown editor for daily reflection.
+- **Habit Alchemy:** Track daily rituals with "Streak" visualizations and trend analysis to see where you're gaining or losing momentum.
+- **Goal Milestones:** Break down massive long-term goals into executable tactical milestones with progress tracking.
 
-| Teknoloji | Amaç |
-| --- | --- |
-| **Next.js 15 (App Router)** | Tam full-stack React framework'ü ve yönlendirme mimarisi |
-| **Supabase** | Veritabanı (PostgreSQL), Auth, Row Level Security (RLS) ve Storage (Profil fotoğrafları) |
-| **Tailwind CSS & Shadcn UI** | Gelişmiş, esnek stil yönetimi ve modern UI bileşenleri |
-| **Yapay Zeka API'leri** | (Groq / Gemini) AI analizleri, metin özetleme ve kişisel asistan özellikleri |
-| **Dexie.js** | Tarayıcı tarafı hızlı lokal veritabanı önbelleklemesi |
+### 5. AI Assistant (Chat & Context)
+The core "brain" of Cognis, fully integrated with your data.
+- **Multi-Session Chat:** Organize different AI research threads into separate sessions.
+- **Provider Agnostic:** Support for Google Gemini (Pro/Flash), OpenAI (GPT-4o), Groq (Llama 3), and Local LLMs (Ollama).
+- **Context Awareness:** Chat with the AI about your journals, tasks, or financial data to get specific, localized insights.
 
-## Kurulum
+### 6. Settings & AI Governance
+- **API Management:** Securely manage your AI provider keys.
+- **Otonomy Controls:** Configure how much control the AI has (e.g., automated invoicing, proactive rescheduling).
+- **Profile Customization:** Unified profile management with Supabase-backed storage.
 
-Projeyi bilgisayarınızda çalıştırmak için Node.js ve pnpm (veya npm) kurulu olmalıdır.
+---
 
-1. Bağımlılıkları yükleyin:
-```bash
-pnpm install
-```
+## 🛠 Technical Architecture
 
-2. `.env.local` dosyasını oluşturun ve Supabase ile AI anahtarlarınızı girin:
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-NEXT_PUBLIC_GROQ_API_KEY=your-groq-key
-```
+Cognis is built on a cutting-edge, high-performance tech stack:
 
-3. Geliştirme ortamını başlatın:
-```bash
-pnpm dev
-```
+- **Framework:** [Next.js 15+](https://nextjs.org/) (App Router, Server Components)
+- **Database:** [Supabase](https://supabase.com/) (PostgreSQL + Realtime Subscriptions)
+- **State Management:** React Hooks + Supabase Realtime + Optimistic UI Updates
+- **Styling:** Vanilla CSS + Tailwind CSS (Bespoke configuration)
+- **AI Integration:** Google Generative AI, OpenAI SDK, and Custom REST Bridges
+- **Charts:** [Recharts](https://recharts.org/) (Customized for Dark Corporate theme)
+- **Icons:** [Lucide React](https://lucide.dev/)
 
-Uygulama `http://localhost:3000` adresinde çalışmaya başlayacaktır.
+---
 
-## Veritabanı Yapısı (Supabase)
+## 📦 Installation & Setup
 
-Cognis, veri güvenliği için katı **Row Level Security (RLS)** kuralları kullanır. Kullanıcılar sadece kendi verilerine erişebilir.
-Ana tablolar:
-- `profiles`: Kullanıcı ayarları, isim, soyisim ve avatar URL bilgileri.
-- `journals`: Kullanıcıya ait ruh hali ve enerji metrikli günlük kayıtları.
-- `tasks`: Kullanıcının manuel olarak eklediği veya AI ile otomatik oluşturulan görevler.
-- `chats`: AI ile yapılan geçmiş sohbet oturumları.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/cognis-dashboard.git
+   ```
 
-Veritabanını projenize entegre etmek için `supabase/schema.sql` dosyasındaki SQL kodlarını Supabase Dashboard > SQL Editor üzerinden çalıştırmanız yeterlidir.
+2. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
+
+3. **Configure Environment Variables:**
+   Create a `.env.local` file and add your Supabase credentials:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+   ```
+
+4. **Initialize Database:**
+   Run the provided SQL scripts in your Supabase SQL Editor to create the necessary tables (`chat_sessions`, `chat_messages`, `user_settings`, `profiles`).
+
+5. **Run the development server:**
+   ```bash
+   pnpm dev
+   ```
+
+---
+
+## 🛡 Security & Privacy
+- **RLS Policies:** Row Level Security ensures that every user only has access to their own data at the database level.
+- **Local Fallback:** Support for local Ollama models ensures that sensitive strategic data can stay on your own hardware if required.
+
+---
+
+**Cognis** — *Design the life you want, strategize the steps to get there.*
