@@ -15,7 +15,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { LogOut, CheckSquare2, Droplets, Moon, Target, Activity, MoreHorizontal, PenTool } from "lucide-react";
+import { LogOut, CheckSquare2, Droplets, Moon, Target, Activity, MoreHorizontal, PenTool, Plus } from "lucide-react";
 
 // Mock Data
 const focusTrendData = [
