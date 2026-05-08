@@ -64,3 +64,21 @@
       transition: background-color 5000s ease-in-out 0s;
   }
 }
+
+@layer utilities {
+  .tiny-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .tiny-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .tiny-scrollbar::-webkit-scrollbar-thumb {
+    background: theme('colors.primary.DEFAULT' / 30%);
+    border-radius: 4px;
+  }
+  .tiny-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.primary.DEFAULT' / 60%);
+  }
+}
+
