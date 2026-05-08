@@ -4,8 +4,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { ErrorToaster } from '@/components/error-toaster'
-import Image from 'next/image'
 import { Icon } from '@/components/ui/icon'
+import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
 export default async function RegisterPage({
   searchParams,
@@ -17,20 +17,15 @@ export default async function RegisterPage({
   const message = resolvedParams?.message
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <>
       {error && message && <ErrorToaster message={String(message)} />}
-
-      <div className="flex flex-1 items-center justify-center p-8 w-full lg:w-1/2">
-        <div className="w-full max-w-sm space-y-8">
-          <div className="text-center lg:text-left">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              Aramıza Katılın
-            </h1>
-            <p className="text-sm text-muted-foreground mt-2">
-              Kişisel yaşam alanınızı oluşturmak için kayıt olun
-            </p>
-          </div>
-
+      <AuthPageShell
+        title="Aramıza Katılın"
+        description="Kişisel yaşam alanınızı oluşturmak için kayıt olun"
+        imageSrc="/images/1830837_Image.png"
+        imageAlt="MindSpace Background"
+        imageSide="right"
+        form={
           <form className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
@@ -63,28 +58,32 @@ export default async function RegisterPage({
               Kayıt Ol
             </Button>
           </form>
+        }
+        secondaryAction={
+          <div className="space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  veya
+                </span>
+              </div>
+            </div>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                veya
-              </span>
-            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-11 text-base font-medium bg-card border-border hover:bg-secondary transition-colors"
+            >
+              <Icon icon="flat-color-icons:google" className="w-5 h-5 mr-2" />
+              Google ile Devam Et
+            </Button>
           </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full h-11 text-base font-medium bg-card border-border hover:bg-secondary transition-colors"
-          >
-            <Icon icon="flat-color-icons:google" className="w-5 h-5 mr-2" />
-            Google ile Devam Et
-          </Button>
-
-          <div className="text-center text-sm mt-6">
+        }
+        footer={
+          <div className="text-center text-sm">
             Zaten hesabınız var mı?{' '}
             <Link
               href="/login"
@@ -93,28 +92,8 @@ export default async function RegisterPage({
               Giriş Yap
             </Link>
           </div>
-        </div>
-      </div>
-
-      <div className="hidden lg:flex lg:w-1/2 p-4 relative">
-        <div className="relative w-full h-full overflow-hidden rounded-2xl">
-          <img
-            src="/images/1830837_Image.png"
-            alt="MindSpace Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30 opacity-90" />
-          <div className="absolute bottom-0 flex items-center justify-center pointer-events-none z-10">
-            <div className="relative drop-shadow-2xl flex items-center gap-4">
-              <img
-                src="/logo/logo.png"
-                alt="MindSpace Logo"
-                className="object-contain w-64 h-auto"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+        }
+      />
+    </>
   )
 }
