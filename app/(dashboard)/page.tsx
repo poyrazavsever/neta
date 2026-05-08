@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState } from "react";
 import {
   Bar,
   BarChart,
@@ -15,7 +15,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { LogOut, CheckSquare2, Droplets, Moon, Target, Activity, MoreHorizontal, PenTool, Plus } from "lucide-react";
+import { 
+  CheckSquare2, Droplets, Moon, Target, Activity, 
+  MoreHorizontal, PenTool, Plus, GripVertical, Maximize2 
+} from "lucide-react";
+import { motion, Reorder } from "framer-motion";
+import { QuickActionsSheet } from "@/components/dashboard/quick-actions-sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // Mock Data
 const focusTrendData = [
@@ -73,19 +79,27 @@ const upcomingEvents = [
   { time: "07:00 PM", title: "Daily Reflection", category: "PERSONAL", color: "border-l-purple-500" },
 ];
 
+type WidgetId = "sleep" | "water" | "mood" | "distribution";
+
 export default function DashboardPage() {
-  const currentDate = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const [isQuickActionOpen, setIsQuickActionOpen] = useState(false);
+  const [selectedKpi, setSelectedKpi] = useState<WidgetId | null>(null);
+  
+  // Widget ordering state
+  const [widgetOrder, setWidgetOrder] = useState<WidgetId[]>(["sleep", "water", "mood", "distribution"]);
 
   return (
-    <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6 text-foreground font-sans">
+    <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6 text-foreground font-sans pb-12">
       
       {/* Top Header */}
       <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-6 mt-4">
         <h1 className="text-lg font-medium text-muted-foreground">
           <span className="text-foreground">Dashboard</span> / Overview
         </h1>
-        <button className="bg-primary hover:bg-primary/90 text-primary-foreground border border-primary/20 px-4 py-1.5 rounded-sm text-xs font-semibold flex items-center gap-2 transition-colors">
+        <button 
+          onClick={() => setIsQuickActionOpen(true)}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground border border-primary/20 px-4 py-1.5 rounded-sm text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-primary/20"
+        >
           <Plus className="h-4 w-4" />
           QUICK ADD
         </button>
@@ -95,7 +109,7 @@ export default function DashboardPage() {
         
         {/* LEFT COLUMN: Focus Trend (Takes 2 columns on XL) */}
         <div className="xl:col-span-2 flex flex-col gap-6">
-          <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex-1 min-h-[400px]">
+          <div className="group rounded-sm border border-white/5 bg-[#0A0710] p-6 flex-1 min-h-[400px] relative">
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Focus Trend</h3>
@@ -154,30 +168,21 @@ export default function DashboardPage() {
         {/* RIGHT COLUMN: Quick Add & Upcoming */}
         <div className="flex flex-col gap-6">
           
-          {/* Quick Add */}
-          <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Quick Add</h3>
-            <div className="bg-[#150F1D] border border-white/5 rounded-sm p-3 mb-4">
-              <input 
-                type="text" 
-                placeholder="What's on your mind?" 
-                className="w-full bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50"
-              />
+          {/* AI Strategy Suggestion (Replacing Quick Add Input) */}
+          <div className="rounded-sm border border-primary/20 bg-[#1F172B] p-6 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+              <Activity className="h-24 w-24 text-primary" />
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <button className="flex flex-col items-center justify-center gap-2 border border-white/5 rounded-sm py-3 hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground">
-                <PenTool className="h-5 w-5" />
-                <span className="text-[10px] font-semibold tracking-wider">NOTE</span>
-              </button>
-              <button className="flex flex-col items-center justify-center gap-2 border border-white/5 rounded-sm py-3 hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground">
-                <Target className="h-5 w-5" />
-                <span className="text-[10px] font-semibold tracking-wider">HABIT</span>
-              </button>
-              <button className="flex flex-col items-center justify-center gap-2 border border-white/5 rounded-sm py-3 hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground">
-                <CheckSquare2 className="h-5 w-5" />
-                <span className="text-[10px] font-semibold tracking-wider">GOAL</span>
-              </button>
-            </div>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-4 flex items-center gap-2">
+              <Activity className="h-3 w-3" />
+              AI Insight
+            </h3>
+            <p className="text-sm font-medium leading-relaxed mb-4">
+              "Based on your 100% focus score yesterday, you have high mental momentum. Schedule your hardest task for 10:00 AM today."
+            </p>
+            <button className="text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary/50 pb-0.5 hover:border-primary transition-all">
+              Apply Suggestion
+            </button>
           </div>
 
           {/* Upcoming */}
@@ -201,128 +206,103 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* BOTTOM ROW: Mini Charts & Donut */}
-      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
-        
-        {/* Sleep Hours */}
-        <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex flex-col justify-between">
-          <div className="flex justify-between items-start mb-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sleep Hours</h3>
-            <Moon className="h-4 w-4 text-primary" />
-          </div>
-          <div>
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-bold">7.2</span>
-              <span className="text-[10px] text-muted-foreground tracking-wider">HOURS</span>
-            </div>
-            <div className="h-[80px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={sleepData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8F89A5' }} dy={5} />
-                  <Tooltip cursor={{ fill: '#ffffff05' }} contentStyle={{ backgroundColor: "#1F172B", border: "none", fontSize: "12px" }} />
-                  <Bar dataKey="value" fill="#6C5BB0" radius={[2, 2, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-4 pt-4 border-t border-white/5 text-[11px] text-primary">Goal: 7-8 Hours</div>
-          </div>
-        </div>
-
-        {/* Water Intake */}
-        <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex flex-col justify-between">
-          <div className="flex justify-between items-start mb-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Water Intake</h3>
-            <Droplets className="h-4 w-4 text-primary" />
-          </div>
-          <div>
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-bold">2.1</span>
-              <span className="text-[10px] text-muted-foreground tracking-wider">LITERS</span>
-            </div>
-            <div className="h-[80px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={waterData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8F89A5' }} dy={5} />
-                  <Tooltip cursor={{ fill: '#ffffff05' }} contentStyle={{ backgroundColor: "#1F172B", border: "none", fontSize: "12px" }} />
-                  <Bar dataKey="value" fill="#6C5BB0" radius={[2, 2, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-4 pt-4 border-t border-white/5 text-[11px] text-primary">Goal: 2.5L</div>
-          </div>
-        </div>
-
-        {/* Mood Score */}
-        <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex flex-col justify-between">
-          <div className="flex justify-between items-start mb-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Mood Score</h3>
-            <Activity className="h-4 w-4 text-primary" />
-          </div>
-          <div>
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-bold">78</span>
-              <span className="text-[10px] text-muted-foreground tracking-wider">/100</span>
-            </div>
-            <div className="h-[80px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={moodData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8F89A5' }} dy={5} />
-                  <Tooltip cursor={{ fill: '#ffffff05' }} contentStyle={{ backgroundColor: "#1F172B", border: "none", fontSize: "12px" }} />
-                  <Bar dataKey="value" fill="#6C5BB0" radius={[2, 2, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-4 pt-4 border-t border-white/5 text-[11px] text-primary">Positive</div>
-          </div>
-        </div>
-
-        {/* Focus Distribution */}
-        <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-6">Focus Distribution</h3>
-          <div className="flex items-center justify-between h-[160px]">
-            <div className="w-[140px] h-full relative flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={focusDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={45}
-                    outerRadius={65}
-                    paddingAngle={2}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {focusDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: "#1F172B", border: "none", fontSize: "12px", color: "#FBF9FE" }} 
-                    itemStyle={{ color: "#FBF9FE" }} 
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex-1 ml-6 space-y-3">
-              {focusDistributionData.map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: item.color }}></div>
-                    <span className="text-muted-foreground">{item.name}</span>
+      {/* BOTTOM ROW: Draggable Widgets */}
+      <Reorder.Group 
+        axis="x" 
+        values={widgetOrder} 
+        onReorder={setWidgetOrder}
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
+      >
+        {widgetOrder.map((id) => (
+          <Reorder.Item 
+            key={id} 
+            value={id}
+            className="cursor-default"
+          >
+            {id === "sleep" && (
+              <WidgetCard 
+                title="Sleep Hours" 
+                icon={Moon} 
+                value="7.2" 
+                unit="HOURS" 
+                goal="7-8 Hours"
+                data={sleepData}
+                onExpand={() => setSelectedKpi("sleep")}
+              />
+            )}
+            {id === "water" && (
+              <WidgetCard 
+                title="Water Intake" 
+                icon={Droplets} 
+                value="2.1" 
+                unit="LITERS" 
+                goal="2.5L"
+                data={waterData}
+                onExpand={() => setSelectedKpi("water")}
+              />
+            )}
+            {id === "mood" && (
+              <WidgetCard 
+                title="Mood Score" 
+                icon={Activity} 
+                value="78" 
+                unit="/100" 
+                goal="Positive"
+                data={moodData}
+                onExpand={() => setSelectedKpi("mood")}
+              />
+            )}
+            {id === "distribution" && (
+              <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 h-full flex flex-col group relative">
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                  <div className="p-1 hover:bg-white/5 rounded-sm cursor-grab active:cursor-grabbing">
+                    <GripVertical className="h-3 w-3 text-muted-foreground" />
                   </div>
-                  <span className="font-semibold">{item.value}%</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-6">Focus Distribution</h3>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="w-[100px] h-[100px] relative shrink-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={focusDistributionData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={35}
+                          outerRadius={50}
+                          paddingAngle={2}
+                          dataKey="value"
+                          stroke="none"
+                        >
+                          {focusDistributionData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    {focusDistributionData.slice(0, 3).map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-[10px]">
+                        <div className="flex items-center gap-1.5 truncate mr-2">
+                          <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }}></div>
+                          <span className="text-muted-foreground truncate">{item.name}</span>
+                        </div>
+                        <span className="font-semibold">{item.value}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </Reorder.Item>
+        ))}
+      </Reorder.Group>
 
       {/* Quote Footer */}
-      <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex justify-between items-center">
+      <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 flex justify-between items-center group">
         <div className="flex gap-4 items-center">
-          <div className="bg-[#150F1D] text-muted-foreground border border-white/5 p-2 rounded-sm">
+          <div className="bg-[#150F1D] text-muted-foreground border border-white/5 p-2 rounded-sm group-hover:text-primary transition-colors">
             <MoreHorizontal className="h-4 w-4" />
           </div>
           <div>
@@ -333,6 +313,83 @@ export default function DashboardPage() {
         <div className="text-sm text-muted-foreground italic">- Jim Rohn</div>
       </div>
 
+      {/* Sheet & Modals */}
+      <QuickActionsSheet 
+        isOpen={isQuickActionOpen} 
+        onClose={() => setIsQuickActionOpen(false)} 
+      />
+
+      <Dialog open={!!selectedKpi} onOpenChange={() => setSelectedKpi(null)}>
+        <DialogContent className="bg-[#0A0710] border-white/5 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              {selectedKpi === "sleep" && <><Moon className="h-5 w-5 text-primary" /> Sleep Analysis</>}
+              {selectedKpi === "water" && <><Droplets className="h-5 w-5 text-primary" /> Hydration Trends</>}
+              {selectedKpi === "mood" && <><Activity className="h-5 w-5 text-primary" /> Mood Tracking</>}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="h-[300px] w-full mt-6">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={selectedKpi === "sleep" ? sleepData : selectedKpi === "water" ? waterData : moodData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#8F89A5' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#8F89A5' }} />
+                <Tooltip 
+                  cursor={{ fill: '#ffffff05' }} 
+                  contentStyle={{ backgroundColor: "#1F172B", border: "none", borderRadius: "4px" }} 
+                />
+                <Bar dataKey="value" fill="#6C5BB0" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-8 grid grid-cols-2 gap-4">
+            <div className="p-4 rounded-sm border border-white/5 bg-[#150F1D]">
+              <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-2">AI Observation</h4>
+              <p className="text-sm">Your consistency is up 12% from last week. Keep this pace for optimal performance.</p>
+            </div>
+            <div className="p-4 rounded-sm border border-white/5 bg-[#150F1D]">
+              <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Recommendation</h4>
+              <p className="text-sm">Try to reach your goal by increasing focus in the evening blocks.</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+    </div>
+  );
+}
+
+function WidgetCard({ title, icon: Icon, value, unit, goal, data, onExpand }: any) {
+  return (
+    <div className="rounded-sm border border-white/5 bg-[#0A0710] p-6 h-full flex flex-col justify-between group relative">
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+        <button onClick={onExpand} className="p-1 hover:bg-white/5 rounded-sm transition-colors">
+          <Maximize2 className="h-3 w-3 text-muted-foreground" />
+        </button>
+        <div className="p-1 hover:bg-white/5 rounded-sm cursor-grab active:cursor-grabbing">
+          <GripVertical className="h-3 w-3 text-muted-foreground" />
+        </div>
+      </div>
+      <div className="flex justify-between items-start mb-6">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
+        <Icon className="h-4 w-4 text-primary" />
+      </div>
+      <div>
+        <div className="flex items-baseline gap-1 mb-6">
+          <span className="text-4xl font-bold">{value}</span>
+          <span className="text-[10px] text-muted-foreground tracking-wider">{unit}</span>
+        </div>
+        <div className="h-[80px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+              <XAxis dataKey="day" hide />
+              <Tooltip cursor={{ fill: '#ffffff05' }} contentStyle={{ backgroundColor: "#1F172B", border: "none", fontSize: "12px" }} />
+              <Bar dataKey="value" fill="#6C5BB0" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="mt-4 pt-4 border-t border-white/5 text-[11px] text-primary">Goal: {goal}</div>
+      </div>
     </div>
   );
 }
