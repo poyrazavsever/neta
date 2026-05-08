@@ -121,18 +121,13 @@ function SidebarPanel({
   return (
     <aside className="flex h-full flex-col overflow-hidden">
       {/* Header / Logo */}
-      <div className="pt-8 pb-4 flex justify-center">
-        <Link href="/" className="relative flex items-center justify-center" onClick={onNavigate}>
-          <Image
-            src="/logo/logo.png"
-            alt="Cognis Logo"
-            width={48}
-            height={48}
-            className="object-contain transition-transform hover:scale-105"
-            priority
-          />
-        </Link>
-      </div>
+      <Link
+        href="/"
+        className="relative font-bold text-xl text-left py-4 pl-6 text-foreground"
+        onClick={onNavigate}
+      >
+        Hoş Geldin
+      </Link>
 
       {/* Main Navigation Links */}
       <nav className="flex-1 space-y-4 px-3 overflow-y-auto tiny-scrollbar mt-4 pb-4">
@@ -147,8 +142,9 @@ function SidebarPanel({
                   route.href === "/"
                     ? pathname === "/"
                     : route.href
-                    ? pathname === route.href || pathname.startsWith(route.href + "/")
-                    : false;
+                      ? pathname === route.href ||
+                        pathname.startsWith(route.href + "/")
+                      : false;
 
                 return (
                   <Link
@@ -169,7 +165,9 @@ function SidebarPanel({
                         <route.icon
                           className={cn(
                             "h-[18px] w-[18px] shrink-0 transition-colors",
-                            isActive ? "text-primary-foreground" : "text-muted-foreground/70",
+                            isActive
+                              ? "text-primary-foreground"
+                              : "text-muted-foreground/70",
                           )}
                           strokeWidth={isActive ? 2.5 : 2}
                         />
@@ -194,17 +192,20 @@ function SidebarPanel({
               "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-300 w-full",
               pathname.startsWith("/settings")
                 ? "bg-primary/20 border border-primary/30 shadow-[0_0_15px_rgba(108,91,176,0.15)] text-foreground font-medium"
-                : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent"
+                : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent",
             )}
           >
-            <Settings2 className="h-[18px] w-[18px] shrink-0" strokeWidth={pathname.startsWith("/settings") ? 2.5 : 2} />
+            <Settings2
+              className="h-[18px] w-[18px] shrink-0"
+              strokeWidth={pathname.startsWith("/settings") ? 2.5 : 2}
+            />
             <span className="text-[14px]">Ayarlar</span>
           </Link>
         </div>
 
         {/* Separator */}
         <div className="h-[1px] w-full bg-white/5 mb-3" />
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
