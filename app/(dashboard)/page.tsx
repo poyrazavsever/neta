@@ -80,7 +80,18 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6 text-foreground font-sans">
       
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-4">
+      {/* Top Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-6 mt-4">
+        <h1 className="text-lg font-medium text-muted-foreground">
+          <span className="text-foreground">Dashboard</span> / Overview
+        </h1>
+        <button className="bg-primary hover:bg-primary/90 text-primary-foreground border border-primary/20 px-4 py-1.5 rounded-sm text-xs font-semibold flex items-center gap-2 transition-colors">
+          <Plus className="h-4 w-4" />
+          QUICK ADD
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         
         {/* LEFT COLUMN: Focus Trend (Takes 2 columns on XL) */}
         <div className="xl:col-span-2 flex flex-col gap-6">
