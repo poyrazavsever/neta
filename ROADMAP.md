@@ -1,105 +1,575 @@
-# MindSpace Proje Yol Haritası (Roadmap)
+# Freelancer OS Roadmap
 
-Bu doküman, `PRD.md` gereksinimlerinin **Supabase**, **Gemini API** ve **Shadcn UI** kullanılarak uygulanması için detaylı, faz bazlı geliştirme planını içermektedir.
+Bu dokuman, uygulamanin temel urun yonunu ve MVP kapsamını tanımlar.
 
----
+Uygulamanin cikis noktasi: Freelancer'larin gundelik hayatlarini, musterilerini, projelerini, side project'lerini, finansal durumlarini ve kisisel performanslarini tek bir self-host edilebilir dashboard uzerinden yonetebilmesi.
 
-## Faz 1: Proje Kurulumu ve Altyapı
-**Amacı:** Geliştirme ortamının hazırlanması, UI bileşen sisteminin kurulması ve veritabanı / yetkilendirme (Auth) altyapısının Supabase ile entegre edilmesi.
-
-1. **Next.js Kurulumu**
-   - Next.js (App Router), React 19, TypeScript ve Tailwind CSS kullanılarak projenin başlatılması.
-   - Dizin yapısının oluşturulması (`src/app`, `src/components`, `src/lib`, `src/hooks`).
-2. **Shadcn UI ve Stil Entegrasyonu**
-   - Shadcn UI CLI ile başlatılması.
-   - Temel bileşenlerin (Button, Card, Input, Label, Dialog, Form, Toast vb.) eklenmesi.
-   - `next-themes` kullanılarak Dark/Light mod geçişinin ayarlanması (Varsayılan olarak Dark Mode ağırlıklı tasarım).
-3. **Supabase Proje Kurulumu**
-   - Supabase projesinin oluşturulması ve API key'lerin `.env.local` dosyasına eklenmesi.
-   - `@supabase/ssr` veya `@supabase/supabase-js` ile client ve server bileşenleri için istemcilerin oluşturulması.
-4. **Veritabanı Şemasının Oluşturulması (Supabase SQL)**
-   - `users` tablosu (Supabase Auth ile senkronize çalışacak yapı).
-   - `journals` tablosu: Kullanıcının günlükleri (id, user_id, date, mood, energy, content, ai_tags, ai_sentiment_score, ai_summary vb.).
-   - `tasks` tablosu: Görev yönetimi (id, user_id, title, description, status, source_journal_id).
-   - `chat_sessions` ve `chat_messages` tabloları (Geçmiş sohbetleri tutmak için).
-5. **Kimlik Doğrulama (Authentication)**
-   - Supabase Auth kullanılarak Email/Şifre ile kayıt olma (Register) ve giriş yapma (Login) sayfalarının geliştirilmesi.
-   - Auth middleware ile yetkisiz kullanıcıların Dashboard'a erişiminin engellenmesi.
+MVP, tek kullanici odakli olacak. Ekip, ajans, CRM otomasyonlari, gelismis AI modulleri ve mobil uygulama MVP sonrasi fazlara birakilir.
 
 ---
 
-## Faz 2: Dashboard ve Temel Düzen (Layout)
-**Amacı:** Kullanıcının giriş yaptığında karşılaşacağı ana navigasyon ve dashboard iskeletinin modern bir görünümle inşa edilmesi.
+## Urun Vizyonu
 
-1. **Ana Layout ve Navigasyon**
-   - Masaüstü için sol veya üst menü bar (Sidebar/Navbar).
-   - Menü linkleri: Dashboard, Günlük, Görevler, Sohbet, Ayarlar.
-   - Responsive tasarım ile mobilde hamburger menü yapısı.
-2. **Dashboard İskeleti**
-   - CSS Grid/Flexbox kullanarak kartların yerleşimi.
-   - Profil bilgisi ve Çıkış Yap butonu içeren bir üst bilgi (header) alanı.
-3. **Boş Durum (Empty State) Yönetimi**
-   - Kullanıcının henüz günlüğü, görevi veya AI analizi yoksa gösterilecek yönlendirici ve estetik bileşenlerin tasarlanması (örn. "Henüz veri yok, ilk günlüğünü yaz").
+Freelancer icin tek merkezli bir operasyon paneli:
 
----
+- Bugun ne yapacagim?
+- Hangi musteride hangi is var?
+- Hangi proje gecikiyor?
+- Side project'lerimde ilerleme var mi?
+- Bu ay ne kadar kazandim, ne kadar harcadim?
+- Enerjim ve ruh halim is performansimi nasil etkiliyor?
+- Tum bu verilerden hangi raporu okuyabilirim?
 
-## Faz 3: Günlük (Journal) ve Görev (Task) Modülleri
-**Amacı:** Kullanıcının duygu, enerji ve günlük notlarını yazabilmesi, ayrıca manuel olarak görev ekleyip takip edebilmesi.
-
-1. **Günlük (Journal) Modülü**
-   - **Oluşturma Ekranı:** Günlük yazma formu. Shadcn form bileşenleriyle validasyon sağlanması.
-   - **Mood & Enerji Seçimi:** Buton grupları veya slider kullanılarak duygu durumu ve enerji (1-5) seçimi.
-   - **Listeleme:** Kaydedilen günlüklerin tarih sırasına göre listelenmesi.
-   - **Detay Görünümü:** Seçilen günlüğün tam sayfa veya modal içinde okunması, silinmesi ve düzenlenmesi.
-2. **Görev (Task) Modülü**
-   - **Görev Ekleme:** Basit başlık ve detay içeren görev ekleme formu.
-   - **Görev Durumu:** "Todo", "In Progress", "Completed" durumlarının listelenmesi ve checkbox veya sürükle bırak tarzında güncellenmesi.
-   - **Günlükle İlişkilendirme:** Görevlerin varsa kaynak günlük ID'sini göstermesi.
+Uygulama, klasik gorev takip aracindan daha genis; freelancer'in is, finans ve kisisel performans alanlarini birlestiren bir "Freelancer OS" olarak konumlanir.
 
 ---
 
-## Faz 4: Gemini API Entegrasyonu (AI Analizi)
-**Amacı:** Kullanıcının girdiği günlük metninin Google Gemini API ile analiz edilip etiketler, duygu skoru, özet ve görev önerileri üretmesi.
+## MVP Ilkeleri
 
-1. **Gemini API Kurulumu**
-   - `@google/generative-ai` SDK'sının projeye dahil edilmesi.
-   - API Key'in `.env.local` içinde güvenli yapılandırılması.
-2. **Analiz Endpoint'inin Geliştirilmesi**
-   - `POST /api/analyze-journal` gibi bir route oluşturularak, kullanıcının günlüğünün modele gönderilmesi.
-   - **Prompt Engineering:** Gemini'ye gönderilecek prompt'un, yanıtın stabil bir JSON formatında (tags, sentiment_score, summary, reflection, suggested_tasks) dönmesini garantileyecek şekilde tasarlanması.
-3. **Veritabanı ve UI Entegrasyonu**
-   - Dönen AI analiz sonuçlarının Supabase'deki `journals` tablosuna (ai_tags, ai_summary vb.) Update edilmesi.
-   - Günlük detay ekranında AI analiz sonucunun görsel bir kart olarak sunulması.
-4. **Görev Önerileri (Suggested Tasks) Akışı**
-   - AI'ın günlüğe bakarak çıkardığı görev önerilerinin kullanıcıya sunulması ("Bunu görev listene eklemek ister misin?").
-   - Onaylanan önerilerin `tasks` tablosuna kaydedilmesi.
+1. **Tek kullanici**
+   - MVP'de ekip, rol, yetki, assignee, ortak calisma yok.
+   - Tum veriler tek kullanicinin kendi calisma alani icindir.
 
----
+2. **Self-host ve open-source uyumlu**
+   - Kurulum dokumani net olmali.
+   - Veritabani migration'lari repo icinde olmali.
+   - Harici servisler opsiyonel olmali.
 
-## Faz 5: Dashboard Veri Görselleştirme
-**Amacı:** Toplanan verilerin (mood, enerji, etiketler) grafikler yardımıyla analiz edilmesi ve özetlerin sunulması.
+3. **Gercek veri, sade akis**
+   - Mock dashboard yerine kullanicinin girdigi gercek verilerden rapor uretilecek.
+   - Her modulde minimum CRUD ve minimum rapor yeterli.
 
-1. **Recharts Entegrasyonu ve Veri Hazırlama**
-   - Recharts kütüphanesinin eklenmesi.
-   - Supabase'den son 7 ve 30 güne ait verilerin çekilip grafiklere uygun formata dönüştürülmesi.
-2. **Mood ve Enerji Trend Grafikleri**
-   - Günlere göre duygu skorları ve enerji (1-5) seviyesini gösteren çizgi veya bar grafikleri.
-3. **Etiket Dağılımı Grafiği**
-   - AI tarafından en çok oluşturulan etiketlerin pasta (Pie) veya yatay çubuk (Bar) grafik ile gösterilmesi.
-4. **Dashboard Özet Kartları**
-   - "Son Günlüklerin", "Aktif Görevlerin" ve "Haftalık AI İçgörüsünün" özet widget'lar halinde Dashboard ekranında sergilenmesi.
+4. **AI destekleyici, cekirdek degil**
+   - MVP'de AI sadece genel chatbot olarak konumlanir.
+   - Chatbot, kayitli gorev/proje/musteri/finans/gunluk verileri hakkinda soru cevap yapabilir.
+   - Modul icindeki otomatik oneriler, scoring, akilli otomasyonlar MVP sonrasi.
+
+5. **Ekranda rapor yeterli**
+   - MVP'de PDF/PNG export sart degil.
+   - Dashboard ve modul rapor ekranlari yeterli kabul edilir.
 
 ---
 
-## Faz 6: AI Chat Modülü (Sohbet)
-**Amacı:** Kullanıcının geçmiş günlüklerini bağlam olarak sunup, bir "Dijital Yansıma Asistanı" (Gemini) ile sohbet etmesi.
+## MVP Kapsami
 
-1. **Sohbet UI Tasarımı**
-   - Shadcn UI ile scrollable mesaj listesi, kullanıcı giriş alanı ve mesaj baloncuklarının tasarlanması.
-2. **Bağlam (Context) Yönetimi**
-   - Kullanıcı bir soru sorduğunda, Supabase'den son X günlüğün veya içeriğe uygun günlüklerin çekilerek Gemini API'ye sistem mesajı/context olarak verilmesi.
-3. **Sohbet Akışı ve Veri Kaydı**
-   - Gemini API üzerinden yanıtların tercihen "stream" (akış) yöntemiyle hızlıca UI'da gösterilmesi.
-   - Tamamlanan konuşmaların `chat_sessions` ve `chat_messages` tablolarına kaydedilerek, sayfa yenilendiğinde eski sohbetin görünmesinin sağlanması.
-4. **Güvenlik ve Sınırlar**
-   - Prompt seviyesinde Gemini'ye "Tıbbi veya klinik tavsiye verme, sadece yansıtıcı ol" komutunun sıkıca verilmesi.
+### 1. Dashboard
+
+**Amac:** Freelancer'in gunluk ve haftalik durumunu tek bakista gostermek.
+
+MVP icerigi:
+
+- Bugunku gorevler
+- Yaklasan takvim etkinlikleri
+- Aktif musterilerden acik isler
+- Aktif projeler ve side project'ler
+- Bu ay gelir/gider ozeti
+- Haftalik gorev tamamlama grafigi
+- Mood/energy trend grafigi
+- Geciken isler ve yaklasan deadline'lar
+
+Raporlar:
+
+- Haftalik is yuklemesi
+- Proje ilerleme ozeti
+- Aylik finans ozeti
+- Kisisel enerji/mood ozeti
+
+---
+
+### 2. Musteriler
+
+**Amac:** Freelancer'in calistigi musterileri ve o musterilerle iliskili isleri takip etmesi.
+
+MVP alanlari:
+
+- Musteri adi
+- Firma/marka adi
+- E-posta
+- Telefon veya iletisim notu
+- Durum: active, paused, archived
+- Notlar
+
+MVP aksiyonlari:
+
+- Musteri ekleme
+- Musteri duzenleme
+- Musteri arsivleme
+- Musteriye bagli projeleri/gorevleri gorme
+
+Raporlar:
+
+- Aktif musteri sayisi
+- Musteri bazli proje sayisi
+- Musteri bazli gelir ozeti
+
+MVP disi:
+
+- Gelismis CRM pipeline
+- E-posta entegrasyonu
+- Otomatik takip hatirlatmalari
+- Musteri sentiment analizi
+
+---
+
+### 3. Projeler ve Side Project'ler
+
+**Amac:** Musteri projeleri ve kisisel side project'leri ayni mantikta ama ayri turlerle takip etmek.
+
+MVP alanlari:
+
+- Proje adi
+- Tur: client_project, side_project
+- Bagli musteri, sadece client_project icin opsiyonel/zorunlu
+- Aciklama
+- Durum: planning, active, paused, completed, cancelled
+- Baslangic tarihi
+- Deadline
+- Butce veya beklenen gelir
+- Ilerleme yuzdesi, gorevlerden otomatik hesaplanabilir
+
+MVP aksiyonlari:
+
+- Proje ekleme
+- Proje duzenleme
+- Projeye gorev baglama
+- Proje durumunu guncelleme
+
+Raporlar:
+
+- Aktif proje sayisi
+- Geciken proje sayisi
+- Proje bazli gorev tamamlama orani
+- Musteri projeleri / side project dagilimi
+
+MVP disi:
+
+- Ekip uyeleri
+- Dosya yonetimi
+- Kanban sprint sistemi
+- Gelismis risk analizi
+
+---
+
+### 4. Gorevler
+
+**Amac:** Freelancer'in gunluk operasyonunu yonetmek.
+
+MVP alanlari:
+
+- Baslik
+- Aciklama
+- Durum: todo, in_progress, done
+- Oncelik: low, medium, high, urgent
+- Son tarih
+- Bagli proje
+- Bagli musteri, proje uzerinden de turetilebilir
+- Tahmini sure
+- Gerceklesen sure, basit manuel giris olarak
+
+MVP aksiyonlari:
+
+- Gorev ekleme
+- Gorev duzenleme
+- Gorev tamamlama
+- Liste ve basit kanban gorunumu
+- Geciken gorevleri filtreleme
+
+Raporlar:
+
+- Haftalik tamamlanan gorev sayisi
+- Duruma gore gorev dagilimi
+- Oncelige gore gorev dagilimi
+- Proje bazli acik gorevler
+
+MVP disi:
+
+- Team assignee
+- Otomatik AI onceliklendirme
+- Gelismis time tracking timer
+
+---
+
+### 5. Takvim
+
+**Amac:** Deadline, toplanti, odak blogu ve kisisel etkinlikleri planlamak.
+
+MVP alanlari:
+
+- Baslik
+- Baslangic tarihi/saati
+- Bitis tarihi/saati
+- Tur: meeting, focus, deadline, personal, finance
+- Bagli musteri/proje/gorev
+- Not
+
+MVP aksiyonlari:
+
+- Etkinlik ekleme
+- Etkinlik duzenleme
+- Aylik gorunum
+- Yaklasan etkinlik listesi
+
+Raporlar:
+
+- Haftalik etkinlik dagilimi
+- Odak bloklari / toplantilar orani
+- Yaklasan deadline listesi
+
+MVP disi:
+
+- Google Calendar entegrasyonu
+- Iki yonlu sync
+- AI schedule optimization
+
+---
+
+### 6. Finans
+
+**Amac:** Freelancer'in temel gelir, gider ve nakit akis durumunu takip etmesi.
+
+MVP alanlari:
+
+- Islem tipi: income, expense
+- Tutar
+- Para birimi
+- Tarih
+- Kategori
+- Bagli musteri
+- Bagli proje
+- Aciklama
+- Odeme durumu: planned, pending, paid, cancelled
+
+MVP aksiyonlari:
+
+- Gelir ekleme
+- Gider ekleme
+- Islem duzenleme
+- Islem silme/arsivleme
+- Aylik filtreleme
+
+Raporlar:
+
+- Aylik gelir
+- Aylik gider
+- Net kazanc
+- Musteri bazli gelir
+- Proje bazli gelir
+- Kategori bazli gider
+
+MVP disi:
+
+- Fatura olusturma
+- Vergi hesaplama
+- Banka entegrasyonu
+- Subscription tracking
+- Coklu sirket/hesap
+
+---
+
+### 7. Gunluk Mood / Energy
+
+**Amac:** Freelancer'in kisisel kapasitesini ve is performansiyla iliskisini takip etmek.
+
+MVP alanlari:
+
+- Tarih
+- Mood skoru
+- Energy skoru
+- Kisa not
+- Calisma memnuniyeti skoru, opsiyonel
+
+MVP aksiyonlari:
+
+- Gunluk kayit ekleme
+- Kayit duzenleme
+- Haftalik/aylik trend izleme
+
+Raporlar:
+
+- Mood trend
+- Energy trend
+- Energy ile tamamlanan gorev iliskisi
+- Dusuk enerji gunlerinde geciken gorevler
+
+MVP disi:
+
+- AI duygu analizi
+- Otomatik etiketleme
+- Klinik/terapötik yorumlar
+
+---
+
+### 8. AI Chatbot
+
+**Amac:** Kullanici, kendi kayitli verileri hakkinda genel sorular sorabilsin.
+
+MVP davranisi:
+
+- Son 7/30 gun gorevleri, projeleri, takvim etkinlikleri, finans kayitlari ve mood/energy verileri context olarak hazırlanır.
+- Kullanici basit sorular sorar:
+  - "Bu hafta en cok hangi projeye zaman harcamisim?"
+  - "Hangi musterilerden odeme bekliyorum?"
+  - "Bu ay finansal durumum nasil?"
+  - "Geciken islerim neler?"
+  - "Enerjim dusukken hangi isler aksamis?"
+
+Teknik yaklasim:
+
+- MVP'de tam vector RAG sart degil.
+- Ilk asama: veritabanindan ilgili ozet context olusturup modele gondermek.
+- Provider opsiyonlari: Ollama local, OpenAI, Gemini, Groq.
+
+MVP disi:
+
+- Embedding tabanli gelismis RAG
+- Modul ici AI butonlari
+- Otomatik gorev/proje onerisinde bulunma
+- Otomatik finans yorumu
+- Otonom aksiyon alma
+
+---
+
+## MVP Disi Birakilacaklar
+
+Asagidaki ozellikler ilk surume alinmayacak:
+
+- Ekip ve rol yonetimi
+- Gelismis CRM pipeline
+- Teklif ve sozlesme sistemi
+- Fatura olusturma
+- Banka veya odeme entegrasyonlari
+- Dokuman/drive yonetimi
+- PDF/PNG export
+- Mobil uygulama
+- Google Calendar sync
+- Modul bazli AI otomasyonlari
+- Gelismis RAG/vector search
+- Bildirim sistemi
+
+---
+
+## Teknik Mimari Karari
+
+### Onerilen MVP Stack
+
+- **Frontend:** Next.js App Router, React, TypeScript
+- **UI:** Tailwind CSS, shadcn/Radix, Recharts, Framer Motion
+- **Database:** PostgreSQL
+- **Backend/Auth:** Supabase veya self-host edilebilir Supabase alternatifi
+- **Local AI opsiyonu:** Ollama
+- **Cloud AI opsiyonlari:** OpenAI, Gemini, Groq
+
+### Neden Server-first?
+
+Mobil uygulama sonraki hedef oldugu icin verinin senkronize olabilecegi merkezi bir backend gerekir. Bu nedenle MVP'de ana kaynak PostgreSQL/Supabase olmali.
+
+Offline/local-first destek daha sonra eklenebilir:
+
+- IndexedDB cache
+- Offline draft kayitlari
+- Sync queue
+- Conflict resolution
+
+MVP'de bu alan mimaride dusunulur, fakat ana risk haline getirilmez.
+
+---
+
+## MVP Veri Modeli
+
+Minimum tablolar:
+
+- `profiles`
+- `clients`
+- `projects`
+- `tasks`
+- `calendar_events`
+- `finance_transactions`
+- `daily_logs`
+- `chat_sessions`
+- `chat_messages`
+- `app_settings`
+
+Temel iliskiler:
+
+- `clients` -> `projects`
+- `projects` -> `tasks`
+- `clients` -> `finance_transactions`
+- `projects` -> `finance_transactions`
+- `calendar_events` -> `clients`, `projects`, `tasks` opsiyonel
+- `daily_logs` -> kullanici ve tarih
+- `chat_messages` -> `chat_sessions`
+
+---
+
+## Faz Plani
+
+### Faz 0: Stabilizasyon
+
+Amac: Mevcut prototipi build edilebilir ve gelistirilebilir hale getirmek.
+
+Isler:
+
+- Build hatalarini gidermek.
+- `Cognis`, `MindSpace` ve yeni urun ismi kararini netlestirmek.
+- Encoding bozukluklarini temizlemek.
+- Mock veri kullanan ekranlari isaretlemek.
+- `user_settings` yerine `app_settings` semasini netlestirmek.
+- MVP disi ekranlari sidebar'dan gecici olarak kaldirmak veya "coming later" durumuna almak.
+
+Kabul kriteri:
+
+- `npm run build` basarili.
+- Ana layout, auth ve dashboard sorunsuz acilir.
+- MVP kapsamindaki moduller net gorunur.
+
+---
+
+### Faz 1: Veritabani ve Auth
+
+Amac: Freelancer OS icin gercek veri modelini kurmak.
+
+Isler:
+
+- `clients`, `projects`, `tasks`, `calendar_events`, `finance_transactions`, `daily_logs`, `app_settings` tablolarini olusturmak.
+- RLS politikalari eklemek.
+- Supabase migration dosyalarini repo icine almak.
+- Seed/demo data script'i hazirlamak.
+- Tek kullanici akisina uygun auth'u sade tutmak.
+
+Kabul kriteri:
+
+- Yeni tablolar Supabase'de calisir.
+- Kullanici sadece kendi verisini gorur.
+- Demo data ile dashboard beslenebilir.
+
+---
+
+### Faz 2: Core CRUD Modulleri
+
+Amac: Freelancer'in temel operasyon verilerini girebilmesi.
+
+Isler:
+
+- Musteriler CRUD
+- Projeler/side project CRUD
+- Gorevler CRUD
+- Takvim etkinlikleri CRUD
+- Finans islemleri CRUD
+- Daily mood/energy CRUD
+
+Kabul kriteri:
+
+- Mock data yerine gercek veriler kullanilir.
+- Her modulde liste, ekleme, duzenleme ve temel silme/arsivleme vardir.
+- Bos durumlar kullaniciyi dogru aksiyona yonlendirir.
+
+---
+
+### Faz 3: Dashboard ve Raporlama
+
+Amac: Girilen verileri anlamli grafiklere ve rapor kartlarina donusturmek.
+
+Isler:
+
+- Dashboard KPI kartlari
+- Gorev tamamlama grafikleri
+- Proje ilerleme grafikleri
+- Musteri/proje bazli gelir ozeti
+- Gelir/gider/net kazanc grafigi
+- Mood/energy trendleri
+- Yaklasan deadline ve odeme listeleri
+
+Kabul kriteri:
+
+- Dashboard tamamen gercek veriden beslenir.
+- Her MVP modulu en az bir anlamli rapor/grafik sunar.
+- Tarih filtresi: bugun, bu hafta, bu ay.
+
+---
+
+### Faz 4: Basit AI Chatbot
+
+Amac: Kullanici kendi freelancer verileri hakkinda soru sorabilsin.
+
+Isler:
+
+- Chat UI'i stabil hale getirmek.
+- Provider secimi: Ollama, OpenAI, Gemini, Groq.
+- Son 7/30 gun verilerinden context builder yazmak.
+- Chat mesajlarini kaydetmek.
+- AI cevaplarini "danisma/asistan" sinirinda tutmak.
+
+Kabul kriteri:
+
+- Kullanici kayitli verileri hakkinda soru sorabilir.
+- Chatbot en az gorev, proje, musteri, finans ve daily log ozetlerini context olarak kullanir.
+- AI calismasa bile uygulamanin temel modulleri calismaya devam eder.
+
+---
+
+### Faz 5: Self-host Hazirligi
+
+Amac: Projeyi acik kaynak ve self-host edilebilir hale getirmek.
+
+Isler:
+
+- `.env.example` hazirlamak.
+- Kurulum dokumani yazmak.
+- Migration calistirma adimlarini belgelemek.
+- Docker Compose opsiyonunu degerlendirmek.
+- Demo kullanici/demo data akisi eklemek.
+
+Kabul kriteri:
+
+- Yeni bir gelistirici dokumana bakarak projeyi ayaga kaldirabilir.
+- Harici AI servisleri opsiyonel kalir.
+- Local Ollama ile temel AI deneyimi mumkundur.
+
+---
+
+## MVP Sonrasi Fazlar
+
+### Faz 6: Freelancer Business OS
+
+- Teklifler
+- Sozlesmeler
+- Fatura olusturma
+- Odeme takip otomasyonlari
+- Vergi/kar tahmini
+- Abonelik ve masraf yonetimi
+
+### Faz 7: Gelismis CRM
+
+- Lead pipeline
+- Musteri aktiviteleri
+- Follow-up hatirlatmalari
+- Musteri degeri ve risk raporlari
+
+### Faz 8: Gelismis AI
+
+- Embedding tabanli RAG
+- Modul ici AI onerileri
+- Akilli onceliklendirme
+- Finansal yorumlama
+- Takvim optimizasyonu
+- Proje risk tahmini
+
+### Faz 9: Mobil ve Sync
+
+- Mobil uygulama
+- Offline cache
+- Push notification
+- Takvim ve gorev sync
+- Local-first deneyim iyilestirmeleri
+
+---
+
+## MVP Basari Kriterleri
+
+MVP basarili sayilirsa:
+
+- Freelancer gunluk islerini, musterilerini, projelerini, side project'lerini ve temel finansini tek yerde takip edebilir.
+- Dashboard gercek verilerle anlamli haftalik/aylik raporlar sunar.
+- Kullanici uygulamayi self-host edebilir.
+- AI chatbot opsiyonel ama kullanisli bir danisma katmani olarak calisir.
+- Uygulama tek kullanici icin guvenilir ve build edilebilir durumdadir.
