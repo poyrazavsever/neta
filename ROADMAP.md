@@ -410,10 +410,13 @@ Amac: Mevcut prototipi build edilebilir ve gelistirilebilir hale getirmek.
 Isler:
 
 - Build hatalarini gidermek.
-- `Cognis`, `MindSpace` ve yeni urun ismi kararini netlestirmek.
+- Urun adini netlestirmek: `Cognis`.
 - Encoding bozukluklarini temizlemek.
 - Mock veri kullanan ekranlari isaretlemek.
 - `user_settings` yerine `app_settings` semasini netlestirmek.
+- Supabase SQL dosyalarini sira, dokumantasyon ve calistirma kaydi olan bir sisteme oturtmak.
+- Mevcut `supabase/schema.sql` dosyasini ilk database baseline olarak kaydetmek.
+- Her yeni SQL ekinde ilgili dokumani ve query log kaydini zorunlu hale getirmek.
 - MVP disi ekranlari sidebar'dan gecici olarak kaldirmak veya "coming later" durumuna almak.
 
 Kabul kriteri:
@@ -421,6 +424,9 @@ Kabul kriteri:
 - `npm run build` basarili.
 - Ana layout, auth ve dashboard sorunsuz acilir.
 - MVP kapsamindaki moduller net gorunur.
+- Database query sirasi `docs/database/query-order.md` icinde kayitlidir.
+- Calistirilan SQL dosyalari `docs/database/query-log.md` icinde takip edilir.
+- Ilk baseline olan `supabase/schema.sql` icin aciklayici dokuman vardir.
 
 ---
 

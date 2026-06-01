@@ -6,7 +6,7 @@ import {
   CreditCard, ArrowUpRight, ArrowDownRight, MoreHorizontal,
   Calendar, FileText, Download, PieChart as PieChartIcon, 
   Wallet, Brain, ArrowRight, X, Check, Activity,
-  Briefcase, Landmark, Receipt, Percent, Target
+  Briefcase, Landmark, Receipt, Percent, Target, Filter
 } from "lucide-react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, 

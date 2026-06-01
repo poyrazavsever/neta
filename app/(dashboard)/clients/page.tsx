@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { 
-  Plus, Search, User, Mail, Phone, Globe, 
+  Plus, Search, User, Users, Mail, Phone, Globe, 
   MoreHorizontal, MessageSquare, Briefcase, 
   TrendingUp, Star, Clock, X, ChevronRight,
   ArrowUpRight, DollarSign, Brain, Shield,

@@ -145,12 +145,15 @@ export default function AIChatPage() {
       } else return;
     }
 
+    const resolvedSessionId = sessionId;
+    if (!resolvedSessionId) return;
+
     setIsLoading(true);
 
     // 1. Optimistic Update: Add User Message locally
     const optimisticUserMsg: ChatMessage = {
       id: uuidv4(),
-      session_id: sessionId,
+      session_id: resolvedSessionId,
       role: "user",
       content: userMessageContent,
       created_at: new Date().toISOString()
@@ -160,7 +163,7 @@ export default function AIChatPage() {
     // 2. Save User Message to Supabase
     await supabase.from("chat_messages").insert({
       id: optimisticUserMsg.id,
-      session_id: sessionId,
+      session_id: resolvedSessionId,
       role: "user",
       content: userMessageContent
     });
@@ -189,7 +192,7 @@ export default function AIChatPage() {
       // 5. Optimistic Update: Add Assistant Message locally
       const assistantMsg: ChatMessage = {
         id: uuidv4(),
-        session_id: sessionId,
+        session_id: resolvedSessionId,
         role: "assistant",
         content: data.reply || "Cevap üretilemedi.",
         created_at: new Date().toISOString()
@@ -199,24 +202,24 @@ export default function AIChatPage() {
       // 6. Save Assistant Message to Supabase
       await supabase.from("chat_messages").insert({
         id: assistantMsg.id,
-        session_id: sessionId,
+        session_id: resolvedSessionId,
         role: "assistant",
         content: assistantMsg.content
       });
 
       // 7. Update session title if it was default
-      const currentSession = sessions.find(s => s.id === sessionId);
+      const currentSession = sessions.find(s => s.id === resolvedSessionId);
       if (currentSession?.title === "Yeni Sohbet") {
         const newTitle = userMessageContent.slice(0, 40);
-        await supabase.from("chat_sessions").update({ title: newTitle }).eq("id", sessionId);
-        setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, title: newTitle } : s));
+        await supabase.from("chat_sessions").update({ title: newTitle }).eq("id", resolvedSessionId);
+        setSessions(prev => prev.map(s => s.id === resolvedSessionId ? { ...s, title: newTitle } : s));
       }
 
     } catch (error) {
       console.error(error);
       const errorMsg: ChatMessage = {
         id: uuidv4(),
-        session_id: sessionId,
+        session_id: resolvedSessionId,
         role: "assistant",
         content: "Hata oluştu. Lütfen Ayarlar sayfasından API anahtarınızı kontrol edin.",
         created_at: new Date().toISOString()
@@ -224,7 +227,7 @@ export default function AIChatPage() {
       setMessages(prev => [...prev, errorMsg]);
       await supabase.from("chat_messages").insert({
         id: errorMsg.id,
-        session_id: sessionId,
+        session_id: resolvedSessionId,
         role: "assistant",
         content: errorMsg.content
       });

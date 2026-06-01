@@ -5,7 +5,7 @@ import {
   Play, Pause, Square, Plus, Search, Clock, 
   BarChart3, Calendar, MoreHorizontal, X, 
   CheckCircle2, AlertCircle, Brain, Zap,
-  TrendingUp, Activity, Briefcase, User
+  TrendingUp, Activity, Briefcase, User, ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 

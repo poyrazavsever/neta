@@ -230,7 +230,7 @@ function SidebarPanel({
               className="flex w-full items-center justify-between gap-2 rounded-md p-2 transition-all hover:bg-white/5 outline-none"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <Avatar user={user} size="sm" />
+                <Avatar user={user} />
                 <div className="min-w-0 text-left">
                   <div className="truncate text-sm font-medium text-foreground leading-tight">
                     {user.displayName}
@@ -341,4 +341,3 @@ function AmbientBackdrop() {
     </>
   );
 }
-

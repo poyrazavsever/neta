@@ -5,7 +5,7 @@ import {
   Plus, Search, Calendar, Clock, Brain, MessageSquare, 
   Smile, Frown, Meh, Star, MoreHorizontal, X, 
   Zap, Save, Trash2, Edit3, Image as ImageIcon, Link as LinkIcon,
-  ChevronLeft, ChevronRight, Activity, Filter, AlignLeft, Hash
+  ChevronLeft, ChevronRight, Activity, Filter, AlignLeft, Hash, ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
