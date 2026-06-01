@@ -15,7 +15,11 @@ The project currently starts with `supabase/schema.sql` as the first database qu
 ## Current Files
 
 - `supabase/schema.sql`: Initial legacy schema. It creates the current auth/profile, journal, task, chat, and avatar storage structure.
+- `supabase/migrations/0002_add_freelancer_os_core_tables.sql`: Freelancer OS MVP core schema.
+- `supabase/seeds/0001_demo_freelancer_os_data.sql`: Optional local/demo data for the MVP schema.
 - `docs/database/0001-initial-schema.md`: Explanation for the initial schema.
+- `docs/database/0002-freelancer-os-core-tables.md`: Explanation for the MVP schema migration.
+- `docs/database/seed-0001-demo-freelancer-os-data.md`: Explanation for the demo seed file.
 - `docs/database/query-order.md`: Canonical order of SQL files.
 - `docs/database/query-log.md`: Manual execution log for SQL files that were run against an environment.
 
@@ -33,3 +37,8 @@ Example:
 supabase/migrations/0002_add_freelancer_os_core_tables.sql
 ```
 
+Use this pattern for future seed files:
+
+```text
+supabase/seeds/0002_short_description.sql
+```

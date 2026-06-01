@@ -448,6 +448,16 @@ Kabul kriteri:
 - Kullanici sadece kendi verisini gorur.
 - Demo data ile dashboard beslenebilir.
 
+Faz 1 repo ciktisi:
+
+- Core schema migration: `supabase/migrations/0002_add_freelancer_os_core_tables.sql`
+- Demo seed dosyasi: `supabase/seeds/0001_demo_freelancer_os_data.sql`
+- Migration dokumani: `docs/database/0002-freelancer-os-core-tables.md`
+- Seed dokumani: `docs/database/seed-0001-demo-freelancer-os-data.md`
+- Query sirasi kaydi: `docs/database/query-order.md`
+
+Not: SQL dosyalari repo icinde hazirdir. Supabase ortaminda calistirildiktan sonra `docs/database/query-log.md` guncellenmelidir.
+
 ---
 
 ### Faz 2: Core CRUD Modulleri
