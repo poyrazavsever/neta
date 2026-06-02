@@ -505,6 +505,14 @@ Notlar:
 - Modul sayfalari Faz 2'de CRUD gelistirme sirasinda Poyraz UI'a tasinir.
 - Poyraz UI rehberi: `poyraz-ui-usage-guide.md`
 
+Faz 1.5 repo ciktisi:
+
+- Poyraz UI paketi projeye eklendi.
+- Tailwind CSS v4 ve `@tailwindcss/postcss` gecisi yapildi.
+- Global CSS, `poyraz-ui/preset.css` ve light Poyraz tokenlariyla guncellendi.
+- Login ve register sayfalari Poyraz UI atomlariyla yeniden kuruldu.
+- Dashboard shell ve sidebar Poyraz UI organism yaklasimina tasindi.
+
 ---
 
 ### Faz 2: Core CRUD Modulleri

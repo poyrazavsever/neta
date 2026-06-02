@@ -1,23 +1,26 @@
 "use client";
 
 import { signOut } from "@/app/login/actions";
-import { Button } from "@/components/ui/button";
+import { Button } from "poyraz-ui/atoms";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Sidebar,
+  SidebarBranding,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarSection,
+  SidebarSeparator,
+  SidebarTrigger,
+  SidebarUserProfile,
+} from "poyraz-ui/organisms";
 import { sidebarData } from "@/config/sidebar";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, LogOut, Menu, Settings2, Clock } from "lucide-react";
-import Image from "next/image";
+import { LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 type DashboardShellProps = {
   children: React.ReactNode;
@@ -32,312 +35,137 @@ type DashboardShellProps = {
 export function DashboardShell({ children, user }: DashboardShellProps) {
   const pathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [isClockFullScreen, setIsClockFullScreen] = useState(false);
-
-  const closeMobileSidebar = () => setIsMobileSidebarOpen(false);
 
   return (
-    <div className="relative h-screen overflow-hidden bg-background text-foreground">
-      <AmbientBackdrop />
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="flex min-h-screen">
+        <aside className="hidden w-[280px] shrink-0 border-r border-border bg-background lg:block">
+          <AppSidebar pathname={pathname} user={user} />
+        </aside>
 
-      {/* Full Screen Clock Overlay */}
-      <AnimatePresence>
-        {isClockFullScreen && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed inset-0 z-[100] bg-[#0A0710] flex flex-col items-center justify-center cursor-pointer"
-            onClick={() => setIsClockFullScreen(false)}
-          >
-            <div className="absolute top-8 right-8 text-muted-foreground text-sm tracking-widest uppercase">
-              Click anywhere to close
-            </div>
-            <FullScreenClock />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="relative z-10 flex h-screen">
-        {/* Desktop Sidebar */}
-        <div className="hidden shrink-0 lg:block lg:w-[260px] h-screen border-r border-white/5 bg-[#0A0710]">
-          <SidebarPanel pathname={pathname} user={user} desktop onClockClick={() => setIsClockFullScreen(true)} />
-        </div>
-
-        {/* Mobile Sidebar */}
-        <AnimatePresence>
-          {isMobileSidebarOpen ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex lg:hidden"
-            >
-              <button
-                type="button"
-                aria-label="Menüyü kapat"
-                className="absolute inset-0 bg-background/75 backdrop-blur-sm"
-                onClick={closeMobileSidebar}
+        {isMobileSidebarOpen ? (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <button
+              type="button"
+              aria-label="Menuyu kapat"
+              className="absolute inset-0 bg-overlay"
+              onClick={() => setIsMobileSidebarOpen(false)}
+            />
+            <aside className="relative h-full w-[min(88vw,300px)] border-r border-border bg-background">
+              <AppSidebar
+                pathname={pathname}
+                user={user}
+                onNavigate={() => setIsMobileSidebarOpen(false)}
               />
-              <motion.div
-                initial={{ x: -48, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -48, opacity: 0 }}
-                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                className="relative z-10 h-full w-[min(88vw,280px)] bg-[#0A0710]"
-              >
-                <SidebarPanel
-                  pathname={pathname}
-                  user={user}
-                  onNavigate={closeMobileSidebar}
-                  onClockClick={() => setIsClockFullScreen(true)}
-                />
-              </motion.div>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+            </aside>
+          </div>
+        ) : null}
 
-        {/* Main Content Area (Scrollable internally) */}
-        <div className="flex h-screen min-w-0 flex-1 flex-col overflow-y-auto tiny-scrollbar relative">
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden p-4 flex items-center justify-between z-30 sticky top-0 bg-background/50 backdrop-blur-md">
-            <div className="flex items-center gap-2">
-              <Image src="/logo/logo.png" alt="Cognis Logo" width={24} height={24} className="object-contain" />
-              <span className="font-semibold text-sm">Cognis</span>
-            </div>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <span className="flex h-8 w-8 items-center justify-center rounded-sm bg-primary text-xs text-primary-foreground">
+                C
+              </span>
+              Cognis
+            </Link>
             <Button
               type="button"
               variant="outline"
-              size="icon"
-              className="rounded-lg border-border bg-white/5 h-8 w-8"
+              className="h-9 w-9 p-0"
               onClick={() => setIsMobileSidebarOpen(true)}
             >
               <Menu className="h-4 w-4" />
             </Button>
-          </div>
+          </header>
 
-          <main className="flex-1 p-6 lg:p-10">
-            {children}
-          </main>
+          <main className="flex-1 p-4 lg:p-8">{children}</main>
         </div>
       </div>
     </div>
   );
 }
 
-function SidebarPanel({
+function AppSidebar({
   pathname,
   user,
-  desktop = false,
   onNavigate,
-  onClockClick,
 }: {
   pathname: string;
   user: DashboardShellProps["user"];
-  desktop?: boolean;
   onNavigate?: () => void;
-  onClockClick: () => void;
 }) {
   return (
-    <aside className="flex h-full flex-col overflow-hidden">
-      {/* Header / Time Badge */}
-      <div className="pt-8 pb-2 px-4 flex justify-start">
-        <ClockBadge onClick={onClockClick} />
-      </div>
+    <Sidebar variant="bordered" className="h-full rounded-none border-0">
+      <SidebarHeader>
+        <SidebarBranding
+          title="Cognis"
+          subtitle="Freelancer OS"
+          logo={
+            <span className="flex h-9 w-9 items-center justify-center rounded-sm bg-primary text-sm font-bold text-primary-foreground">
+              C
+            </span>
+          }
+        />
+      </SidebarHeader>
 
-      {/* Main Navigation Links */}
-      <nav className="flex-1 space-y-4 px-3 overflow-y-auto tiny-scrollbar mt-4 pb-4">
-        {sidebarData.map((group, groupIdx) => (
-          <div key={groupIdx} className="space-y-1">
-            <h4 className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2">
-              {group.title}
-            </h4>
-            <div className="space-y-1">
-              {group.items.map((route) => {
+      <SidebarContent className="tiny-scrollbar">
+        {sidebarData.map((group) => (
+          <SidebarSection key={group.title} title={group.title} defaultOpen>
+            <SidebarMenu>
+              {group.items.map((item) => {
                 const isActive =
-                  route.href === "/"
+                  item.href === "/"
                     ? pathname === "/"
-                    : route.href
-                      ? pathname === route.href ||
-                        pathname.startsWith(route.href + "/")
+                    : item.href
+                      ? pathname === item.href || pathname.startsWith(item.href + "/")
                       : false;
+                const Icon = item.icon;
 
                 return (
-                  <Link
-                    key={route.href || route.title}
-                    href={route.href || "#"}
-                    className="block w-full"
-                    onClick={onNavigate}
+                  <SidebarMenuItem
+                    key={item.href || item.title}
+                    active={isActive}
+                    icon={Icon ? <Icon className="h-4 w-4" /> : undefined}
+                    className={cn(isActive && "font-semibold")}
                   >
-                    <div
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-300 w-full",
-                        isActive
-                          ? "bg-primary/20 border border-primary/30 shadow-[0_0_15px_rgba(108,91,176,0.15)] text-foreground font-medium"
-                          : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent",
-                      )}
+                    <Link
+                      href={item.href || "#"}
+                      onClick={onNavigate}
+                      className="block w-full"
                     >
-                      {route.icon && (
-                        <route.icon
-                          className={cn(
-                            "h-[18px] w-[18px] shrink-0 transition-colors",
-                            isActive
-                              ? "text-primary-foreground"
-                              : "text-muted-foreground/70",
-                          )}
-                          strokeWidth={isActive ? 2.5 : 2}
-                        />
-                      )}
-                      <span className="text-[14px]">{route.title}</span>
-                    </div>
-                  </Link>
+                      {item.title}
+                    </Link>
+                  </SidebarMenuItem>
                 );
               })}
-            </div>
-          </div>
+            </SidebarMenu>
+          </SidebarSection>
         ))}
-      </nav>
+      </SidebarContent>
 
-      {/* Bottom User Profile & Settings Section */}
-      <div className="mt-auto p-3">
-        <div className="mb-2">
-          <Link
-            href="/settings"
-            onClick={onNavigate}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-300 w-full",
-              pathname.startsWith("/settings")
-                ? "bg-primary/20 border border-primary/30 shadow-[0_0_15px_rgba(108,91,176,0.15)] text-foreground font-medium"
-                : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent",
-            )}
-          >
-            <Settings2
-              className="h-[18px] w-[18px] shrink-0"
-              strokeWidth={pathname.startsWith("/settings") ? 2.5 : 2}
-            />
-            <span className="text-[14px]">Ayarlar</span>
-          </Link>
-        </div>
+      <SidebarSeparator />
 
-        {/* Separator */}
-        <div className="h-[1px] w-full bg-white/5 mb-3" />
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="flex w-full items-center justify-between gap-2 rounded-md p-2 transition-all hover:bg-white/5 outline-none"
-            >
-              <div className="flex items-center gap-2 min-w-0">
-                <Avatar user={user} />
-                <div className="min-w-0 text-left">
-                  <div className="truncate text-sm font-medium text-foreground leading-tight">
-                    {user.displayName}
-                  </div>
-                </div>
-              </div>
-              <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-            </button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent
-            side="right"
-            align="end"
-            sideOffset={16}
-            className="w-56 rounded-lg border border-white/10 bg-[#0A0710] p-1 text-foreground shadow-2xl"
-          >
-            <DropdownMenuLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-              {user.email}
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/5" />
-            <DropdownMenuItem
-              className="rounded-md px-2 py-1.5 text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer flex items-center gap-2 text-sm"
-              onClick={async () => {
-                await signOut();
-              }}
-            >
-              <LogOut className="h-4 w-4" />
-              Çıkış Yap
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </aside>
-  );
-}
-
-function ClockBadge({ onClick }: { onClick: () => void }) {
-  const [time, setTime] = useState<string>("");
-
-  useEffect(() => {
-    const updateTime = () => {
-      setTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!time) {
-    return <div className="h-[34px] w-[100px] bg-white/5 animate-pulse rounded-sm" />;
-  }
-
-  return (
-    <button
-      onClick={onClick}
-      className="border border-white/5 bg-[#150F1D] px-3 py-2 text-xs font-semibold tracking-wider text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors rounded-sm flex items-center gap-2 group outline-none"
-    >
-      <Clock className="h-3.5 w-3.5 text-primary/70 group-hover:text-primary transition-colors" />
-      <span suppressHydrationWarning>{time}</span>
-    </button>
-  );
-}
-
-function FullScreenClock() {
-  const [time, setTime] = useState<string>("");
-  
-  useEffect(() => {
-    const updateTime = () => {
-      setTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="text-[12vw] font-black tracking-tighter text-primary/90 drop-shadow-[0_0_60px_rgba(108,91,176,0.3)] select-none tabular-nums">
-      <span suppressHydrationWarning>{time || "..."}</span>
-    </div>
-  );
-}
-
-function Avatar({ user }: { user: DashboardShellProps["user"] }) {
-  if (user.avatarUrl) {
-    return (
-      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-primary/20 bg-primary/10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={user.avatarUrl}
-          alt={user.displayName}
-          className="h-full w-full object-cover"
+      <SidebarFooter className="space-y-3">
+        <SidebarUserProfile
+          name={user.displayName}
+          role={user.email}
+          avatarUrl={user.avatarUrl || undefined}
+          initials={user.shortName}
         />
-      </div>
-    );
-  }
+        <form action={signOut}>
+          <Button
+            type="submit"
+            variant="outline"
+            className="h-10 w-full justify-start gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Cikis yap
+          </Button>
+        </form>
+      </SidebarFooter>
 
-  return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/20 font-semibold text-primary-foreground text-sm">
-      {user.shortName}
-    </div>
-  );
-}
-
-function AmbientBackdrop() {
-  return (
-    <>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(108,91,176,0.1),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(108,91,176,0.1),transparent_30%)]" />
-    </>
+      <SidebarTrigger className="hidden" />
+    </Sidebar>
   );
 }

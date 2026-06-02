@@ -1,61 +1,61 @@
-import { signup } from '@/app/login/actions'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import Link from 'next/link'
-import { ErrorToaster } from '@/components/error-toaster'
-import { Icon } from '@/components/ui/icon'
-import { AuthPageShell } from '@/components/auth/auth-page-shell'
+import { signup } from "@/app/login/actions";
+import { AuthPageShell } from "@/components/auth/auth-page-shell";
+import { ErrorToaster } from "@/components/error-toaster";
+import { LockKeyhole, Mail, Search, UserPlus } from "lucide-react";
+import Link from "next/link";
+import { Button, Input, Label } from "poyraz-ui/atoms";
 
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const resolvedParams = await searchParams
-  const error = resolvedParams?.error
-  const message = resolvedParams?.message
+  const resolvedParams = await searchParams;
+  const error = resolvedParams?.error;
+  const message = resolvedParams?.message;
 
   return (
     <>
       {error && message && <ErrorToaster message={String(message)} />}
       <AuthPageShell
-        title="Aramıza Katılın"
-        description="Kişisel yaşam alanınızı oluşturmak için kayıt olun"
-        imageSrc="/images/1830837_Image.png"
-        imageAlt="MindSpace Background"
-        imageSide="right"
+        title="Kayıt ol"
+        description="Freelancer operasyon panelini kullanmak için hesabını oluştur."
         form={
           <form className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">E-posta</Label>
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  E-posta
+                </Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
                   placeholder="ornek@mail.com"
                   required
-                  className="h-11 bg-input-bg border-border"
+                  className="h-11"
                 />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="password">Şifre</Label>
+                <Label htmlFor="password" className="flex items-center gap-2">
+                  <LockKeyhole className="h-4 w-4 text-muted-foreground" />
+                  Şifre
+                </Label>
                 <Input
                   id="password"
                   name="password"
                   type="password"
                   required
-                  className="h-11 bg-input-bg border-border"
+                  className="h-11"
                 />
               </div>
             </div>
 
-            <Button
-              formAction={signup}
-              className="w-full h-11 text-base font-medium shadow-md transition-transform active:scale-[0.98] bg-primary hover:bg-primary-hover text-primary-foreground"
-            >
-              Kayıt Ol
+            <Button formAction={signup} className="h-11 w-full gap-2">
+              <UserPlus className="h-4 w-4" />
+              Hesap oluştur
             </Button>
           </form>
         }
@@ -66,34 +66,28 @@ export default async function RegisterPage({
                 <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  veya
-                </span>
+                <span className="bg-background px-2 text-muted-foreground">veya</span>
               </div>
             </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full h-11 text-base font-medium bg-card border-border hover:bg-secondary transition-colors"
-            >
-              <Icon icon="flat-color-icons:google" className="w-5 h-5 mr-2" />
-              Google ile Devam Et
+            <Button type="button" variant="outline" className="h-11 w-full gap-2">
+              <Search className="h-4 w-4" />
+              Google ile devam et
             </Button>
           </div>
         }
         footer={
           <div className="text-center text-sm">
-            Zaten hesabınız var mı?{' '}
+            Zaten hesabın var mı?{" "}
             <Link
               href="/login"
-              className="font-medium text-primary hover:text-primary-hover transition-colors"
+              className="font-medium text-primary transition-colors hover:text-primary-hover"
             >
-              Giriş Yap
+              Giriş yap
             </Link>
           </div>
         }
       />
     </>
-  )
+  );
 }

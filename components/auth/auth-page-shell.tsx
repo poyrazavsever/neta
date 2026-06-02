@@ -1,191 +1,185 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
-import Image from "next/image"
-import { motion, useReducedMotion } from "framer-motion"
-import { cn } from "@/lib/utils"
+import type { ReactNode } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  ArrowUpRight,
+  BarChart3,
+  CalendarDays,
+  Kanban,
+  Wallet,
+} from "lucide-react";
+import { Typography } from "poyraz-ui/atoms";
 
 type AuthPageShellProps = {
-  title: string
-  description: string
-  imageSrc: string
-  imageAlt: string
-  imageSide: "left" | "right"
-  form: ReactNode
-  secondaryAction?: ReactNode
-  footer: ReactNode
-}
+  title: string;
+  description: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  imageSide?: "left" | "right";
+  form: ReactNode;
+  secondaryAction?: ReactNode;
+  footer: ReactNode;
+};
+
+const highlights = [
+  { label: "Müşteriler", icon: Kanban },
+  { label: "Takvim", icon: CalendarDays },
+  { label: "Finans", icon: Wallet },
+  { label: "Raporlar", icon: BarChart3 },
+];
 
 export function AuthPageShell({
   title,
   description,
-  imageSrc,
-  imageAlt,
-  imageSide,
   form,
   secondaryAction,
   footer,
 }: AuthPageShellProps) {
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useReducedMotion();
 
-  const stackVariants = {
-    hidden: {},
-    show: {
-      transition: reducedMotion
-        ? undefined
-        : {
-            staggerChildren: 0.1,
-            delayChildren: 0.15,
-          },
+  const fadeUp = {
+    initial: reducedMotion ? false : { opacity: 0, y: 18 },
+    animate: { opacity: 1, y: 0 },
+    transition: {
+      duration: reducedMotion ? 0 : 0.55,
+      ease: [0.22, 1, 0.36, 1] as const,
     },
-  }
-
-  const itemVariants = {
-    hidden: reducedMotion ? { opacity: 1 } : { opacity: 0, y: 24 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: reducedMotion ? 0 : 0.65,
-        ease: [0.22, 1, 0.36, 1] as const,
-      },
-    },
-  }
-
-  const formPanel = (
-    <motion.div
-      initial={reducedMotion ? false : { opacity: 0, x: imageSide === "left" ? 36 : -36 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{
-        duration: reducedMotion ? 0 : 0.8,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className="flex flex-1 items-center justify-center p-8 w-full lg:w-1/2"
-    >
-      <motion.div
-        variants={stackVariants}
-        initial="hidden"
-        animate="show"
-        className="w-full max-w-sm space-y-8"
-      >
-        <motion.div variants={itemVariants} className="text-center lg:text-left">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            {title}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-2">{description}</p>
-        </motion.div>
-
-        <motion.div variants={itemVariants}>{form}</motion.div>
-
-        {secondaryAction ? (
-          <motion.div variants={itemVariants}>{secondaryAction}</motion.div>
-        ) : null}
-
-        <motion.div variants={itemVariants}>{footer}</motion.div>
-      </motion.div>
-    </motion.div>
-  )
-
-  const imagePanel = (
-    <motion.div
-      initial={reducedMotion ? false : { opacity: 0, x: imageSide === "left" ? -42 : 42 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{
-        duration: reducedMotion ? 0 : 0.95,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className="hidden lg:flex lg:w-1/2 p-4 relative"
-    >
-      <div className="relative w-full h-full overflow-hidden rounded-2xl">
-        <motion.div
-          initial={reducedMotion ? false : { scale: 1.08, filter: "blur(6px)" }}
-          animate={{ scale: 1, filter: "blur(0px)" }}
-          transition={{
-            duration: reducedMotion ? 0 : 1.2,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="absolute inset-0"
-        >
-          <Image src={imageSrc} alt={imageAlt} fill className="object-cover" priority />
-        </motion.div>
-
-        <motion.div
-          initial={reducedMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 0.9 }}
-          transition={{ duration: reducedMotion ? 0 : 0.9, delay: reducedMotion ? 0 : 0.1 }}
-          className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30"
-        />
-
-        <motion.div
-          initial={reducedMotion ? false : { opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: reducedMotion ? 0 : 1.1,
-            delay: reducedMotion ? 0 : 0.2,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.18),transparent_46%)]"
-        />
-
-        <motion.div
-          initial={reducedMotion ? false : { opacity: 0, y: 26 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: reducedMotion ? 0 : 0.85,
-            delay: reducedMotion ? 0 : 0.32,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="absolute bottom-0 left-0 right-0 flex items-center justify-center pointer-events-none z-10"
-        >
-          <motion.div
-            animate={
-              reducedMotion
-                ? undefined
-                : {
-                    y: [0, -8, 0],
-                    scale: [1, 1.02, 1],
-                  }
-            }
-            transition={
-              reducedMotion
-                ? undefined
-                : {
-                    duration: 8,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }
-            }
-            className="relative drop-shadow-2xl flex items-center gap-4"
-          >
-            <Image
-              src="/logo/logo.png"
-              alt="MindSpace Logo"
-              width={256}
-              height={128}
-              className="object-contain w-64 h-auto"
-              priority
-            />
-          </motion.div>
-        </motion.div>
-      </div>
-    </motion.div>
-  )
+  };
 
   return (
-    <div className="relative isolate flex min-h-screen overflow-hidden bg-background">
-      {imageSide === "left" ? imagePanel : null}
-      {formPanel}
-      {imageSide === "right" ? imagePanel : null}
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[minmax(0,1fr)_480px]">
+        <motion.section
+          initial={reducedMotion ? false : { opacity: 0, x: -28 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{
+            duration: reducedMotion ? 0 : 0.75,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between"
+        >
+          <div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(255,255,255,.18)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.18)_1px,transparent_1px)] bg-size-[32px_32px]" />
+          <div className="relative z-10 flex items-center gap-4 p-10">
+            <Image
+              src="/logo/LogoWithBg.png"
+              alt="Cognis logo"
+              width={64}
+              height={64}
+              className="h-16 w-16 rounded-sm object-cover border border-red-500"
+              priority
+            />
+            <div>
+              <div className="text-lg font-bold leading-none">Cognis</div>
+              <div className="mt-1 text-sm text-primary-foreground/75">
+                Freelancer OS
+              </div>
+            </div>
+          </div>
 
-      <motion.div
-        initial={reducedMotion ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: reducedMotion ? 0 : 1.4 }}
-        className={cn(
-          "pointer-events-none absolute inset-0 -z-10",
-          "bg-[radial-gradient(circle_at_top,rgba(108,91,176,0.12),transparent_42%)]",
-        )}
-      />
-    </div>
-  )
+          <div className="relative z-10 px-10">
+            <motion.div {...fadeUp}>
+              <Typography
+                variant="h1"
+                className="max-w-2xl text-5xl leading-[1.02] text-primary-foreground"
+              >
+                Freelancer işlerini, müşterilerini ve finansını tek yerde yönet.
+              </Typography>
+              <Typography
+                variant="lead"
+                className="mt-6 max-w-xl text-primary-foreground/78"
+              >
+                Cognis, günlük operasyonunu, projelerini, side projectlerini ve
+                temel finans durumunu sade raporlarla takip etmen için
+                tasarlanır.
+              </Typography>
+            </motion.div>
+
+            <motion.div
+              initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: reducedMotion ? 0 : 0.55, delay: 0.16 }}
+              className="mt-10 grid max-w-xl grid-cols-2 gap-3"
+            >
+              {highlights.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.label}
+                    className="flex items-center gap-3 rounded-sm border border-white/18 bg-white/10 px-4 py-3 text-sm font-medium backdrop-blur"
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </div>
+                );
+              })}
+            </motion.div>
+          </div>
+
+          <div className="w-full relative z-10 p-10 text-sm text-primary-foreground/78">
+            <span>Açık kaynak ve self-host edilebilir.</span>{" "}
+            <Link
+              href="https://github.com/poyrazavsever/cognis"
+              className="font-semibold text-primary-foreground underline-offset-4 hover:underline"
+              target="_blank"
+            >
+              GitHub <ArrowUpRight className="h-3.5 w-3.5 inline" />
+            </Link>
+            <span> üzerinden ulaşabilirsin, </span>
+            <Link
+              href="https://ui.poyrazavsever.com"
+              className="font-semibold text-primary-foreground underline-offset-4 hover:underline"
+              target="_blank"
+            >
+              Poyraz UI <ArrowUpRight className="h-3.5 w-3.5 inline" />
+            </Link>
+            <span> ile tasarlandı, </span>
+            <Link
+              href="https://poyrazavsever.com"
+              className="inline-flex items-center gap-1 font-semibold text-primary-foreground underline-offset-4 hover:underline"
+              target="_blank"
+            >
+              Poyraz Avsever <ArrowUpRight className="h-3.5 w-3.5 inline" />
+            </Link>
+            <span> tarafından kodlandı.</span>
+          </div>
+        </motion.section>
+
+        <section className="flex min-h-screen items-center justify-center px-6 py-8 lg:px-12">
+          <motion.div
+            initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reducedMotion ? 0 : 0.6, delay: 0.08 }}
+            className="w-full max-w-sm"
+          >
+            <div className="mb-8 flex justify-center lg:hidden">
+              <Image
+                src="/logo/LogoWithBg.png"
+                alt="Cognis logo"
+                width={84}
+                height={84}
+                className="h-20 w-20 rounded-sm object-cover"
+                priority
+              />
+            </div>
+
+            <div className="hidden space-y-2 text-center lg:block lg:text-left">
+              <Typography variant="h2" className="text-3xl">
+                {title}
+              </Typography>
+              <Typography variant="muted">{description}</Typography>
+            </div>
+
+            <div className="mt-8 space-y-6">
+              {form}
+              {secondaryAction}
+              {footer}
+            </div>
+          </motion.div>
+        </section>
+      </div>
+    </main>
+  );
 }

@@ -7,8 +7,8 @@ import { Toaster } from "react-hot-toast";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Cognis - Your AI Assistant",
-  description: "Productivity Dashboard - AI-Powered Personal Life and Planning Dashboard",
+  title: "Cognis",
+  description: "Self-hosted freelancer operating dashboard",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={cn("font-sans dark", geist.variable)}
+      className={cn("font-sans", geist.variable)}
       suppressHydrationWarning
     >
       <body>
