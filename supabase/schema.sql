@@ -1,8 +1,11 @@
+-- 0001: Initial Cognis baseline schema
+-- This file is intentionally idempotent enough to be retried after a failed SQL Editor run.
+
 -- Enable necessary extensions
 create extension if not exists "uuid-ossp";
 
 -- 1. Create journals table
-create table public.journals (
+create table if not exists public.journals (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,
   date timestamp with time zone default timezone('utc'::text, now()) not null,
@@ -19,7 +22,7 @@ create table public.journals (
 );
 
 -- 2. Create tasks table
-create table public.tasks (
+create table if not exists public.tasks (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,
   date timestamp with time zone default timezone('utc'::text, now()) not null,
@@ -33,7 +36,7 @@ create table public.tasks (
 );
 
 -- 3. Create chat_sessions table
-create table public.chat_sessions (
+create table if not exists public.chat_sessions (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,
   title text not null,
@@ -42,7 +45,7 @@ create table public.chat_sessions (
 );
 
 -- 4. Create chat_messages table
-create table public.chat_messages (
+create table if not exists public.chat_messages (
   id uuid default uuid_generate_v4() primary key,
   session_id uuid references public.chat_sessions(id) on delete cascade not null,
   role text not null,
@@ -51,80 +54,8 @@ create table public.chat_messages (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- RLS (Row Level Security) Policies
-alter table public.journals enable row level security;
-alter table public.tasks enable row level security;
-alter table public.chat_sessions enable row level security;
-alter table public.chat_messages enable row level security;
-
--- Journals Policies
-create policy "Users can view their own journals." on public.journals
-  for select using (auth.uid() = user_id);
-create policy "Users can insert their own journals." on public.journals
-  for insert with check (auth.uid() = user_id);
-create policy "Users can update their own journals." on public.journals
-  for update using (auth.uid() = user_id);
-create policy "Users can delete their own journals." on public.journals
-  for delete using (auth.uid() = user_id);
-
--- Tasks Policies
-create policy "Users can view their own tasks." on public.tasks
-  for select using (auth.uid() = user_id);
-create policy "Users can insert their own tasks." on public.tasks
-  for insert with check (auth.uid() = user_id);
-create policy "Users can update their own tasks." on public.tasks
-  for update using (auth.uid() = user_id);
-create policy "Users can delete their own tasks." on public.tasks
-  for delete using (auth.uid() = user_id);
-
--- Chat Sessions Policies
-create policy "Users can view their own chat sessions." on public.chat_sessions
-  for select using (auth.uid() = user_id);
-create policy "Users can insert their own chat sessions." on public.chat_sessions
-  for insert with check (auth.uid() = user_id);
-create policy "Users can update their own chat sessions." on public.chat_sessions
-  for update using (auth.uid() = user_id);
-create policy "Users can delete their own chat sessions." on public.chat_sessions
-  for delete using (auth.uid() = user_id);
-
--- Chat Messages Policies
--- Assuming users can only access messages in their own sessions
-create policy "Users can view their own chat messages." on public.chat_messages
-  for select using (
-    exists (
-      select 1 from public.chat_sessions
-      where chat_sessions.id = chat_messages.session_id
-      and chat_sessions.user_id = auth.uid()
-    )
-  );
-create policy "Users can insert their own chat messages." on public.chat_messages
-  for insert with check (
-    exists (
-      select 1 from public.chat_sessions
-      where chat_sessions.id = session_id
-      and chat_sessions.user_id = auth.uid()
-    )
-  );
-create policy "Users can update their own chat messages." on public.chat_messages
-  for update using (
-    exists (
-      select 1 from public.chat_sessions
-      where chat_sessions.id = session_id
-      and chat_sessions.user_id = auth.uid()
-    )
-  );
-create policy "Users can delete their own chat messages." on public.chat_messages
-  for delete using (
-    exists (
-      select 1 from public.chat_sessions
-      where chat_sessions.id = session_id
-      and chat_sessions.user_id = auth.uid()
-    )
-  );
-
-
 -- 5. Create profiles table
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid references auth.users(id) on delete cascade primary key,
   first_name text,
   last_name text,
@@ -132,51 +63,167 @@ create table public.profiles (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- RLS (Row Level Security)
+alter table public.journals enable row level security;
+alter table public.tasks enable row level security;
+alter table public.chat_sessions enable row level security;
+alter table public.chat_messages enable row level security;
 alter table public.profiles enable row level security;
 
+-- Journals policies
+drop policy if exists "Users can view their own journals." on public.journals;
+create policy "Users can view their own journals." on public.journals
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert their own journals." on public.journals;
+create policy "Users can insert their own journals." on public.journals
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update their own journals." on public.journals;
+create policy "Users can update their own journals." on public.journals
+  for update using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete their own journals." on public.journals;
+create policy "Users can delete their own journals." on public.journals
+  for delete using (auth.uid() = user_id);
+
+-- Tasks policies
+drop policy if exists "Users can view their own tasks." on public.tasks;
+create policy "Users can view their own tasks." on public.tasks
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert their own tasks." on public.tasks;
+create policy "Users can insert their own tasks." on public.tasks
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update their own tasks." on public.tasks;
+create policy "Users can update their own tasks." on public.tasks
+  for update using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete their own tasks." on public.tasks;
+create policy "Users can delete their own tasks." on public.tasks
+  for delete using (auth.uid() = user_id);
+
+-- Chat sessions policies
+drop policy if exists "Users can view their own chat sessions." on public.chat_sessions;
+create policy "Users can view their own chat sessions." on public.chat_sessions
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert their own chat sessions." on public.chat_sessions;
+create policy "Users can insert their own chat sessions." on public.chat_sessions
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update their own chat sessions." on public.chat_sessions;
+create policy "Users can update their own chat sessions." on public.chat_sessions
+  for update using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete their own chat sessions." on public.chat_sessions;
+create policy "Users can delete their own chat sessions." on public.chat_sessions
+  for delete using (auth.uid() = user_id);
+
+-- Chat messages policies
+drop policy if exists "Users can view their own chat messages." on public.chat_messages;
+create policy "Users can view their own chat messages." on public.chat_messages
+  for select using (
+    exists (
+      select 1 from public.chat_sessions
+      where chat_sessions.id = chat_messages.session_id
+        and chat_sessions.user_id = auth.uid()
+    )
+  );
+
+drop policy if exists "Users can insert their own chat messages." on public.chat_messages;
+create policy "Users can insert their own chat messages." on public.chat_messages
+  for insert with check (
+    exists (
+      select 1 from public.chat_sessions
+      where chat_sessions.id = session_id
+        and chat_sessions.user_id = auth.uid()
+    )
+  );
+
+drop policy if exists "Users can update their own chat messages." on public.chat_messages;
+create policy "Users can update their own chat messages." on public.chat_messages
+  for update using (
+    exists (
+      select 1 from public.chat_sessions
+      where chat_sessions.id = session_id
+        and chat_sessions.user_id = auth.uid()
+    )
+  );
+
+drop policy if exists "Users can delete their own chat messages." on public.chat_messages;
+create policy "Users can delete their own chat messages." on public.chat_messages
+  for delete using (
+    exists (
+      select 1 from public.chat_sessions
+      where chat_sessions.id = session_id
+        and chat_sessions.user_id = auth.uid()
+    )
+  );
+
+-- Profiles policies
+drop policy if exists "Users can view their own profile." on public.profiles;
 create policy "Users can view their own profile." on public.profiles
   for select using (auth.uid() = id);
+
+drop policy if exists "Users can insert their own profile." on public.profiles;
 create policy "Users can insert their own profile." on public.profiles
   for insert with check (auth.uid() = id);
+
+drop policy if exists "Users can update their own profile." on public.profiles;
 create policy "Users can update their own profile." on public.profiles
   for update using (auth.uid() = id);
 
 -- Function to handle new user signup
 create or replace function public.handle_new_user()
-returns trigger as $$$
+returns trigger as $$
 begin
   insert into public.profiles (id, first_name, last_name, avatar_url)
-  values (new.id, '', '', '');
+  values (new.id, '', '', '')
+  on conflict (id) do nothing;
+
   return new;
 end;
-$$$ language plpgsql security definer;
-
--- Drop trigger if exists to avoid errors on multiple runs
-drop trigger if exists on_auth_user_created on auth.users;
+$$ language plpgsql security definer;
 
 -- Trigger to automatically create profile on signup
+drop trigger if exists on_auth_user_created on auth.users;
+
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
 -- Setup storage bucket for avatars
-insert into storage.buckets (id, name, public) 
+insert into storage.buckets (id, name, public)
 values ('avatars', 'avatars', true)
 on conflict (id) do nothing;
 
+drop policy if exists "Avatar images are publicly accessible." on storage.objects;
 create policy "Avatar images are publicly accessible."
   on storage.objects for select
-  using ( bucket_id = 'avatars' );
+  using (bucket_id = 'avatars');
 
+drop policy if exists "Users can upload an avatar." on storage.objects;
 create policy "Users can upload an avatar."
   on storage.objects for insert
-  with check ( bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1] );
+  with check (
+    bucket_id = 'avatars'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
 
+drop policy if exists "Users can update their own avatar." on storage.objects;
 create policy "Users can update their own avatar."
   on storage.objects for update
-  using ( bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1] );
+  using (
+    bucket_id = 'avatars'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
 
+drop policy if exists "Users can delete their own avatar." on storage.objects;
 create policy "Users can delete their own avatar."
   on storage.objects for delete
-  using ( bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1] );
-
+  using (
+    bucket_id = 'avatars'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );

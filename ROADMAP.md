@@ -353,11 +353,25 @@ Asagidaki ozellikler ilk surume alinmayacak:
 ### Onerilen MVP Stack
 
 - **Frontend:** Next.js App Router, React, TypeScript
-- **UI:** Tailwind CSS, shadcn/Radix, Recharts, Framer Motion
+- **UI:** Poyraz UI, Tailwind CSS v4, Recharts
 - **Database:** PostgreSQL
 - **Backend/Auth:** Supabase veya self-host edilebilir Supabase alternatifi
 - **Local AI opsiyonu:** Ollama
 - **Cloud AI opsiyonlari:** OpenAI, Gemini, Groq
+
+### UI Karari
+
+MVP tasarimi Poyraz UI ile light design olarak kurulacak.
+
+Mevcut dark shadcn/Radix agirlikli prototip tasarim sistemi MVP icin referans alinmayacak. Sayfalar Poyraz UI bilesenleri, `poyraz-ui/preset.css` token sistemi ve Poyraz UI semantic renkleri uzerinden yeniden insa edilecek.
+
+Gecis prensipleri:
+
+- Ilk hedef login, register ve sidebar gibi uygulama kabugu ekranlari.
+- Daha sonra Faz 2'de her modul kendi CRUD akisi gelistirilirken Poyraz UI'a tasinacak.
+- Light design varsayilan olacak.
+- Dark mode MVP icin zorunlu degil; Poyraz UI destekledigi icin sonraki fazlarda eklenebilir.
+- Eski UI bilesenleri sadece gecici olarak kullanilabilir; yeni sayfa ve moduller Poyraz UI ile yazilacak.
 
 ### Neden Server-first?
 
@@ -460,6 +474,39 @@ Not: SQL dosyalari repo icinde hazirdir. Supabase ortaminda calistirildiktan son
 
 ---
 
+### Faz 1.5: Poyraz UI Tasarim Sistemi Gecisi
+
+Amac: Mevcut koyu prototip tasarimindan ayrilip uygulama kabugunu Poyraz UI tabanli light design sistemine tasimak.
+
+Isler:
+
+- `poyraz-ui` paketini projeye eklemek.
+- Global CSS icinde Poyraz UI preset importunu yapmak: `@import "poyraz-ui/preset.css";`
+- Tailwind CSS v4 gereksinimini ve mevcut Tailwind yapisiyla uyumlulugu netlestirmek.
+- Poyraz UI light tokenlarini varsayilan tasarim dili olarak ayarlamak.
+- Mevcut shadcn/Radix agirlikli dark auth tasarimini Poyraz UI ile degistirmek.
+- Login sayfasini Poyraz UI atoms/molecules ile yeniden kurmak.
+- Register sayfasini Poyraz UI atoms/molecules ile yeniden kurmak.
+- Dashboard shell ve sidebar'i Poyraz UI navigation/organism yaklasimina gore yeniden kurmak.
+- Eski dark background, gradient, glow ve agir motion desenlerini uygulama kabugundan kaldirmak.
+- Poyraz UI kullanim notlarini proje dokumantasyonuna baglamak.
+
+Kabul kriteri:
+
+- Login light design ile Poyraz UI bilesenleri kullanarak calisir.
+- Register light design ile Poyraz UI bilesenleri kullanarak calisir.
+- Sidebar ve temel dashboard shell Poyraz UI tasarim diliyle uyumludur.
+- Uygulama varsayilan olarak light gorunur.
+- `npm run build` basarili olur.
+
+Notlar:
+
+- Bu fazda modul ic sayfalarinin tamamini yeniden tasarlamak zorunlu degildir.
+- Modul sayfalari Faz 2'de CRUD gelistirme sirasinda Poyraz UI'a tasinir.
+- Poyraz UI rehberi: `poyraz-ui-usage-guide.md`
+
+---
+
 ### Faz 2: Core CRUD Modulleri
 
 Amac: Freelancer'in temel operasyon verilerini girebilmesi.
@@ -467,17 +514,30 @@ Amac: Freelancer'in temel operasyon verilerini girebilmesi.
 Isler:
 
 - Musteriler CRUD
+  - Liste, bos durum, ekleme/duzenleme formu ve detay gorunumu Poyraz UI ile kurulur.
+  - Eski CRM/prototip gorsel dili kaldirilir.
 - Projeler/side project CRUD
+  - Proje kartlari, filtreler, detay paneli ve form akislari Poyraz UI ile kurulur.
+  - Musteri projesi ve side project ayrimi UI'da net gosterilir.
 - Gorevler CRUD
+  - Liste ve basit kanban Poyraz UI bilesenleriyle yeniden tasarlanir.
+  - Durum, oncelik, deadline ve proje iliskisi icin Poyraz UI Badge/Form/Select kullanilir.
 - Takvim etkinlikleri CRUD
+  - Aylik gorunum ve yaklasan etkinlik listesi light design ile kurulur.
+  - Etkinlik formu Poyraz UI form bilesenleriyle yazilir.
 - Finans islemleri CRUD
+  - Gelir/gider listesi, finans kartlari ve islem formu Poyraz UI ile kurulur.
+  - Rapor kartlari Poyraz UI StatsCard/Card yaklasimina uygun olur.
 - Daily mood/energy CRUD
+  - Gunluk kayit formu, trend ozeti ve kayit listesi Poyraz UI ile kurulur.
+  - Mood/energy secimleri light, sade ve form odakli olur.
 
 Kabul kriteri:
 
 - Mock data yerine gercek veriler kullanilir.
 - Her modulde liste, ekleme, duzenleme ve temel silme/arsivleme vardir.
 - Bos durumlar kullaniciyi dogru aksiyona yonlendirir.
+- Faz 2 kapsamindaki her yeni/yenilenen modul Poyraz UI bilesenleriyle yazilir.
 
 ---
 

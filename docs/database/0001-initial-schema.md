@@ -45,7 +45,16 @@ The existing `journals` table can either be migrated into `daily_logs` or kept a
 
 ## Execution Notes
 
-This file should be treated as the first baseline. If it has already been run in a Supabase project, do not rerun it blindly because some `create table` and `create policy` statements are not idempotent.
+This file should be treated as the first baseline.
+
+It was updated to be safer for Supabase SQL Editor retries:
+
+- tables use `create table if not exists`
+- policies are dropped before being recreated
+- the profile trigger is dropped before being recreated
+- the PL/pgSQL function uses the correct `$$` delimiter
+- profile creation uses `on conflict (id) do nothing`
+
+If a previous run failed halfway through, rerunning this baseline should be safe for the current schema shape.
 
 Future changes should be added as ordered migration files rather than editing this baseline after execution.
-
