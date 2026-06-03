@@ -24,7 +24,7 @@ export type SidebarNavGroup = {
 
 export const sidebarData: SidebarNavGroup[] = [
   {
-    title: "GENEL BAKIS",
+    title: "GENEL BAKIŞ",
     items: [
       { title: "Dashboard", href: "/", icon: Sparkles },
       { title: "Takvim", href: "/calendar", icon: Calendar },
@@ -34,18 +34,18 @@ export const sidebarData: SidebarNavGroup[] = [
   {
     title: "OPERASYON",
     items: [
-      { title: "Musteriler", href: "/clients", icon: Building2 },
+      { title: "Müşteriler", href: "/clients", icon: Building2 },
       { title: "Projeler", href: "/projects", icon: FolderKanban },
-      { title: "Gorevler", href: "/tasks", icon: CheckSquare2 },
+      { title: "Görevler", href: "/tasks", icon: CheckSquare2 },
       { title: "Finans", href: "/finance", icon: Wallet },
     ],
   },
   {
-    title: "KISISEL",
-    items: [{ title: "Gunluk", href: "/journal", icon: BookOpenText }],
+    title: "KİŞİSEL",
+    items: [{ title: "Günlük", href: "/journal", icon: BookOpenText }],
   },
   {
-    title: "AI ASISTAN",
+    title: "AI ASİSTAN",
     items: [{ title: "Sohbet", href: "/chat", icon: MessageCircleHeart }],
   },
 ];

@@ -3,6 +3,14 @@
 import { signOut } from "@/app/login/actions";
 import { Button } from "poyraz-ui/atoms";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "poyraz-ui/molecules";
+import {
   Sidebar,
   SidebarBranding,
   SidebarContent,
@@ -17,7 +25,8 @@ import {
 } from "poyraz-ui/organisms";
 import { sidebarData } from "@/config/sidebar";
 import { cn } from "@/lib/utils";
-import { LogOut, Menu } from "lucide-react";
+import { ChevronUp, LogOut, Menu, Settings } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -39,7 +48,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
-        <aside className="hidden w-[280px] shrink-0 border-r border-border bg-background lg:block">
+        <aside className="hidden h-dvh w-[280px] shrink-0 border-r border-border bg-background lg:block">
           <AppSidebar pathname={pathname} user={user} />
         </aside>
 
@@ -51,7 +60,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
               className="absolute inset-0 bg-overlay"
               onClick={() => setIsMobileSidebarOpen(false)}
             />
-            <aside className="relative h-full w-[min(88vw,300px)] border-r border-border bg-background">
+            <aside className="relative h-dvh w-[min(88vw,300px)] border-r border-border bg-background">
               <AppSidebar
                 pathname={pathname}
                 user={user}
@@ -64,9 +73,14 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
             <Link href="/" className="flex items-center gap-2 font-semibold">
-              <span className="flex h-8 w-8 items-center justify-center rounded-sm bg-primary text-xs text-primary-foreground">
-                C
-              </span>
+              <Image
+                src="/logo/LogoWithBg.png"
+                alt="Cognis"
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-sm object-cover"
+                priority
+              />
               Cognis
             </Link>
             <Button
@@ -96,20 +110,28 @@ function AppSidebar({
   onNavigate?: () => void;
 }) {
   return (
-    <Sidebar variant="bordered" className="h-full rounded-none border-0">
-      <SidebarHeader>
+    <Sidebar
+      variant="bordered"
+      className="flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0"
+    >
+      <SidebarHeader className="shrink-0">
         <SidebarBranding
           title="Cognis"
           subtitle="Freelancer OS"
           logo={
-            <span className="flex h-9 w-9 items-center justify-center rounded-sm bg-primary text-sm font-bold text-primary-foreground">
-              C
-            </span>
+            <Image
+              src="/logo/LogoWithBg.png"
+              alt="Cognis"
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-sm object-cover"
+              priority
+            />
           }
         />
       </SidebarHeader>
 
-      <SidebarContent className="tiny-scrollbar">
+      <SidebarContent className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto">
         {sidebarData.map((group) => (
           <SidebarSection key={group.title} title={group.title} defaultOpen>
             <SidebarMenu>
@@ -146,23 +168,54 @@ function AppSidebar({
 
       <SidebarSeparator />
 
-      <SidebarFooter className="space-y-3">
-        <SidebarUserProfile
-          name={user.displayName}
-          role={user.email}
-          avatarUrl={user.avatarUrl || undefined}
-          initials={user.shortName}
-        />
-        <form action={signOut}>
-          <Button
-            type="submit"
-            variant="outline"
-            className="h-10 w-full justify-start gap-2"
-          >
-            <LogOut className="h-4 w-4" />
-            Cikis yap
-          </Button>
-        </form>
+      <SidebarFooter className="shrink-0">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="w-full rounded-sm text-left outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="flex items-center gap-2">
+                <SidebarUserProfile
+                  name={user.displayName}
+                  role={user.email}
+                  avatarUrl={user.avatarUrl || undefined}
+                  initials={user.shortName}
+                  className="min-w-0 flex-1"
+                />
+                <ChevronUp className="mr-3 h-4 w-4 shrink-0 text-muted-foreground" />
+              </div>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="top" className="w-64">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col gap-1">
+                <span className="truncate text-sm font-medium text-foreground">
+                  {user.displayName}
+                </span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {user.email}
+                </span>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/settings" onClick={onNavigate} className="gap-2">
+                <Settings className="h-4 w-4" />
+                Ayarlar
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <form action={signOut}>
+              <DropdownMenuItem asChild>
+                <button type="submit" className="w-full gap-2">
+                  <LogOut className="h-4 w-4" />
+                  Çıkış yap
+                </button>
+              </DropdownMenuItem>
+            </form>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
 
       <SidebarTrigger className="hidden" />
