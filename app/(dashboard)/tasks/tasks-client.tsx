@@ -4,6 +4,7 @@ import {
   completeTaskRecord,
   createTaskRecord,
   deleteTaskRecord,
+  updateTaskStatusRecord,
   updateTaskRecord,
 } from "@/app/(dashboard)/tasks/actions";
 import { Badge, Button, Card, CardContent, Input, Label, Textarea } from "poyraz-ui/atoms";
@@ -30,7 +31,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState, useTransition, type DragEvent } from "react";
 
 export type TaskRelationOption = {
   id: string;
@@ -81,20 +82,48 @@ type TasksClientProps = {
 };
 
 export function TasksClient({ tasks, clients, projects }: TasksClientProps) {
+  const [localTasks, setLocalTasks] = useState(tasks);
   const [query, setQuery] = useState("");
+  const [projectFilter, setProjectFilter] = useState("__all");
   const [view, setView] = useState<"list" | "kanban">("list");
+  const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
+
+  function handleTaskStatusChange(taskId: string, status: TaskListItem["status"]) {
+    const previousTasks = localTasks;
+
+    setLocalTasks((currentTasks) =>
+      currentTasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
+    );
+
+    startTransition(() => {
+      void updateTaskStatusRecord(taskId, status).catch(() => {
+        setLocalTasks(previousTasks);
+      });
+    });
+  }
+
   const normalizedQuery = query.trim().toLowerCase();
+  const filteredByProject =
+    projectFilter === "__all"
+      ? localTasks
+      : projectFilter === "__none"
+        ? localTasks.filter((task) => !task.project_id)
+        : localTasks.filter((task) => task.project_id === projectFilter);
   const filteredTasks = normalizedQuery
-    ? tasks.filter((task) =>
+    ? filteredByProject.filter((task) =>
         [task.title, task.description, task.clientName, task.projectName]
           .filter(Boolean)
           .some((value) => value!.toLowerCase().includes(normalizedQuery)),
       )
-    : tasks;
+    : filteredByProject;
 
-  const doneCount = tasks.filter((task) => task.status === "done").length;
-  const overdueCount = tasks.filter((task) => isOverdue(task)).length;
-  const urgentCount = tasks.filter((task) => task.priority === "urgent").length;
+  const doneCount = localTasks.filter((task) => task.status === "done").length;
+  const overdueCount = localTasks.filter((task) => isOverdue(task)).length;
+  const urgentCount = localTasks.filter((task) => task.priority === "urgent").length;
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6">
@@ -118,7 +147,7 @@ export function TasksClient({ tasks, clients, projects }: TasksClientProps) {
       </div>
 
       <div className="grid gap-3 md:grid-cols-4">
-        <StatCard label="Toplam görev" value={tasks.length.toString()} />
+        <StatCard label="Toplam görev" value={localTasks.length.toString()} />
         <StatCard label="Tamamlanan" value={doneCount.toString()} />
         <StatCard label="Geciken" value={overdueCount.toString()} />
         <StatCard label="Acil" value={urgentCount.toString()} />
@@ -140,6 +169,20 @@ export function TasksClient({ tasks, clients, projects }: TasksClientProps) {
                 placeholder="Görev, proje veya müşteri ara"
                 className="sm:w-80"
               />
+              <Select value={projectFilter} onValueChange={setProjectFilter}>
+                <SelectTrigger className="sm:w-56">
+                  <SelectValue placeholder="Proje filtrele" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all">Tüm projeler</SelectItem>
+                  <SelectItem value="__none">Projesiz görevler</SelectItem>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <div className="flex rounded-sm border border-border p-1">
                 <Button
                   type="button"
@@ -167,7 +210,12 @@ export function TasksClient({ tasks, clients, projects }: TasksClientProps) {
             view === "list" ? (
               <TaskList tasks={filteredTasks} clients={clients} projects={projects} />
             ) : (
-              <TaskKanban tasks={filteredTasks} clients={clients} projects={projects} />
+              <TaskKanban
+                tasks={filteredTasks}
+                clients={clients}
+                projects={projects}
+                onTaskStatusChange={handleTaskStatusChange}
+              />
             )
           ) : (
             <EmptyState hasQuery={Boolean(normalizedQuery)} />
@@ -245,12 +293,29 @@ function TaskKanban({
   tasks,
   clients,
   projects,
+  onTaskStatusChange,
 }: {
   tasks: TaskListItem[];
   clients: TaskRelationOption[];
   projects: TaskRelationOption[];
+  onTaskStatusChange: (taskId: string, status: TaskListItem["status"]) => void;
 }) {
   const columns = ["todo", "in_progress", "done"] as const;
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+
+  function handleDragStart(event: DragEvent<HTMLDivElement>, taskId: string) {
+    setDraggedTaskId(taskId);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", taskId);
+    event.dataTransfer.setDragImage(event.currentTarget, 24, 24);
+  }
+
+  function handleDrop(status: TaskListItem["status"]) {
+    if (!draggedTaskId) return;
+
+    onTaskStatusChange(draggedTaskId, status);
+    setDraggedTaskId(null);
+  }
 
   return (
     <div className="tiny-scrollbar grid gap-4 overflow-x-auto pb-2 lg:grid-cols-3">
@@ -258,14 +323,32 @@ function TaskKanban({
         const columnTasks = tasks.filter((task) => task.status === status);
 
         return (
-          <div key={status} className="min-w-72 rounded-sm border border-border bg-muted/20 p-3">
+          <div
+            key={status}
+            className="min-w-72 rounded-sm border border-border bg-muted/20 p-3 transition-colors"
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "move";
+            }}
+            onDrop={() => handleDrop(status)}
+          >
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-foreground">{statusLabels[status]}</h3>
               <Badge>{columnTasks.length}</Badge>
             </div>
             <div className="space-y-3">
               {columnTasks.map((task) => (
-                <Card key={task.id}>
+                <Card
+                  key={task.id}
+                  draggable
+                  className={
+                    draggedTaskId === task.id
+                      ? "cursor-grabbing opacity-50 ring-2 ring-primary/20 transition"
+                      : "cursor-grab transition hover:border-primary/30 active:cursor-grabbing"
+                  }
+                  onDragStart={(event) => handleDragStart(event, task.id)}
+                  onDragEnd={() => setDraggedTaskId(null)}
+                >
                   <CardContent className="space-y-3 p-3">
                     <div>
                       <div className="font-medium text-foreground">{task.title}</div>
@@ -399,6 +482,39 @@ function TaskFormFields({
   clients: TaskRelationOption[];
   projects: TaskRelationOption[];
 }) {
+  const [clientId, setClientId] = useState(task?.client_id || "__none");
+  const [projectId, setProjectId] = useState(task?.project_id || "__none");
+  const selectedProject =
+    projectId === "__none" ? null : projects.find((project) => project.id === projectId) || null;
+  const shouldLockClient = Boolean(selectedProject);
+  const filteredProjects =
+    clientId === "__none" || shouldLockClient
+      ? projects
+      : projects.filter((project) => project.client_id === clientId);
+
+  function handleClientChange(nextClientId: string) {
+    setClientId(nextClientId);
+
+    if (
+      projectId !== "__none" &&
+      nextClientId !== "__none" &&
+      !projects.some((project) => project.id === projectId && project.client_id === nextClientId)
+    ) {
+      setProjectId("__none");
+    }
+  }
+
+  function handleProjectChange(nextProjectId: string) {
+    setProjectId(nextProjectId);
+
+    if (nextProjectId === "__none") {
+      return;
+    }
+
+    const nextProject = projects.find((project) => project.id === nextProjectId);
+    setClientId(nextProject?.client_id || "__none");
+  }
+
   return (
     <div className="grid gap-4">
       <div className="grid gap-2">
@@ -438,20 +554,44 @@ function TaskFormFields({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <SelectField name="client_id" label="Müşteri" defaultValue={task?.client_id || ""}>
-          {clients.map((client) => (
-            <SelectItem key={client.id} value={client.id}>
-              {client.name}
-            </SelectItem>
-          ))}
-        </SelectField>
-        <SelectField name="project_id" label="Proje" defaultValue={task?.project_id || ""}>
-          {projects.map((project) => (
-            <SelectItem key={project.id} value={project.id}>
-              {project.name}
-            </SelectItem>
-          ))}
-        </SelectField>
+        <div className="grid gap-2">
+          <Label>Müşteri</Label>
+          {shouldLockClient ? <input type="hidden" name="client_id" value={clientId} /> : null}
+          <Select
+            name="client_id"
+            value={clientId}
+            onValueChange={handleClientChange}
+            disabled={shouldLockClient}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Müşteri seç" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none">Müşteri yok</SelectItem>
+              {clients.map((client) => (
+                <SelectItem key={client.id} value={client.id}>
+                  {client.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <Label>Proje</Label>
+          <Select name="project_id" value={projectId} onValueChange={handleProjectChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Proje seç" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none">Proje yok</SelectItem>
+              {filteredProjects.map((project) => (
+                <SelectItem key={project.id} value={project.id}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

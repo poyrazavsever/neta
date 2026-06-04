@@ -11,6 +11,11 @@ function cleanText(value: FormDataEntryValue | null) {
   return text.length > 0 ? text : null;
 }
 
+function cleanRelationId(value: FormDataEntryValue | null) {
+  const id = cleanText(value);
+  return id && id !== "__none" ? id : null;
+}
+
 function readStatus(value: FormDataEntryValue | null) {
   const status = typeof value === "string" ? value : "todo";
   return TASK_STATUSES.includes(status as (typeof TASK_STATUSES)[number])
@@ -50,8 +55,8 @@ function readPayload(formData: FormData) {
     description: cleanText(formData.get("description")),
     status: readStatus(formData.get("status")),
     priority: readPriority(formData.get("priority")),
-    client_id: cleanText(formData.get("client_id")),
-    project_id: cleanText(formData.get("project_id")),
+    client_id: cleanRelationId(formData.get("client_id")),
+    project_id: cleanRelationId(formData.get("project_id")),
     due_at: cleanText(formData.get("due_at")),
     estimated_minutes: readMinutes(formData.get("estimated_minutes")),
     actual_minutes: readMinutes(formData.get("actual_minutes")),
@@ -117,6 +122,27 @@ export async function completeTaskRecord(formData: FormData) {
 
   if (error) {
     throw new Error(`Görev tamamlanamadı: ${error.message}`);
+  }
+
+  revalidatePath("/tasks");
+}
+
+export async function updateTaskStatusRecord(taskId: string, status: string) {
+  const { supabase, userId } = await getCurrentUserId();
+  const nextStatus = readStatus(status);
+
+  if (!taskId) {
+    throw new Error("Durumu güncellenecek görev bulunamadı.");
+  }
+
+  const { error } = await supabase
+    .from("tasks")
+    .update({ status: nextStatus })
+    .eq("id", taskId)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(`Görev durumu güncellenemedi: ${error.message}`);
   }
 
   revalidatePath("/tasks");
