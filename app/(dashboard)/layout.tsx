@@ -19,7 +19,7 @@ export default async function DashboardLayout({
         .maybeSingle()
     : { data: null };
 
-  const fallbackName = user?.email?.split("@")[0] ?? "MindSpace Kullanıcısı";
+  const fallbackName = user?.email?.split("@")[0] ?? "Cognis Kullanıcısı";
   const displayName =
     [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
     fallbackName;
