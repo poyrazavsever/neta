@@ -1,0 +1,567 @@
+"use client";
+
+import {
+  completeTaskRecord,
+  createTaskRecord,
+  deleteTaskRecord,
+  updateTaskRecord,
+} from "@/app/(dashboard)/tasks/actions";
+import { Badge, Button, Card, CardContent, Input, Label, Textarea } from "poyraz-ui/atoms";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "poyraz-ui/molecules";
+import {
+  CalendarDays,
+  CheckCircle2,
+  KanbanSquare,
+  LayoutList,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
+import { useState } from "react";
+
+export type TaskRelationOption = {
+  id: string;
+  name: string;
+  client_id?: string | null;
+};
+
+export type TaskListItem = {
+  id: string;
+  title: string;
+  description: string | null;
+  status: "todo" | "in_progress" | "done";
+  priority: "low" | "medium" | "high" | "urgent";
+  due_at: string | null;
+  estimated_minutes: number | null;
+  actual_minutes: number | null;
+  client_id: string | null;
+  clientName: string | null;
+  project_id: string | null;
+  projectName: string | null;
+  created_at: string;
+};
+
+const statusLabels = {
+  todo: "Yapılacak",
+  in_progress: "Devam ediyor",
+  done: "Tamamlandı",
+};
+
+const priorityLabels = {
+  low: "Düşük",
+  medium: "Orta",
+  high: "Yüksek",
+  urgent: "Acil",
+};
+
+const priorityClasses = {
+  low: "border-zinc-200 bg-zinc-50 text-zinc-700",
+  medium: "border-blue-200 bg-blue-50 text-blue-700",
+  high: "border-amber-200 bg-amber-50 text-amber-700",
+  urgent: "border-rose-200 bg-rose-50 text-rose-700",
+};
+
+type TasksClientProps = {
+  tasks: TaskListItem[];
+  clients: TaskRelationOption[];
+  projects: TaskRelationOption[];
+};
+
+export function TasksClient({ tasks, clients, projects }: TasksClientProps) {
+  const [query, setQuery] = useState("");
+  const [view, setView] = useState<"list" | "kanban">("list");
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredTasks = normalizedQuery
+    ? tasks.filter((task) =>
+        [task.title, task.description, task.clientName, task.projectName]
+          .filter(Boolean)
+          .some((value) => value!.toLowerCase().includes(normalizedQuery)),
+      )
+    : tasks;
+
+  const doneCount = tasks.filter((task) => task.status === "done").length;
+  const overdueCount = tasks.filter((task) => isOverdue(task)).length;
+  const urgentCount = tasks.filter((task) => task.priority === "urgent").length;
+
+  return (
+    <div className="mx-auto flex max-w-7xl flex-col gap-6">
+      <div className="flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <CheckCircle2 className="h-4 w-4" />
+            Günlük operasyon
+          </div>
+          <div>
+            <h1 className="text-3xl font-semibold tracking-normal text-foreground">
+              Görevler
+            </h1>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+              Proje ve müşteri bağlantılı işleri liste veya basit kanban ile takip et.
+            </p>
+          </div>
+        </div>
+
+        <TaskDialog mode="create" clients={clients} projects={projects} />
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-4">
+        <StatCard label="Toplam görev" value={tasks.length.toString()} />
+        <StatCard label="Tamamlanan" value={doneCount.toString()} />
+        <StatCard label="Geciken" value={overdueCount.toString()} />
+        <StatCard label="Acil" value={urgentCount.toString()} />
+      </div>
+
+      <Card>
+        <CardContent className="space-y-4 p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">Görev listesi</h2>
+              <p className="text-sm text-muted-foreground">
+                {filteredTasks.length} kayıt görüntüleniyor.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Görev, proje veya müşteri ara"
+                className="sm:w-80"
+              />
+              <div className="flex rounded-sm border border-border p-1">
+                <Button
+                  type="button"
+                  variant={view === "list" ? "default" : "ghost"}
+                  className="h-8 gap-2 px-3"
+                  onClick={() => setView("list")}
+                >
+                  <LayoutList className="h-4 w-4" />
+                  Liste
+                </Button>
+                <Button
+                  type="button"
+                  variant={view === "kanban" ? "default" : "ghost"}
+                  className="h-8 gap-2 px-3"
+                  onClick={() => setView("kanban")}
+                >
+                  <KanbanSquare className="h-4 w-4" />
+                  Kanban
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {filteredTasks.length > 0 ? (
+            view === "list" ? (
+              <TaskList tasks={filteredTasks} clients={clients} projects={projects} />
+            ) : (
+              <TaskKanban tasks={filteredTasks} clients={clients} projects={projects} />
+            )
+          ) : (
+            <EmptyState hasQuery={Boolean(normalizedQuery)} />
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function TaskList({
+  tasks,
+  clients,
+  projects,
+}: {
+  tasks: TaskListItem[];
+  clients: TaskRelationOption[];
+  projects: TaskRelationOption[];
+}) {
+  return (
+    <div className="overflow-hidden rounded-sm border border-border">
+      <div className="hidden grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
+        <span>Görev</span>
+        <span>Bağlantı</span>
+        <span>Öncelik</span>
+        <span>Son tarih</span>
+        <span className="text-right">İşlem</span>
+      </div>
+      <div className="divide-y divide-border">
+        {tasks.map((task) => (
+          <TaskRow key={task.id} task={task} clients={clients} projects={projects} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TaskRow({
+  task,
+  clients,
+  projects,
+}: {
+  task: TaskListItem;
+  clients: TaskRelationOption[];
+  projects: TaskRelationOption[];
+}) {
+  return (
+    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] lg:items-center">
+      <div className="min-w-0">
+        <div className={task.status === "done" ? "font-medium text-muted-foreground line-through" : "font-medium text-foreground"}>
+          {task.title}
+        </div>
+        <div className="truncate text-sm text-muted-foreground">
+          {statusLabels[task.status]}
+        </div>
+      </div>
+      <div className="text-sm text-muted-foreground">
+        <div>{task.projectName || "Proje yok"}</div>
+        <div>{task.clientName || "Müşteri yok"}</div>
+      </div>
+      <div>
+        <Badge className={priorityClasses[task.priority]}>
+          {priorityLabels[task.priority]}
+        </Badge>
+      </div>
+      <div className={isOverdue(task) ? "text-sm font-medium text-rose-600" : "text-sm text-muted-foreground"}>
+        {task.due_at ? formatDateTime(task.due_at) : "Yok"}
+      </div>
+      <TaskActions task={task} clients={clients} projects={projects} />
+    </div>
+  );
+}
+
+function TaskKanban({
+  tasks,
+  clients,
+  projects,
+}: {
+  tasks: TaskListItem[];
+  clients: TaskRelationOption[];
+  projects: TaskRelationOption[];
+}) {
+  const columns = ["todo", "in_progress", "done"] as const;
+
+  return (
+    <div className="tiny-scrollbar grid gap-4 overflow-x-auto pb-2 lg:grid-cols-3">
+      {columns.map((status) => {
+        const columnTasks = tasks.filter((task) => task.status === status);
+
+        return (
+          <div key={status} className="min-w-72 rounded-sm border border-border bg-muted/20 p-3">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground">{statusLabels[status]}</h3>
+              <Badge>{columnTasks.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {columnTasks.map((task) => (
+                <Card key={task.id}>
+                  <CardContent className="space-y-3 p-3">
+                    <div>
+                      <div className="font-medium text-foreground">{task.title}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {task.projectName || task.clientName || "Bağlantı yok"}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge className={priorityClasses[task.priority]}>
+                        {priorityLabels[task.priority]}
+                      </Badge>
+                      <TaskActions task={task} clients={clients} projects={projects} compact />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TaskActions({
+  task,
+  clients,
+  projects,
+  compact = false,
+}: {
+  task: TaskListItem;
+  clients: TaskRelationOption[];
+  projects: TaskRelationOption[];
+  compact?: boolean;
+}) {
+  return (
+    <div className={compact ? "flex justify-end gap-1" : "flex justify-start gap-2 lg:justify-end"}>
+      <TaskDialog mode="edit" task={task} clients={clients} projects={projects} />
+      {task.status !== "done" ? (
+        <form action={completeTaskRecord}>
+          <input type="hidden" name="id" value={task.id} />
+          <Button type="submit" variant="outline" className="h-9 min-w-24 gap-2 px-3">
+            <CheckCircle2 className="h-4 w-4" />
+            {!compact ? "Tamamla" : null}
+          </Button>
+        </form>
+      ) : null}
+      <form action={deleteTaskRecord}>
+        <input type="hidden" name="id" value={task.id} />
+        <Button type="submit" variant="outline" className="h-9 gap-2 px-3 text-rose-600">
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </form>
+    </div>
+  );
+}
+
+function TaskDialog({
+  mode,
+  task,
+  clients,
+  projects,
+}: {
+  mode: "create" | "edit";
+  task?: TaskListItem;
+  clients: TaskRelationOption[];
+  projects: TaskRelationOption[];
+}) {
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const action = mode === "create" ? createTaskRecord : updateTaskRecord;
+
+  async function handleSubmit(formData: FormData) {
+    setIsSubmitting(true);
+
+    try {
+      await action(formData);
+      setOpen(false);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant={mode === "create" ? "default" : "outline"}
+          className="h-9 min-w-24 gap-2 px-3"
+        >
+          {mode === "create" ? <Plus className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+          {mode === "create" ? "Görev ekle" : "Düzenle"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[min(680px,calc(100dvh-6rem))] overflow-hidden sm:max-w-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
+        <form action={handleSubmit} className="flex max-h-[min(640px,calc(100dvh-9rem))] flex-col">
+          {task ? <input type="hidden" name="id" value={task.id} /> : null}
+          <DialogHeader className="shrink-0 pb-5">
+            <DialogTitle>{mode === "create" ? "Yeni görev" : "Görevi düzenle"}</DialogTitle>
+            <DialogDescription>
+              Görevi proje, müşteri, öncelik ve son tarih bilgileriyle kaydet.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto pr-2">
+            <TaskFormFields task={task} clients={clients} projects={projects} />
+          </div>
+
+          <DialogFooter className="shrink-0 border-t border-border pt-5">
+            <Button type="submit" disabled={isSubmitting} className="gap-2">
+              {mode === "create" ? <Plus className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+              {isSubmitting
+                ? "Kaydediliyor"
+                : mode === "create"
+                  ? "Görevi ekle"
+                  : "Değişiklikleri kaydet"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function TaskFormFields({
+  task,
+  clients,
+  projects,
+}: {
+  task?: TaskListItem;
+  clients: TaskRelationOption[];
+  projects: TaskRelationOption[];
+}) {
+  return (
+    <div className="grid gap-4">
+      <div className="grid gap-2">
+        <Label htmlFor={`title-${task?.id || "new"}`}>Başlık</Label>
+        <Input
+          id={`title-${task?.id || "new"}`}
+          name="title"
+          defaultValue={task?.title || ""}
+          required
+          placeholder="Örn. Ana sayfa wireframe revizyonu"
+        />
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor={`description-${task?.id || "new"}`}>Açıklama</Label>
+        <Textarea
+          id={`description-${task?.id || "new"}`}
+          name="description"
+          defaultValue={task?.description || ""}
+          rows={3}
+          placeholder="Kapsam, not veya teslim kriterleri..."
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <SelectField name="status" label="Durum" defaultValue={task?.status || "todo"}>
+          <SelectItem value="todo">Yapılacak</SelectItem>
+          <SelectItem value="in_progress">Devam ediyor</SelectItem>
+          <SelectItem value="done">Tamamlandı</SelectItem>
+        </SelectField>
+        <SelectField name="priority" label="Öncelik" defaultValue={task?.priority || "medium"}>
+          <SelectItem value="low">Düşük</SelectItem>
+          <SelectItem value="medium">Orta</SelectItem>
+          <SelectItem value="high">Yüksek</SelectItem>
+          <SelectItem value="urgent">Acil</SelectItem>
+        </SelectField>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <SelectField name="client_id" label="Müşteri" defaultValue={task?.client_id || ""}>
+          {clients.map((client) => (
+            <SelectItem key={client.id} value={client.id}>
+              {client.name}
+            </SelectItem>
+          ))}
+        </SelectField>
+        <SelectField name="project_id" label="Proje" defaultValue={task?.project_id || ""}>
+          {projects.map((project) => (
+            <SelectItem key={project.id} value={project.id}>
+              {project.name}
+            </SelectItem>
+          ))}
+        </SelectField>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-2">
+          <Label htmlFor={`due-${task?.id || "new"}`}>Son tarih</Label>
+          <Input
+            id={`due-${task?.id || "new"}`}
+            name="due_at"
+            type="datetime-local"
+            defaultValue={task?.due_at ? toDateTimeLocal(task.due_at) : ""}
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor={`estimated-${task?.id || "new"}`}>Tahmini süre</Label>
+          <Input
+            id={`estimated-${task?.id || "new"}`}
+            name="estimated_minutes"
+            type="number"
+            min="0"
+            defaultValue={task?.estimated_minutes ?? ""}
+            placeholder="Dakika"
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor={`actual-${task?.id || "new"}`}>Gerçekleşen süre</Label>
+          <Input
+            id={`actual-${task?.id || "new"}`}
+            name="actual_minutes"
+            type="number"
+            min="0"
+            defaultValue={task?.actual_minutes ?? ""}
+            placeholder="Dakika"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SelectField({
+  name,
+  label,
+  defaultValue,
+  children,
+}: {
+  name: string;
+  label: string;
+  defaultValue: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="grid gap-2">
+      <Label>{label}</Label>
+      <Select name={name} defaultValue={defaultValue}>
+        <SelectTrigger>
+          <SelectValue placeholder={`${label} seç`} />
+        </SelectTrigger>
+        <SelectContent>{children}</SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <Card>
+      <CardContent className="flex items-center justify-between gap-3 p-4">
+        <div>
+          <p className="text-sm text-muted-foreground">{label}</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10 text-primary">
+          <CheckCircle2 className="h-5 w-5" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function EmptyState({ hasQuery }: { hasQuery: boolean }) {
+  return (
+    <div className="flex min-h-72 flex-col items-center justify-center rounded-sm border border-dashed border-border bg-muted/20 p-8 text-center">
+      <CheckCircle2 className="h-10 w-10 text-muted-foreground" />
+      <h3 className="mt-4 text-lg font-semibold text-foreground">
+        {hasQuery ? "Aramana uygun görev yok" : "Henüz görev eklenmedi"}
+      </h3>
+      <p className="mt-2 max-w-md text-sm text-muted-foreground">
+        {hasQuery
+          ? "Arama metnini sadeleştirerek tekrar deneyebilirsin."
+          : "İlk görevini ekleyerek proje ve müşteri operasyonunu takip etmeye başlayabilirsin."}
+      </p>
+    </div>
+  );
+}
+
+function isOverdue(task: TaskListItem) {
+  return Boolean(task.due_at && task.status !== "done" && new Date(task.due_at) < new Date());
+}
+
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("tr-TR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function toDateTimeLocal(value: string) {
+  const date = new Date(value);
+  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return offsetDate.toISOString().slice(0, 16);
+}
