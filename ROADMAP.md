@@ -113,40 +113,61 @@ MVP disi:
 
 ### 3. Projeler ve Side Project'ler
 
-**Amac:** Musteri projeleri ve kisisel side project'leri ayni mantikta ama ayri turlerle takip etmek.
+**Amaç:** Müşteri projeleri ve kişisel side project'leri aynı temel mantıkla ama ayrı türlerle takip etmek. Proje yönetimi yalnızca görevlerden oluşmaz; proje hedefi, çözdüğü problem, kapsamı, görsel kimliği ve planlama notları da projenin ana parçasıdır.
 
-MVP alanlari:
+MVP alanları:
 
-- Proje adi
-- Tur: client_project, side_project
-- Bagli musteri, sadece client_project icin opsiyonel/zorunlu
-- Aciklama
+- Proje adı
+- Tür: client_project, side_project
+- Bağlı müşteri, sadece client_project için opsiyonel/zorunlu
+- Kapak görseli, kullanıcının bilgisayarından yüklenir
+- Kapak görseli alt metni
+- Açıklama
 - Durum: planning, active, paused, completed, cancelled
-- Baslangic tarihi
+- Başlangıç tarihi
 - Deadline
-- Butce veya beklenen gelir
-- Ilerleme yuzdesi, gorevlerden otomatik hesaplanabilir
+- Bütçe veya beklenen gelir
+- İlerleme yüzdesi, görevlerden otomatik hesaplanabilir veya manuel güncellenebilir
 
-MVP aksiyonlari:
+MVP proje detay alanları:
+
+- Genel bakış: Projenin kısa özeti, mevcut durum ve önemli notlar
+- Çözdüğü problem: Hangi kullanıcı/müşteri problemini çözdüğü
+- Amaç ve başarı kriterleri: Proje bittiğinde neyin başarılı kabul edileceği
+- Hedef kitle: Projenin kimin için yapıldığı
+- Kapsam: Dahil olan ve dahil olmayan işler
+- Design system: Renk paleti, tipografi, component notları ve görsel dil
+- Renk paleti: Hex değerleri, kullanım rolleri ve notlar
+- Tipografi: Font ailesi, başlık/gövde kullanımı ve hiyerarşi notları
+- Görsel varlıklar: Kapak görseli ve proje içi görsel referanslar
+- Serbest notlar: Projeye özel planlama notları
+
+MVP aksiyonları:
 
 - Proje ekleme
-- Proje duzenleme
-- Projeye gorev baglama
-- Proje durumunu guncelleme
+- Proje düzenleme
+- Projeye bilgisayardan kapak görseli yükleme
+- Proje detay sayfasında görev dışı planlama alanlarını yönetme
+- Proje detayında design system alanları ekleme/düzenleme
+- Projeye görev bağlama
+- Proje durumunu güncelleme
+- Projeyi tamamlandı olarak işaretleme
 
 Raporlar:
 
-- Aktif proje sayisi
-- Geciken proje sayisi
-- Proje bazli gorev tamamlama orani
-- Musteri projeleri / side project dagilimi
+- Aktif proje sayısı
+- Geciken proje sayısı
+- Proje bazlı görev tamamlama oranı
+- Müşteri projeleri / side project dağılımı
+- Design system alanı eksik olan aktif projeler
+- Amaç veya problem tanımı eksik olan projeler
 
-MVP disi:
+MVP dışı:
 
-- Ekip uyeleri
-- Dosya yonetimi
+- Ekip üyeleri
+- Gelişmiş dosya/drive yönetimi
 - Kanban sprint sistemi
-- Gelismis risk analizi
+- Gelişmiş risk analizi
 
 ---
 
@@ -395,6 +416,7 @@ Minimum tablolar:
 - `profiles`
 - `clients`
 - `projects`
+- `project_planning_sections`
 - `tasks`
 - `calendar_events`
 - `finance_transactions`
@@ -402,10 +424,12 @@ Minimum tablolar:
 - `chat_sessions`
 - `chat_messages`
 - `app_settings`
+- Supabase Storage bucket: `project-assets`
 
 Temel iliskiler:
 
 - `clients` -> `projects`
+- `projects` -> `project_planning_sections`
 - `projects` -> `tasks`
 - `clients` -> `finance_transactions`
 - `projects` -> `finance_transactions`
@@ -527,6 +551,11 @@ Isler:
 - Projeler/side project CRUD
   - Proje kartlari, filtreler, detay paneli ve form akislari Poyraz UI ile kurulur.
   - Musteri projesi ve side project ayrimi UI'da net gosterilir.
+  - Proje kapak gorseli bilgisayardan yuklenebilir; harici gorsel linki MVP icin ana akis olmaz.
+  - Proje detay sayfasi eklenir.
+  - Proje detayinda gorevler disinda planlama alanlari yonetilir: genel bakis, cozdugu problem, amac, hedef kitle, kapsam, design system, renk paleti, tipografi, gorsel varliklar ve notlar.
+  - Design system alaninda renk paleti, tipografi ve component/gorsel dil notlari eklenebilir ve duzenlenebilir.
+  - Proje detay sayfasi proje icin tek kaynak olur; gorevler sadece bu kaynak icindeki operasyon katmanidir.
 - Gorevler CRUD
   - Liste ve basit kanban Poyraz UI bilesenleriyle yeniden tasarlanir.
   - Durum, oncelik, deadline ve proje iliskisi icin Poyraz UI Badge/Form/Select kullanilir.
@@ -546,6 +575,202 @@ Kabul kriteri:
 - Her modulde liste, ekleme, duzenleme ve temel silme/arsivleme vardir.
 - Bos durumlar kullaniciyi dogru aksiyona yonlendirir.
 - Faz 2 kapsamindaki her yeni/yenilenen modul Poyraz UI bilesenleriyle yazilir.
+
+---
+
+## Proje Detay MVP Planı
+
+Bu bölüm, Faz 2 içindeki Projeler/Side Project modülünün görev takibinden daha geniş bir proje yönetim alanına dönüşmesi için detaylı uygulama planıdır.
+
+### 1. Liste ve Oluşturma
+
+Amaç: Kullanıcı projeyi hızlıca oluşturabilsin ve görsel kimliğini ilk anda belirleyebilsin.
+
+Alanlar:
+
+- Proje adı
+- Tür: müşteri projesi veya side project
+- Bağlı müşteri
+- Kapak görseli
+- Kapak görseli alt metni
+- Kısa açıklama
+- Durum
+- Başlangıç tarihi
+- Deadline
+- Bütçe / beklenen gelir
+- İlerleme yüzdesi
+
+Davranış:
+
+- Görsel bilgisayardan seçilir ve `project-assets` bucket'ına yüklenir.
+- Görsel yolu `projects.cover_image_path` alanında saklanır.
+- Görsel link ile ekleme MVP akışı değildir.
+- Görsel yüklenmezse proje kartında sade placeholder gösterilir.
+
+### 2. Proje Detay Sayfası
+
+Amaç: Proje ile ilgili görev dışı tüm planlama bilgisini tek merkezde yönetmek.
+
+Route önerisi:
+
+- `/projects/[id]`
+
+Ana bölümler:
+
+- Özet
+- Planlama
+- Design system
+- Görevler
+- Finans bağlantıları
+- Zaman çizelgesi
+
+İlk MVP için zorunlu bölümler:
+
+- Özet
+- Planlama
+- Design system
+- Görevler
+
+### 3. Özet Bölümü
+
+İçerik:
+
+- Kapak görseli
+- Proje adı
+- Müşteri veya side project etiketi
+- Durum
+- İlerleme
+- Deadline
+- Bütçe
+- Kısa açıklama
+
+Amaç:
+
+- Kullanıcı projeye girdiğinde projenin ne olduğunu ve hangi durumda olduğunu ilk bakışta anlar.
+
+### 4. Planlama Bölümü
+
+Bu bölüm `project_planning_sections` tablosundan beslenir.
+
+MVP kategorileri:
+
+- Genel bakış (`overview`)
+- Çözdüğü problem (`problem`)
+- Amaç (`goal`)
+- Hedef kitle (`audience`)
+- Kapsam (`scope`)
+- Notlar (`notes`)
+
+Her kategori için:
+
+- Başlık
+- Açıklama / içerik
+- Sıralama
+- Opsiyonel metadata
+
+Kullanım:
+
+- Kullanıcı kategori ekleyebilir.
+- Kullanıcı kategori düzenleyebilir.
+- Kullanıcı kategori silebilir.
+- Kategoriler proje detayında ayrı kartlar halinde gösterilir.
+
+### 5. Design System Bölümü
+
+Bu bölüm de `project_planning_sections` tablosunu kullanır.
+
+MVP kategorileri:
+
+- Design system (`design_system`)
+- Renk paleti (`color_palette`)
+- Tipografi (`typography`)
+- Görsel varlıklar (`assets`)
+
+Design system alanları:
+
+- Genel görsel dil
+- Kullanılacak UI kit veya referans sistem
+- Component notları
+- Spacing / radius / shadow notları
+
+Renk paleti alanları:
+
+- Renk adı
+- Hex değeri
+- Kullanım rolü: primary, secondary, accent, background, text, border
+- Not
+
+Tipografi alanları:
+
+- Font ailesi
+- Başlık kullanımı
+- Gövde metni kullanımı
+- Boyut/hiyerarşi notları
+
+MVP yaklaşımı:
+
+- İlk sürümde renk paleti ve tipografi structured JSON metadata içinde tutulabilir.
+- UI tarafında bu metadata sade form alanlarıyla düzenlenir.
+- Gerekirse MVP sonrası `project_colors` ve `project_typography_tokens` gibi ayrı tablolara bölünebilir.
+
+### 6. Görevler Bölümü
+
+Amaç:
+
+- Projeye bağlı görevleri proje detayından da yönetebilmek.
+
+MVP kapsamı:
+
+- Projeye bağlı görevleri listeleme
+- Yeni görev ekleme
+- Görev durumunu güncelleme
+- Görevi tamamlandı işaretleme
+
+Bu bölüm görev modülüyle aynı veriyi kullanır; ayrı bir görev sistemi kurulmaz.
+
+### 7. Görsel Varlık Yönetimi
+
+MVP kapsamı:
+
+- Proje kapak görseli yükleme
+- Kapak görselini değiştirme
+- Kapak görseli alt metni düzenleme
+
+MVP dışı:
+
+- Çoklu dosya klasör yapısı
+- Versiyonlama
+- Dosya yorumları
+- Gelişmiş medya kütüphanesi
+
+Storage kuralı:
+
+- Bucket: `project-assets`
+- Path: `<user_id>/projects/<project_id>/<file_name>`
+- Bucket private olur.
+- Uygulama görsel gösterirken signed URL üretir.
+
+### 8. Uygulama Sırası
+
+1. Database migration: `0003_add_project_planning_assets.sql`
+2. Proje formuna kapak görseli yükleme alanı ekle
+3. Proje kartlarında kapak görseli göster
+4. `/projects/[id]` detay sayfasını oluştur
+5. Proje detay özet bölümünü gerçek veriyle kur
+6. `project_planning_sections` CRUD action'larını ekle
+7. Planlama bölümü kartlarını ekle
+8. Design system bölümünü ekle
+9. Projeye bağlı görevler bölümünü detay sayfasına bağla
+10. Dashboard raporlarında design system/problem/amaç eksikliği gibi proje sağlık sinyallerini kullan
+
+### 9. Kabul Kriterleri
+
+- Kullanıcı proje oluştururken bilgisayarından kapak görseli yükleyebilir.
+- Proje kartında ve detay sayfasında kapak görseli görünür.
+- Kullanıcı proje detayında görevler dışında proje planlama alanlarını yönetebilir.
+- Kullanıcı design system, renk paleti ve tipografi notlarını ekleyebilir.
+- Tüm veriler kullanıcı bazlı RLS ile korunur.
+- `npm run build` başarılı olur.
 
 ---
 

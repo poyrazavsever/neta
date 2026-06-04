@@ -80,21 +80,33 @@
 }
 
 @layer utilities {
-  .tiny-scrollbar::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--poyraz-primary) 45%, transparent) transparent;
   }
 
+  *::-webkit-scrollbar,
+  .tiny-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track,
   .tiny-scrollbar::-webkit-scrollbar-track {
     background: transparent;
   }
 
+  *::-webkit-scrollbar-thumb,
   .tiny-scrollbar::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--poyraz-primary) 30%, transparent);
-    border-radius: 4px;
+    background: color-mix(in srgb, var(--poyraz-primary) 36%, transparent);
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
   }
 
+  *::-webkit-scrollbar-thumb:hover,
   .tiny-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in srgb, var(--poyraz-primary) 55%, transparent);
+    background: color-mix(in srgb, var(--poyraz-primary) 58%, transparent);
+    background-clip: padding-box;
   }
 }
