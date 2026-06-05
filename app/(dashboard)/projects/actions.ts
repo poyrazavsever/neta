@@ -6,6 +6,18 @@ import { revalidatePath } from "next/cache";
 
 const PROJECT_TYPES = ["client_project", "side_project"] as const;
 const PROJECT_STATUSES = ["planning", "active", "paused", "completed", "cancelled"] as const;
+const PLANNING_SECTION_CATEGORIES = [
+  "overview",
+  "problem",
+  "goal",
+  "audience",
+  "scope",
+  "design_system",
+  "color_palette",
+  "typography",
+  "assets",
+  "notes",
+] as const;
 const PROJECT_ASSETS_BUCKET = "project-assets";
 
 function cleanText(value: FormDataEntryValue | null) {
@@ -25,6 +37,15 @@ function readProjectStatus(value: FormDataEntryValue | null) {
   return PROJECT_STATUSES.includes(status as (typeof PROJECT_STATUSES)[number])
     ? status
     : "planning";
+}
+
+function readPlanningSectionCategory(value: FormDataEntryValue | null) {
+  const category = typeof value === "string" ? value : "overview";
+  return PLANNING_SECTION_CATEGORIES.includes(
+    category as (typeof PLANNING_SECTION_CATEGORIES)[number],
+  )
+    ? category
+    : "overview";
 }
 
 function readNumber(value: FormDataEntryValue | null) {
@@ -209,4 +230,93 @@ export async function completeProjectRecord(formData: FormData) {
   }
 
   revalidatePath("/projects");
+  revalidatePath(`/projects/${id}`);
+}
+
+function readPlanningSectionPayload(formData: FormData) {
+  return {
+    project_id: cleanText(formData.get("project_id")),
+    category: readPlanningSectionCategory(formData.get("category")),
+    title: cleanText(formData.get("title")),
+    content: cleanText(formData.get("content")),
+    sort_order: Math.round(readNumber(formData.get("sort_order")) ?? 0),
+  };
+}
+
+export async function createProjectPlanningSectionRecord(formData: FormData) {
+  const { supabase, userId } = await getCurrentUserId();
+  const payload = readPlanningSectionPayload(formData);
+
+  if (!payload.project_id || !payload.title) {
+    throw new Error("Planlama alanı eklemek için proje ve başlık zorunludur.");
+  }
+
+  const { error } = await supabase.from("project_planning_sections").insert({
+    user_id: userId,
+    project_id: payload.project_id,
+    category: payload.category,
+    title: payload.title,
+    content: payload.content,
+    sort_order: payload.sort_order,
+  });
+
+  if (error) {
+    throw new Error(`Planlama alanı eklenemedi: ${error.message}`);
+  }
+
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${payload.project_id}`);
+}
+
+export async function updateProjectPlanningSectionRecord(formData: FormData) {
+  const { supabase, userId } = await getCurrentUserId();
+  const id = cleanText(formData.get("id"));
+  const payload = readPlanningSectionPayload(formData);
+
+  if (!id || !payload.project_id || !payload.title) {
+    throw new Error("Planlama alanını güncellemek için kayıt kimliği, proje ve başlık zorunludur.");
+  }
+
+  const { error } = await supabase
+    .from("project_planning_sections")
+    .update({
+      category: payload.category,
+      title: payload.title,
+      content: payload.content,
+      sort_order: payload.sort_order,
+    })
+    .eq("id", id)
+    .eq("project_id", payload.project_id)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(`Planlama alanı güncellenemedi: ${error.message}`);
+  }
+
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${payload.project_id}`);
+}
+
+export async function deleteProjectPlanningSectionRecord(formData: FormData) {
+  const { supabase, userId } = await getCurrentUserId();
+  const id = cleanText(formData.get("id"));
+  const projectId = cleanText(formData.get("project_id"));
+
+  if (!id || !projectId) {
+    throw new Error("Silinecek planlama alanı bulunamadı.");
+  }
+
+  const { error } = await supabase
+    .from("project_planning_sections")
+    .delete()
+    .eq("id", id)
+    .eq("project_id", projectId)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(`Planlama alanı silinemedi: ${error.message}`);
+  }
+
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${projectId}`);
 }

@@ -109,6 +109,7 @@ export async function updateTaskRecord(formData: FormData) {
 export async function completeTaskRecord(formData: FormData) {
   const { supabase, userId } = await getCurrentUserId();
   const id = cleanText(formData.get("id"));
+  const projectId = cleanRelationId(formData.get("project_id"));
 
   if (!id) {
     throw new Error("Tamamlanacak görev bulunamadı.");
@@ -125,6 +126,10 @@ export async function completeTaskRecord(formData: FormData) {
   }
 
   revalidatePath("/tasks");
+
+  if (projectId) {
+    revalidatePath(`/projects/${projectId}`);
+  }
 }
 
 export async function updateTaskStatusRecord(taskId: string, status: string) {

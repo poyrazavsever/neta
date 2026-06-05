@@ -23,6 +23,7 @@ import {
 import {
   CalendarDays,
   CheckCircle2,
+  Eye,
   FolderKanban,
   ImageIcon,
   LayoutGrid,
@@ -32,6 +33,8 @@ import {
   Target,
   Wallet,
 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, type ChangeEvent } from "react";
 
 export type ProjectClientOption = {
@@ -210,8 +213,26 @@ function ProjectCard({
   project: ProjectListItem;
   clients: ProjectClientOption[];
 }) {
+  const router = useRouter();
+
+  function goToProjectDetail() {
+    router.push(`/projects/${project.id}`);
+  }
+
   return (
-    <Card className="transition-colors hover:border-primary/30">
+    <Card
+      role="link"
+      tabIndex={0}
+      aria-label={`${project.name} detayına git`}
+      className="cursor-pointer transition-colors hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      onClick={goToProjectDetail}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          goToProjectDetail();
+        }
+      }}
+    >
       <CardContent className="flex h-full flex-col gap-5 p-5">
         <ProjectCover project={project} />
         <div className="flex items-start justify-between gap-3">
@@ -231,7 +252,7 @@ function ProjectCard({
           <div className="text-xs text-muted-foreground">
             {project.doneTaskCount}/{project.taskCount} görev tamamlandı
           </div>
-          <ProjectActions project={project} clients={clients} />
+          <ProjectActions project={project} clients={clients} showDetail={false} />
         </div>
       </CardContent>
     </Card>
@@ -281,7 +302,7 @@ function ProjectRow({
         <ProgressBar progress={project.progress} compact />
       </div>
       <div className="flex justify-start lg:justify-end">
-        <ProjectActions project={project} clients={clients} />
+        <ProjectActions project={project} clients={clients} showDetail />
       </div>
     </div>
   );
@@ -304,19 +325,43 @@ function ProjectMeta({ project }: { project: ProjectListItem }) {
 function ProjectActions({
   project,
   clients,
+  showDetail,
 }: {
   project: ProjectListItem;
   clients: ProjectClientOption[];
+  showDetail: boolean;
 }) {
   return (
-    <div className="flex gap-2">
-      <ProjectDialog mode="edit" project={project} clients={clients} />
+    <div
+      className="flex gap-2"
+      onClick={(event) => event.stopPropagation()}
+      onKeyDown={(event) => event.stopPropagation()}
+    >
+      {showDetail ? (
+        <Button
+          asChild
+          variant="outline"
+          className="h-9 w-9 p-0"
+          title="Detaya git"
+          aria-label="Detaya git"
+        >
+          <Link href={`/projects/${project.id}`}>
+          <Eye className="h-4 w-4" />
+          </Link>
+        </Button>
+      ) : null}
+      <ProjectDialog mode="edit" project={project} clients={clients} iconOnly />
       {project.status !== "completed" ? (
         <form action={completeProjectRecord}>
           <input type="hidden" name="id" value={project.id} />
-          <Button type="submit" variant="outline" className="h-9 min-w-24 gap-2 px-3">
+          <Button
+            type="submit"
+            variant="outline"
+            className="h-9 w-9 p-0"
+            title="Tamamla"
+            aria-label="Tamamla"
+          >
             <CheckCircle2 className="h-4 w-4" />
-            Tamamla
           </Button>
         </form>
       ) : null}
@@ -328,10 +373,12 @@ function ProjectDialog({
   mode,
   project,
   clients,
+  iconOnly = false,
 }: {
   mode: "create" | "edit";
   project?: ProjectListItem;
   clients: ProjectClientOption[];
+  iconOnly?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -354,10 +401,12 @@ function ProjectDialog({
       <DialogTrigger asChild>
         <Button
           variant={mode === "create" ? "default" : "outline"}
-          className="h-9 min-w-24 gap-2 px-3"
+          className={iconOnly ? "h-9 w-9 p-0" : "h-9 min-w-24 gap-2 px-3"}
+          title={mode === "create" ? "Proje ekle" : "Düzenle"}
+          aria-label={mode === "create" ? "Proje ekle" : "Düzenle"}
         >
           {mode === "create" ? <Plus className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-          {mode === "create" ? "Proje ekle" : "Düzenle"}
+          {iconOnly ? null : mode === "create" ? "Proje ekle" : "Düzenle"}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[min(720px,calc(100dvh-6rem))] overflow-hidden sm:max-w-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
