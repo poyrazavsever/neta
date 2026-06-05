@@ -6,7 +6,7 @@ import {
   deleteProjectPlanningSectionRecord,
   updateProjectPlanningSectionRecord,
 } from "@/app/(dashboard)/projects/actions";
-import { completeTaskRecord } from "@/app/(dashboard)/tasks/actions";
+import { completeTaskRecord, createTaskRecord } from "@/app/(dashboard)/tasks/actions";
 import { Badge, Button, Card, CardContent, Input, Label, Textarea } from "poyraz-ui/atoms";
 import {
   Dialog,
@@ -306,7 +306,9 @@ export function ProjectDetailClient({
         />
       ) : null}
 
-      {activeTab === "tasks" ? <TaskPanel projectId={project.id} tasks={tasks} /> : null}
+      {activeTab === "tasks" ? (
+        <TaskPanel projectId={project.id} clientId={project.client_id} tasks={tasks} />
+      ) : null}
       {activeTab === "finance" ? <FinancePanel transactions={financeTransactions} /> : null}
     </div>
   );
@@ -496,15 +498,26 @@ function SectionDialog({
   );
 }
 
-function TaskPanel({ projectId, tasks }: { projectId: string; tasks: ProjectDetailTaskItem[] }) {
+function TaskPanel({
+  projectId,
+  clientId,
+  tasks,
+}: {
+  projectId: string;
+  clientId: string | null;
+  tasks: ProjectDetailTaskItem[];
+}) {
   return (
     <Card>
       <CardContent className="space-y-4 p-5">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">Proje görevleri</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Bu proje ile bağlantılı görevler aynı task modülünden beslenir.
-          </p>
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Proje görevleri</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Bu proje ile bağlantılı görevler aynı task modülünden beslenir.
+            </p>
+          </div>
+          <ProjectTaskDialog projectId={projectId} clientId={clientId} />
         </div>
 
         {tasks.length > 0 ? (
@@ -566,6 +579,134 @@ function TaskPanel({ projectId, tasks }: { projectId: string; tasks: ProjectDeta
         )}
       </CardContent>
     </Card>
+  );
+}
+
+function ProjectTaskDialog({
+  projectId,
+  clientId,
+}: {
+  projectId: string;
+  clientId: string | null;
+}) {
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(formData: FormData) {
+    setIsSubmitting(true);
+
+    try {
+      await createTaskRecord(formData);
+      setOpen(false);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="h-9 gap-2 px-3">
+          <Plus className="h-4 w-4" />
+          Görev ekle
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-xl">
+        <form action={handleSubmit} className="space-y-5">
+          <input type="hidden" name="project_id" value={projectId} />
+          {clientId ? <input type="hidden" name="client_id" value={clientId} /> : null}
+          <DialogHeader>
+            <DialogTitle>Projeye görev ekle</DialogTitle>
+            <DialogDescription>
+              Yeni görev bu proje ile ilişkilendirilerek görev modülüne kaydedilir.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="project-task-title">Başlık</Label>
+              <Input
+                id="project-task-title"
+                name="title"
+                required
+                placeholder="Örn. Mobil görünüm kontrolü"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="project-task-description">Açıklama</Label>
+              <Textarea
+                id="project-task-description"
+                name="description"
+                rows={3}
+                placeholder="Kapsam, teslim notu veya kabul kriterleri..."
+              />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label>Durum</Label>
+                <Select name="status" defaultValue="todo">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Durum seç" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todo">Yapılacak</SelectItem>
+                    <SelectItem value="in_progress">Devam ediyor</SelectItem>
+                    <SelectItem value="done">Tamamlandı</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Öncelik</Label>
+                <Select name="priority" defaultValue="medium">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Öncelik seç" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Düşük</SelectItem>
+                    <SelectItem value="medium">Orta</SelectItem>
+                    <SelectItem value="high">Yüksek</SelectItem>
+                    <SelectItem value="urgent">Acil</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-2">
+                <Label htmlFor="project-task-due">Son tarih</Label>
+                <Input id="project-task-due" name="due_at" type="datetime-local" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="project-task-estimated">Tahmini süre</Label>
+                <Input
+                  id="project-task-estimated"
+                  name="estimated_minutes"
+                  type="number"
+                  min="0"
+                  placeholder="Dakika"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="project-task-actual">Gerçekleşen süre</Label>
+                <Input
+                  id="project-task-actual"
+                  name="actual_minutes"
+                  type="number"
+                  min="0"
+                  placeholder="Dakika"
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="submit" disabled={isSubmitting} className="gap-2">
+              <Plus className="h-4 w-4" />
+              {isSubmitting ? "Kaydediliyor" : "Görevi ekle"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 

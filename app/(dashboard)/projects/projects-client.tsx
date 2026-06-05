@@ -498,6 +498,15 @@ function CoverImageInput({ project }: { project?: ProjectListItem }) {
             </div>
           </div>
         )}
+
+        <div>
+
+            <div>
+              < ImageIcon className="h-6 w-6" />
+
+            </div>
+          </div>
+
         {previewUrl ? (
           <div className="absolute inset-x-0 bottom-0 bg-background/90 px-3 py-2 text-xs text-muted-foreground backdrop-blur">
             Görseli değiştirmek için tıkla.

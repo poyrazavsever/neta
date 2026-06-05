@@ -82,6 +82,10 @@ export async function createTaskRecord(formData: FormData) {
   }
 
   revalidatePath("/tasks");
+
+  if (payload.project_id) {
+    revalidatePath(`/projects/${payload.project_id}`);
+  }
 }
 
 export async function updateTaskRecord(formData: FormData) {
@@ -104,6 +108,10 @@ export async function updateTaskRecord(formData: FormData) {
   }
 
   revalidatePath("/tasks");
+
+  if (payload.project_id) {
+    revalidatePath(`/projects/${payload.project_id}`);
+  }
 }
 
 export async function completeTaskRecord(formData: FormData) {
@@ -156,6 +164,7 @@ export async function updateTaskStatusRecord(taskId: string, status: string) {
 export async function deleteTaskRecord(formData: FormData) {
   const { supabase, userId } = await getCurrentUserId();
   const id = cleanText(formData.get("id"));
+  const projectId = cleanRelationId(formData.get("project_id"));
 
   if (!id) {
     throw new Error("Silinecek görev bulunamadı.");
@@ -172,4 +181,8 @@ export async function deleteTaskRecord(formData: FormData) {
   }
 
   revalidatePath("/tasks");
+
+  if (projectId) {
+    revalidatePath(`/projects/${projectId}`);
+  }
 }
