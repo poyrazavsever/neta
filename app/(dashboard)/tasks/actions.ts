@@ -140,7 +140,7 @@ export async function completeTaskRecord(formData: FormData) {
   }
 }
 
-export async function updateTaskStatusRecord(taskId: string, status: string) {
+export async function updateTaskStatusRecord(taskId: string, status: string, projectId?: string) {
   const { supabase, userId } = await getCurrentUserId();
   const nextStatus = readStatus(status);
 
@@ -159,6 +159,10 @@ export async function updateTaskStatusRecord(taskId: string, status: string) {
   }
 
   revalidatePath("/tasks");
+
+  if (projectId) {
+    revalidatePath(`/projects/${projectId}`);
+  }
 }
 
 export async function deleteTaskRecord(formData: FormData) {

@@ -6,7 +6,11 @@ import {
   deleteProjectPlanningSectionRecord,
   updateProjectPlanningSectionRecord,
 } from "@/app/(dashboard)/projects/actions";
-import { completeTaskRecord, createTaskRecord } from "@/app/(dashboard)/tasks/actions";
+import {
+  completeTaskRecord,
+  createTaskRecord,
+  updateTaskStatusRecord,
+} from "@/app/(dashboard)/tasks/actions";
 import { Badge, Button, Card, CardContent, Input, Label, Textarea } from "poyraz-ui/atoms";
 import {
   Dialog,
@@ -29,6 +33,8 @@ import {
   ClipboardList,
   FileText,
   FolderKanban,
+  KanbanSquare,
+  LayoutList,
   Palette,
   Pencil,
   Plus,
@@ -37,7 +43,7 @@ import {
   Wallet,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition, type DragEvent } from "react";
 
 export type ProjectDetail = {
   id: string;
@@ -507,6 +513,24 @@ function TaskPanel({
   clientId: string | null;
   tasks: ProjectDetailTaskItem[];
 }) {
+  const [view, setView] = useState<"list" | "kanban">("list");
+  const [localTasks, setLocalTasks] = useState(tasks);
+  const [, startTransition] = useTransition();
+
+  function handleTaskStatusChange(taskId: string, status: ProjectDetailTaskItem["status"]) {
+    const previousTasks = localTasks;
+
+    setLocalTasks((currentTasks) =>
+      currentTasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
+    );
+
+    startTransition(() => {
+      void updateTaskStatusRecord(taskId, status, projectId).catch(() => {
+        setLocalTasks(previousTasks);
+      });
+    });
+  }
+
   return (
     <Card>
       <CardContent className="space-y-4 p-5">
@@ -517,10 +541,32 @@ function TaskPanel({
               Bu proje ile bağlantılı görevler aynı task modülünden beslenir.
             </p>
           </div>
-          <ProjectTaskDialog projectId={projectId} clientId={clientId} />
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex rounded-sm border border-border p-1">
+              <Button
+                type="button"
+                variant={view === "list" ? "default" : "ghost"}
+                className="h-8 gap-2 px-3"
+                onClick={() => setView("list")}
+              >
+                <LayoutList className="h-4 w-4" />
+                Liste
+              </Button>
+              <Button
+                type="button"
+                variant={view === "kanban" ? "default" : "ghost"}
+                className="h-8 gap-2 px-3"
+                onClick={() => setView("kanban")}
+              >
+                <KanbanSquare className="h-4 w-4" />
+                Kanban
+              </Button>
+            </div>
+            <ProjectTaskDialog projectId={projectId} clientId={clientId} />
+          </div>
         </div>
 
-        {tasks.length > 0 ? (
+        {localTasks.length > 0 && view === "list" ? (
           <div className="overflow-hidden rounded-sm border border-border">
             <div className="hidden grid-cols-[1.5fr_0.8fr_0.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
               <span>Görev</span>
@@ -529,7 +575,7 @@ function TaskPanel({
               <span className="text-right">İşlem</span>
             </div>
             <div className="divide-y divide-border">
-              {tasks.map((task) => (
+              {localTasks.map((task) => (
                 <div
                   key={task.id}
                   className="grid gap-4 px-4 py-4 lg:grid-cols-[1.5fr_0.8fr_0.8fr_0.8fr] lg:items-center"
@@ -574,11 +620,117 @@ function TaskPanel({
               ))}
             </div>
           </div>
-        ) : (
+        ) : null}
+
+        {localTasks.length > 0 && view === "kanban" ? (
+          <ProjectTaskKanban
+            projectId={projectId}
+            tasks={localTasks}
+            onTaskStatusChange={handleTaskStatusChange}
+          />
+        ) : null}
+
+        {localTasks.length === 0 ? (
           <EmptyPanel icon={ClipboardList} title="Bu projeye bağlı görev yok" />
-        )}
+        ) : null}
       </CardContent>
     </Card>
+  );
+}
+
+function ProjectTaskKanban({
+  projectId,
+  tasks,
+  onTaskStatusChange,
+}: {
+  projectId: string;
+  tasks: ProjectDetailTaskItem[];
+  onTaskStatusChange: (taskId: string, status: ProjectDetailTaskItem["status"]) => void;
+}) {
+  const columns = ["todo", "in_progress", "done"] as const;
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+
+  function handleDragStart(event: DragEvent<HTMLDivElement>, taskId: string) {
+    setDraggedTaskId(taskId);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", taskId);
+    event.dataTransfer.setDragImage(event.currentTarget, 24, 24);
+  }
+
+  function handleDrop(status: ProjectDetailTaskItem["status"]) {
+    if (!draggedTaskId) return;
+
+    onTaskStatusChange(draggedTaskId, status);
+    setDraggedTaskId(null);
+  }
+
+  return (
+    <div className="tiny-scrollbar grid gap-4 overflow-x-auto pb-2 lg:grid-cols-3">
+      {columns.map((status) => {
+        const columnTasks = tasks.filter((task) => task.status === status);
+
+        return (
+          <div
+            key={status}
+            className="min-w-72 rounded-sm border border-border bg-muted/20 p-3 transition-colors"
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "move";
+            }}
+            onDrop={() => handleDrop(status)}
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground">
+                {getTaskStatusLabel(status)}
+              </h3>
+              <Badge>{columnTasks.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {columnTasks.map((task) => (
+                <Card
+                  key={task.id}
+                  draggable
+                  className={
+                    draggedTaskId === task.id
+                      ? "cursor-grabbing opacity-50 ring-2 ring-primary/20 transition"
+                      : "cursor-grab transition hover:border-primary/30 active:cursor-grabbing"
+                  }
+                  onDragStart={(event) => handleDragStart(event, task.id)}
+                  onDragEnd={() => setDraggedTaskId(null)}
+                >
+                  <CardContent className="space-y-3 p-3">
+                    <div>
+                      <div className="font-medium text-foreground">{task.title}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {task.due_at ? formatDateTime(task.due_at) : "Son tarih yok"}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge className={priorityClasses[task.priority]}>{task.priority}</Badge>
+                      {task.status !== "done" ? (
+                        <form action={completeTaskRecord}>
+                          <input type="hidden" name="id" value={task.id} />
+                          <input type="hidden" name="project_id" value={projectId} />
+                          <Button
+                            type="submit"
+                            variant="outline"
+                            className="h-8 w-8 p-0"
+                            title="Tamamla"
+                            aria-label="Tamamla"
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                          </Button>
+                        </form>
+                      ) : null}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -611,7 +763,7 @@ function ProjectTaskDialog({
           Görev ekle
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-2xl">
         <form action={handleSubmit} className="space-y-5">
           <input type="hidden" name="project_id" value={projectId} />
           {clientId ? <input type="hidden" name="client_id" value={clientId} /> : null}
@@ -670,7 +822,7 @@ function ProjectTaskDialog({
                 </Select>
               </div>
             </div>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-3">
               <div className="grid gap-2">
                 <Label htmlFor="project-task-due">Son tarih</Label>
                 <Input id="project-task-due" name="due_at" type="datetime-local" />
@@ -851,6 +1003,12 @@ function formatDateTime(value: string) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
+}
+
+function getTaskStatusLabel(status: ProjectDetailTaskItem["status"]) {
+  if (status === "done") return "Tamamlandı";
+  if (status === "in_progress") return "Devam ediyor";
+  return "Yapılacak";
 }
 
 function formatCurrency(value: number, currency: string) {
