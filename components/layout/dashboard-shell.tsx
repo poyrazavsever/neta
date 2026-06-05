@@ -48,7 +48,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
-        <aside className="hidden h-dvh w-[280px] shrink-0 border-r border-border bg-background lg:block">
+        <aside className="sticky top-0 hidden h-dvh w-[280px] shrink-0 self-start border-r border-border bg-background lg:block">
           <AppSidebar pathname={pathname} user={user} />
         </aside>
 
@@ -114,7 +114,7 @@ function AppSidebar({
       variant="bordered"
       className="flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0"
     >
-      <SidebarHeader className="shrink-0">
+      <SidebarHeader className="shrink-0 border-b-0 px-6 py-6">
         <SidebarBranding
           title="Cognis"
           subtitle="Freelancer OS"
@@ -131,44 +131,51 @@ function AppSidebar({
         />
       </SidebarHeader>
 
-      <SidebarContent className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto">
-        {sidebarData.map((group) => (
-          <SidebarSection key={group.title} title={group.title} defaultOpen>
-            <SidebarMenu>
-              {group.items.map((item) => {
-                const isActive =
-                  item.href === "/"
-                    ? pathname === "/"
-                    : item.href
-                      ? pathname === item.href || pathname.startsWith(item.href + "/")
-                      : false;
-                const Icon = item.icon;
+      <SidebarSeparator className="mx-0 my-0 w-full" />
 
-                return (
-                  <SidebarMenuItem
-                    key={item.href || item.title}
-                    active={isActive}
-                    icon={Icon ? <Icon className="h-4 w-4" /> : undefined}
-                    className={cn(isActive && "font-semibold")}
-                  >
-                    <Link
-                      href={item.href || "#"}
-                      onClick={onNavigate}
-                      className="block w-full"
+      <SidebarContent className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto px-6 py-6">
+        {sidebarData.map((group, groupIndex) => (
+          <div key={group.title}>
+            <SidebarSection title={group.title} defaultOpen className="mb-0">
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const isActive =
+                    item.href === "/"
+                      ? pathname === "/"
+                      : item.href
+                        ? pathname === item.href || pathname.startsWith(item.href + "/")
+                        : false;
+                  const Icon = item.icon;
+
+                  return (
+                    <SidebarMenuItem
+                      key={item.href || item.title}
+                      active={isActive}
+                      icon={Icon ? <Icon className="h-4 w-4" /> : undefined}
+                      className={cn(isActive && "font-semibold")}
                     >
-                      {item.title}
-                    </Link>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarSection>
+                      <Link
+                        href={item.href || "#"}
+                        onClick={onNavigate}
+                        className="block w-full"
+                      >
+                        {item.title}
+                      </Link>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarSection>
+            {groupIndex < sidebarData.length - 1 ? (
+              <SidebarSeparator className="-mx-6 my-5 w-[calc(100%+3rem)]" />
+            ) : null}
+          </div>
         ))}
       </SidebarContent>
 
-      <SidebarSeparator />
+      <SidebarSeparator className="mx-0 my-0 w-full" />
 
-      <SidebarFooter className="shrink-0">
+      <SidebarFooter className="shrink-0 border-t-0 px-6 py-5">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -187,7 +194,12 @@ function AppSidebar({
               </div>
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="top" className="w-64">
+          <DropdownMenuContent
+            align="end"
+            side="right"
+            sideOffset={8}
+            className="w-64"
+          >
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col gap-1">
                 <span className="truncate text-sm font-medium text-foreground">
