@@ -262,7 +262,7 @@ function ProjectCard({
 function ProjectCover({ project }: { project: ProjectListItem }) {
   if (project.coverImageUrl) {
     return (
-      <div className="aspect-[16/9] overflow-hidden rounded-sm border border-border bg-muted">
+      <div className="aspect-video overflow-hidden rounded-sm border border-border bg-muted">
         <img
           src={project.coverImageUrl}
           alt={project.cover_image_alt || project.name}
@@ -273,7 +273,7 @@ function ProjectCover({ project }: { project: ProjectListItem }) {
   }
 
   return (
-    <div className="flex aspect-[16/9] items-center justify-center rounded-sm border border-dashed border-border bg-muted/30 text-sm text-muted-foreground">
+    <div className="flex aspect-video items-center justify-center rounded-sm border border-dashed border-border bg-muted/30 text-sm text-muted-foreground">
       Kapak görseli yok
     </div>
   );
@@ -346,7 +346,7 @@ function ProjectActions({
           aria-label="Detaya git"
         >
           <Link href={`/projects/${project.id}`}>
-          <Eye className="h-4 w-4" />
+            <Eye className="h-4 w-4" />
           </Link>
         </Button>
       ) : null}
@@ -479,7 +479,7 @@ function CoverImageInput({ project }: { project?: ProjectListItem }) {
       <Label htmlFor={inputId}>Kapak görseli</Label>
       <label
         htmlFor={inputId}
-        className="group relative flex aspect-[16/7] cursor-pointer items-center justify-center overflow-hidden rounded-sm border border-dashed border-border bg-muted/20 transition-colors hover:border-primary/50 hover:bg-primary/5"
+        className="group relative flex aspect-16/7 cursor-pointer items-center justify-center overflow-hidden rounded-sm border border-dashed border-border bg-muted/20 transition-colors hover:border-primary/50 hover:bg-primary/5"
       >
         {previewUrl ? (
           <img
