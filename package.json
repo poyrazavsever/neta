@@ -9,6 +9,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.80",
+    "@ai-sdk/openai": "^3.0.68",
     "@base-ui/react": "^1.5.0",
     "@hookform/resolvers": "^5.4.0",
     "@iconify/react": "^6.0.2",
@@ -23,6 +25,7 @@
     "@radix-ui/react-toast": "^1.2.15",
     "@supabase/ssr": "^0.10.3",
     "@tailwindcss/postcss": "^4.3.0",
+    "ai": "^6.0.197",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dexie": "^4.4.3",

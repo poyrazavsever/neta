@@ -167,8 +167,18 @@ export function DashboardClient({ data }: DashboardClientProps) {
                         boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
                       }} 
                     />
-                    <Bar dataKey="income" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="expense" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
+                    <Bar 
+                      dataKey="income" 
+                      fill="hsl(var(--primary))" 
+                      radius={[4, 4, 0, 0]} 
+                      activeBar={{ fill: "hsl(var(--primary))", opacity: 0.8 }}
+                    />
+                    <Bar 
+                      dataKey="expense" 
+                      fill="hsl(var(--destructive))" 
+                      radius={[4, 4, 0, 0]} 
+                      activeBar={{ fill: "hsl(var(--destructive))", opacity: 0.8 }}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (

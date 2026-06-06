@@ -154,7 +154,13 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                       borderRadius: '0.375rem',
                     }} 
                   />
-                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={60} />
+                  <Bar 
+                    dataKey="value" 
+                    fill="hsl(var(--primary))" 
+                    radius={[4, 4, 0, 0]} 
+                    barSize={60} 
+                    activeBar={{ fill: "hsl(var(--primary))", opacity: 0.8 }}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>

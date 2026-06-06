@@ -1,163 +1,154 @@
-import { NextResponse } from "next/server";
+import { streamText, tool } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { z } from 'zod';
+import { createClient } from '@/lib/supabase/server';
 
-type ChatProvider = "groq" | "openai" | "ollama" | "gemini";
+export const maxDuration = 30; // Allow longer execution for tool calls
 
-type ChatRequestBody = {
-  provider?: ChatProvider;
-  apiKey?: string;
-  userMessageContent?: string;
-};
-
-type ProviderErrorResponse = {
-  error?: {
-    message?: string;
-  };
-};
-
-type ChatCompletionResponse = {
-  choices?: Array<{
-    message?: {
-      content?: string;
-    };
-  }>;
-};
-
-type OllamaResponse = {
-  response?: string;
-};
-
-function getErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : "Bilinmeyen sunucu hatası";
-}
-
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = (await request.json()) as ChatRequestBody;
-    const provider = body.provider ?? "ollama";
-    const apiKey = body.apiKey ?? "";
-    const userMessageContent = body.userMessageContent?.trim();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!userMessageContent) {
-      return NextResponse.json(
-        { error: "Mesaj içeriği boş olamaz." },
-        { status: 400 },
-      );
+    if (!user) {
+      return new Response('Yetkisiz erişim', { status: 401 });
     }
 
-    let assistantReply = "";
+    const { messages, sessionId, provider: clientProvider, apiKey: clientApiKey } = await req.json();
 
-    if (provider === "gemini") {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            system_instruction: {
-              parts: [{ text: "Sen MindSpace adlı kullanıcının kişisel yapay zeka terapistisin ve sırdaşısın. Şefkatli, yargılamayan ve destekleyici cevaplar ver. Kullanıcının iş süreçlerini asiste edebilirsin." }]
-            },
-            contents: [
-              {
-                parts: [{ text: userMessageContent }]
-              }
-            ]
-          }),
-        }
-      );
+    // Read App Settings for Provider/API Key
+    const { data: appSettings } = await supabase
+      .from("app_settings")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
 
-      if (!response.ok) {
-        throw new Error("Gemini API hatası");
-      }
+    const provider = clientProvider || appSettings?.ai_provider || "openai";
+    const apiKey = clientApiKey || appSettings?.api_key || "";
 
-      const data = await response.json();
-      assistantReply = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-
-    } else if (provider === "groq") {
-      const response = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model: "llama-3.1-8b-instant",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "Sen MindSpace adlı kullanıcının kişisel yapay zeka terapistisin ve sırdaşısın. Şefkatli, yargılamayan ve destekleyici cevaplar ver. Yüzeysel öğütlerden kaçın.",
-              },
-              { role: "user", content: userMessageContent },
-            ],
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const errorData = (await response.json()) as ProviderErrorResponse;
-        throw new Error(errorData.error?.message || "Groq API hatası");
-      }
-
-      const data = (await response.json()) as ChatCompletionResponse;
-      assistantReply = data.choices?.[0]?.message?.content ?? "";
-    } else if (provider === "openai") {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o",
-          messages: [
-            {
-              role: "system",
-              content:
-                "Sen MindSpace adlı kullanıcının kişisel yapay zeka terapistisin ve sırdaşısın. Şefkatli ve destekleyici cevap ver.",
-            },
-            { role: "user", content: userMessageContent },
-          ],
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("OpenAI API hatası");
-      }
-
-      const data = (await response.json()) as ChatCompletionResponse;
-      assistantReply = data.choices?.[0]?.message?.content ?? "";
+    let model;
+    if (provider === 'gemini') {
+      const google = createGoogleGenerativeAI({ apiKey });
+      model = google('gemini-1.5-pro-latest');
+    } else if (provider === 'groq') {
+      const groq = createOpenAI({ apiKey, baseURL: 'https://api.groq.com/openai/v1' });
+      model = groq('llama-3.1-8b-instant');
     } else {
-      const response = await fetch("http://127.0.0.1:11434/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "llama3",
-          prompt: `Sen MindSpace adlı kullanıcının kişisel yapay zeka terapistisin ve sırdaşısın. Şefkatli ve destekleyici cevap ver.\n\nKullanıcı: ${userMessageContent}\nTerapist:`,
-          stream: false,
-        }),
-      });
+      const openai = createOpenAI({ apiKey });
+      model = openai('gpt-4o');
+    }
 
-      if (!response.ok) {
-        throw new Error("Ollama API yanıt vermedi.");
+    // Identify the latest user message to save to Supabase
+    const latestMessage = messages[messages.length - 1];
+    if (sessionId && latestMessage && latestMessage.role === 'user') {
+      // Sadece metin varsa kaydediyoruz
+      if (latestMessage.content) {
+        await supabase.from("chat_messages").insert({
+          session_id: sessionId,
+          role: "user",
+          content: latestMessage.content,
+        });
       }
-
-      const data = (await response.json()) as OllamaResponse;
-      assistantReply = data.response ?? "";
     }
 
-    if (!assistantReply) {
-      throw new Error("Model geçerli bir yanıt üretmedi.");
-    }
+    const systemPrompt = `Sen kullanıcının kişisel Freelancer İş Asistanı ve Danışmanısın. Cognis Freelancer OS içinde yaşıyorsun.
+Kullanıcının iş süreçlerini, projelerini ve finansal durumunu organize etmesine yardımcı oluyorsun.
+Gerektiğinde araçları (tools) kullanarak sistemden güncel verileri çek ve doğrudan veri ekle.
+Aşağıdaki yeteneklere sahipsin:
+- Finansal verileri listeleyebilir ve yeni finans kaydı (gelir/gider) girebilirsin.
+- Görevleri okuyabilir ve yeni görevler ekleyebilirsin.
+- Projeleri sorgulayabilir ve projelerin detaylarını/tasarım sistemini çekebilirsin.
+Kullanıcıya her zaman proaktif, kısa ve profesyonel yanıtlar ver. Türkçe dilinde cevapla.`;
 
-    return NextResponse.json({ reply: assistantReply });
-  } catch (error: unknown) {
-    const message = getErrorMessage(error);
-    console.error("API route hatası:", error);
+    const result = streamText({
+      model,
+      system: systemPrompt,
+      messages,
+      tools: {
+        getFinancialSummary: tool({
+          description: 'Son X gündeki gelir ve gider işlemlerinin listesini getirir.',
+          parameters: z.object({ days: z.number().default(30) }),
+          execute: async ({ days }) => {
+            const pastDate = new Date();
+            pastDate.setDate(pastDate.getDate() - days);
+            const { data } = await supabase.from('finance_transactions')
+              .select('type, amount, category, transaction_date')
+              .gte('transaction_date', pastDate.toISOString());
+            return data || [];
+          }
+        }),
+        listTasks: tool({
+          description: 'Kullanıcının mevcut görevlerini belirli bir duruma göre listeler.',
+          parameters: z.object({ status: z.enum(['todo', 'in_progress', 'completed', 'all']).default('all') }),
+          execute: async ({ status }) => {
+            let query = supabase.from('tasks').select('id, title, status, due_at');
+            if (status !== 'all') query = query.eq('status', status);
+            const { data } = await query.order('created_at', { ascending: false }).limit(20);
+            return data || [];
+          }
+        }),
+        createTask: tool({
+          description: 'Sisteme yeni bir görev ekler.',
+          parameters: z.object({ 
+            title: z.string().describe('Görev başlığı'), 
+            description: z.string().optional().describe('Görevin detayı') 
+          }),
+          execute: async ({ title, description }) => {
+            const { data, error } = await supabase.from('tasks')
+              .insert({ user_id: user.id, title, description, status: 'todo' })
+              .select().single();
+            if (error) return { success: false, error: error.message };
+            return { success: true, task: data };
+          }
+        }),
+        searchProjects: tool({
+          description: 'Projeleri isimlerine veya durumlarına göre listeler',
+          parameters: z.object({ status: z.enum(['active', 'planning', 'completed', 'paused', 'all']).default('active') }),
+          execute: async ({ status }) => {
+            let query = supabase.from('projects').select('id, name, status, progress, budget');
+            if (status !== 'all') query = query.eq('status', status);
+            const { data } = await query.limit(10);
+            return data || [];
+          }
+        }),
+        addFinanceTransaction: tool({
+          description: 'Sisteme yeni bir finansal kayıt (gelir veya gider) ekler.',
+          parameters: z.object({ 
+            type: z.enum(['income', 'expense']).describe('income (gelir) veya expense (gider)'), 
+            amount: z.number().describe('Tutar'), 
+            category: z.string().describe('Kategori örn. Yazılım, Yemek, Vergi vb.')
+          }),
+          execute: async ({ type, amount, category }) => {
+            const { data, error } = await supabase.from('finance_transactions')
+              .insert({ 
+                user_id: user.id, 
+                type, 
+                amount, 
+                category, 
+                transaction_date: new Date().toISOString() 
+              })
+              .select().single();
+            if (error) return { success: false, error: error.message };
+            return { success: true, transaction: data };
+          }
+        })
+      },
+      onFinish: async ({ text }) => {
+        // Save assistant response to DB
+        if (sessionId && text) {
+          await supabase.from("chat_messages").insert({
+            session_id: sessionId,
+            role: "assistant",
+            content: text,
+          });
+        }
+      }
+    });
 
-    return NextResponse.json({ error: message }, { status: 500 });
+    return result.toDataStreamResponse();
+  } catch (error: any) {
+    console.error("Chat API error:", error);
+    return new Response(error.message || "Internal Server Error", { status: 500 });
   }
 }
