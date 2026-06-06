@@ -127,6 +127,7 @@ export function FinanceClient({ transactions, clients, projects }: FinanceClient
               Gelir, gider, ödeme durumu ve proje/müşteri bağlantılarını takip et.
             </p>
           </div>
+        </div>
         <div className="flex gap-2">
           <AIFinanceDialog />
           <FinanceDialog mode="create" clients={clients} projects={projects} />
