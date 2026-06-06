@@ -1,31 +1,37 @@
-# Production Dockerfile
+# ── Production Dockerfile (Dokploy / Coolify ready) ──────────────
 FROM node:20-alpine AS base
 
-# Install dependencies only when needed
+# ── 1. Install dependencies ─────────────────────────────────────
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install pnpm
 RUN corepack enable pnpm
 
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
 RUN pnpm i --frozen-lockfile
 
-# Rebuild the source code only when needed
+# ── 2. Build ─────────────────────────────────────────────────────
 FROM base AS builder
 WORKDIR /app
 RUN corepack enable pnpm
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Environment variables must be present at build time
-# Disable telemetry during build
+# Next.js inlines NEXT_PUBLIC_* at build time.
+# Dokploy / Coolify inject these as build-args automatically.
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN pnpm build
 
-# Production image, copy all the files and run next
+# ── 3. Production runner ─────────────────────────────────────────
 FROM base AS runner
 WORKDIR /app
 
@@ -35,10 +41,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Copy public assets
 COPY --from=builder /app/public ./public
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
+# Copy standalone output (Next.js output: "standalone")
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
@@ -48,4 +54,10 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
+# Health check for Dokploy / Coolify / Docker orchestrators
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD wget -qO- http://localhost:3000/api/health || exit 1
+
+# Runtime env vars (Supabase keys, AI keys etc.) are injected by
+# Dokploy / Coolify as environment variables — no .env file needed.
 CMD ["node", "server.js"]
