@@ -4,9 +4,10 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Card, CardContent, Badge, Button, Input, Textarea, Label } from "poyraz-ui/atoms";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "poyraz-ui/molecules";
-import { Phone, Mail, ExternalLink, Calendar, Plus, MessageSquare, Briefcase, FileText } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, DialogDescription } from "poyraz-ui/molecules";
+import { Phone, Mail, ExternalLink, Calendar, Plus, MessageSquare, Briefcase, FileText, UserPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { addClientActivity } from "./actions";
 
 export type ClientDetailData = {
@@ -19,6 +20,7 @@ export type ClientDetailData = {
   pipeline_stage: string;
   status: string;
   notes: string | null;
+  client_auth_id: string | null;
 };
 
 export type ClientActivity = {
@@ -62,6 +64,37 @@ export function ClientDetailClient({ client, activities }: { client: ClientDetai
     }
   }
 
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [createUserOpen, setCreateUserOpen] = useState(false);
+
+  async function handleCreateUser(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    
+    setIsCreatingUser(true);
+    try {
+      const res = await fetch("/api/create-client-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, client_id: client.id })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Kullanıcı oluşturulamadı.");
+      }
+      toast.success("Müşteri portal hesabı başarıyla oluşturuldu.");
+      setCreateUserOpen(false);
+      // Optional: Refresh page to reflect the new client_auth_id
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setIsCreatingUser(false);
+    }
+  }
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header Info */}
@@ -75,11 +108,52 @@ export function ClientDetailClient({ client, activities }: { client: ClientDetai
             {client.company_name && <p className="text-muted-foreground mt-1">{client.company_name}</p>}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <Badge variant="outline" className="px-3 py-1 capitalize text-sm">{client.status}</Badge>
           <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1 capitalize text-sm">
             {client.pipeline_stage.replace('_', ' ')}
           </Badge>
+          {!client.client_auth_id && (
+            <Dialog open={createUserOpen} onOpenChange={setCreateUserOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 ml-2 border-dashed">
+                  <UserPlus className="h-4 w-4" /> Portal Hesabı Aç
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <form onSubmit={handleCreateUser}>
+                  <DialogHeader>
+                    <DialogTitle>Müşteri Portalı Hesabı Oluştur</DialogTitle>
+                    <DialogDescription>
+                      Müşteriniz bu e-posta ve şifre ile sisteme giriş yaparak projelerini takip edebilir.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">E-posta Adresi</Label>
+                      <Input id="email" name="email" type="email" required defaultValue={client.email || ""} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Geçici Şifre</Label>
+                      <Input id="password" name="password" type="text" required minLength={6} placeholder="Min 6 karakter" />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={() => setCreateUserOpen(false)}>İptal</Button>
+                    <Button type="submit" disabled={isCreatingUser}>
+                      {isCreatingUser && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Hesabı Oluştur
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
+          {client.client_auth_id && (
+            <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 px-3 py-1 text-sm flex items-center gap-1.5 ml-2">
+              <UserPlus className="h-3.5 w-3.5" /> Portal Aktif
+            </Badge>
+          )}
         </div>
       </div>
 

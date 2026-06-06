@@ -14,10 +14,15 @@ export default async function DashboardLayout({
   const { data: profile } = user
     ? await supabase
         .from("profiles")
-        .select("first_name, last_name, avatar_url")
+        .select("first_name, last_name, avatar_url, role")
         .eq("id", user.id)
         .maybeSingle()
     : { data: null };
+
+  if (profile?.role === "client") {
+    const { redirect } = await import("next/navigation");
+    redirect("/portal");
+  }
 
   const fallbackName = user?.email?.split("@")[0] ?? "Cognis Kullanıcısı";
   const displayName =
