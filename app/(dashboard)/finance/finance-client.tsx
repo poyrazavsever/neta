@@ -130,10 +130,12 @@ export function FinanceClient({ transactions, clients, projects }: FinanceClient
         <FinanceDialog mode="create" clients={clients} projects={projects} />
       </div>
 
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-6">
         <StatCard label="Aylık gelir" value={formatCurrency(summary.income)} tone="green" />
         <StatCard label="Aylık gider" value={formatCurrency(summary.expense)} tone="rose" />
-        <StatCard label="Net kazanç" value={formatCurrency(summary.net)} tone="primary" />
+        <StatCard label="Brüt kazanç" value={formatCurrency(summary.net)} tone="primary" />
+        <StatCard label="KDV Tahmini (%20)" value={formatCurrency(summary.tax)} tone="amber" />
+        <StatCard label="Vergi Sonrası Net" value={formatCurrency(summary.afterTax)} tone="green" />
         <StatCard label="Bekleyen" value={formatCurrency(summary.pending)} tone="amber" />
       </div>
 
@@ -528,9 +530,11 @@ function calculateSummary(transactions: FinanceTransactionItem[]) {
         summary.pending += transaction.amount;
       }
       summary.net = summary.income - summary.expense;
+      summary.tax = summary.income * 0.20; // 20% KDV/Vergi tahmini
+      summary.afterTax = summary.net - summary.tax;
       return summary;
     },
-    { income: 0, expense: 0, net: 0, pending: 0 },
+    { income: 0, expense: 0, net: 0, tax: 0, afterTax: 0, pending: 0 },
   );
 }
 

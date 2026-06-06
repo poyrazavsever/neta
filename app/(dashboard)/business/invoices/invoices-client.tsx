@@ -1,0 +1,159 @@
+"use client";
+
+import { useState } from "react";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
+import { Receipt, Plus, MoreHorizontal, FileEdit, Trash2, Send, Download, CheckCircle2 } from "lucide-react";
+import { Button, Card, CardContent, Badge } from "poyraz-ui/atoms";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "poyraz-ui/molecules";
+
+export type InvoiceRow = {
+  id: string;
+  invoice_number: string;
+  amount: number;
+  currency: string;
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
+  issue_date: string | null;
+  due_date: string | null;
+  clientName: string | null;
+  projectName: string | null;
+  created_at: string;
+};
+
+export function InvoicesClient({ invoices }: { invoices: InvoiceRow[] }) {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const formatCurrency = (amount: number, currency: string) => {
+    return new Intl.NumberFormat("tr-TR", { style: "currency", currency }).format(amount);
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "draft":
+        return <Badge variant="secondary">Taslak</Badge>;
+      case "sent":
+        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 hover:bg-blue-500/20">Gönderildi</Badge>;
+      case "paid":
+        return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20">Ödendi</Badge>;
+      case "overdue":
+        return <Badge variant="destructive">Gecikmiş</Badge>;
+      case "cancelled":
+        return <Badge variant="outline" className="opacity-50">İptal</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Faturalar</h1>
+          <p className="text-muted-foreground mt-1">Müşteri faturalarınızı ve ödemeleri takip edin.</p>
+        </div>
+        <Button onClick={() => setIsAddModalOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" /> Yeni Fatura
+        </Button>
+      </div>
+
+      <Card>
+        <CardContent className="p-0">
+          <div className="rounded-md border border-border">
+            <div className="relative w-full overflow-auto">
+              <table className="w-full caption-bottom text-sm">
+                <thead className="[&_tr]:border-b">
+                  <tr className="border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Fatura No</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Müşteri</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tutar</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Durum</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Düzenlenme Tarihi</th>
+                    <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody className="[&_tr:last-child]:border-0">
+                  {invoices.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="h-24 text-center text-muted-foreground">
+                        Henüz hiç fatura bulunmuyor.
+                      </td>
+                    </tr>
+                  ) : (
+                    invoices.map((invoice) => (
+                      <tr key={invoice.id} className="border-b border-border transition-colors hover:bg-muted/50">
+                        <td className="p-4 align-middle font-medium text-foreground">
+                          {invoice.invoice_number}
+                          {invoice.projectName && (
+                            <div className="text-xs text-muted-foreground font-normal mt-0.5">{invoice.projectName}</div>
+                          )}
+                        </td>
+                        <td className="p-4 align-middle text-muted-foreground">
+                          {invoice.clientName || "-"}
+                        </td>
+                        <td className="p-4 align-middle font-medium">
+                          {formatCurrency(invoice.amount, invoice.currency)}
+                        </td>
+                        <td className="p-4 align-middle">
+                          {getStatusBadge(invoice.status)}
+                        </td>
+                        <td className="p-4 align-middle text-muted-foreground">
+                          {invoice.issue_date ? format(new Date(invoice.issue_date), "dd MMM yyyy", { locale: tr }) : "-"}
+                        </td>
+                        <td className="p-4 align-middle text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Menüyü aç</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem className="cursor-pointer">
+                                <FileEdit className="mr-2 h-4 w-4" /> Düzenle
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="cursor-pointer">
+                                <Download className="mr-2 h-4 w-4" /> PDF İndir
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="cursor-pointer">
+                                <Send className="mr-2 h-4 w-4" /> Gönder
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="cursor-pointer text-emerald-500 focus:text-emerald-500">
+                                <CheckCircle2 className="mr-2 h-4 w-4" /> Ödendi İşaretle
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" /> Sil
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-bold mb-4 text-foreground">Yeni Fatura Ekle</h3>
+              <p className="text-sm text-muted-foreground mb-6">Bu özellik şu an geliştirme aşamasındadır.</p>
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>Kapat</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+}
