@@ -1,0 +1,299 @@
+"use client";
+
+import { useState } from "react";
+import { Badge, Button, Card, CardContent } from "poyraz-ui/atoms";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "poyraz-ui/molecules";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Line, LineChart } from "recharts";
+import { CheckCircle2, Wallet, FolderKanban, Activity, CalendarDays, Plus } from "lucide-react";
+import { QuickActionsSheet } from "@/components/dashboard/quick-actions-sheet";
+
+export type DashboardData = {
+  tasks: { id: string; status: string; created_at: string; updated_at?: string; due_at?: string }[];
+  projects: { id: string; status: string; name: string }[];
+  finances: { id: string; type: string; amount: number; transaction_date: string }[];
+  logs: { id: string; log_date: string; mood_score: number; energy_score: number }[];
+  events: { id: string; title: string; type: string; starts_at: string }[];
+};
+
+type DashboardClientProps = {
+  data: DashboardData;
+};
+
+export function DashboardClient({ data }: DashboardClientProps) {
+  const [dateRange, setDateRange] = useState("this_month");
+  const [isQuickActionOpen, setIsQuickActionOpen] = useState(false);
+
+  // Calculate real metrics from the `data` prop depending on `dateRange`
+  const now = new Date();
+  
+  // Helper to filter by date
+  const filterByDate = (dateStr: string | null) => {
+    if (!dateStr) return false;
+    const date = new Date(dateStr);
+    if (dateRange === "today") {
+      return date.toDateString() === now.toDateString();
+    }
+    if (dateRange === "this_week") {
+      const firstDay = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))); // Monday
+      return date >= firstDay;
+    }
+    if (dateRange === "this_month") {
+      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+    }
+    return true;
+  };
+
+  // KPIs
+  const filteredFinances = data.finances.filter(f => filterByDate(f.transaction_date));
+  const income = filteredFinances.filter(f => f.type === "income").reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const expense = filteredFinances.filter(f => f.type === "expense").reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const netProfit = income - expense;
+
+  const activeProjectsCount = data.projects.filter(p => p.status === "active").length;
+  
+  const completedTasksCount = data.tasks.filter(t => t.status === "completed" && filterByDate(t.updated_at || t.created_at)).length;
+
+  const filteredLogs = data.logs.filter(l => filterByDate(l.log_date));
+  const avgMood = filteredLogs.length > 0 
+    ? (filteredLogs.reduce((acc, curr) => acc + curr.mood_score, 0) / filteredLogs.length).toFixed(1) 
+    : "0.0";
+
+  // Recharts Data Prep
+  // Group finances by date
+  const financeMap = new Map();
+  filteredFinances.forEach(f => {
+    const d = new Date(f.transaction_date).toLocaleDateString("tr-TR", { month: "short", day: "numeric" });
+    if (!financeMap.has(d)) {
+      financeMap.set(d, { name: d, income: 0, expense: 0 });
+    }
+    const entry = financeMap.get(d);
+    if (f.type === "income") entry.income += Number(f.amount);
+    if (f.type === "expense") entry.expense += Number(f.amount);
+  });
+  const incomeTrendData = Array.from(financeMap.values());
+
+  // Group logs by date
+  const moodTrendData = filteredLogs.map(l => ({
+    date: new Date(l.log_date).toLocaleDateString("tr-TR", { month: "short", day: "numeric" }),
+    mood: l.mood_score,
+    energy: l.energy_score,
+  }));
+
+  // Format currency
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat("tr-TR", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }).format(val);
+  };
+
+  return (
+    <div className="mx-auto flex max-w-7xl flex-col gap-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Activity className="h-4 w-4" />
+            Genel Bakış
+          </div>
+          <div>
+            <h1 className="text-3xl font-semibold tracking-normal text-foreground">
+              Dashboard
+            </h1>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+              İş performansını, gelirlerini ve günlük durumunu takip et.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Tarih aralığı" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Bugün</SelectItem>
+              <SelectItem value="this_week">Bu Hafta</SelectItem>
+              <SelectItem value="this_month">Bu Ay</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button onClick={() => setIsQuickActionOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Hızlı Ekle
+          </Button>
+          <QuickActionsSheet open={isQuickActionOpen} onOpenChange={setIsQuickActionOpen} />
+        </div>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Net Kazanç" value={formatCurrency(netProfit)} icon={Wallet} tone="green" />
+        <StatCard label="Aktif Projeler" value={activeProjectsCount.toString()} icon={FolderKanban} tone="blue" />
+        <StatCard label="Tamamlanan Görev" value={completedTasksCount.toString()} icon={CheckCircle2} tone="amber" />
+        <StatCard label="Ortalama Mood" value={avgMood} icon={Activity} tone="red" />
+      </div>
+
+      {/* Charts */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="mb-6 text-sm font-semibold text-foreground">Gelir / Gider Özeti</h3>
+            <div className="h-[300px] w-full">
+              {incomeTrendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={incomeTrendData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
+                      dy={10}
+                    />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
+                      dx={-10}
+                    />
+                    <Tooltip 
+                      cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--background))', 
+                        borderColor: 'hsl(var(--border))',
+                        borderRadius: '0.375rem',
+                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
+                      }} 
+                    />
+                    <Bar dataKey="income" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="expense" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Bu tarih aralığında finansal veri yok.</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="mb-6 text-sm font-semibold text-foreground">Mood & Enerji Trendi</h3>
+            <div className="h-[300px] w-full">
+              {moodTrendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={moodTrendData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="date" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
+                      dy={10}
+                    />
+                    <YAxis 
+                      domain={[0, 5]} 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
+                      width={30}
+                      dx={-10}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--background))', 
+                        borderColor: 'hsl(var(--border))',
+                        borderRadius: '0.375rem',
+                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
+                      }} 
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="mood" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={3}
+                      dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "hsl(var(--background))" }}
+                      activeDot={{ r: 6, strokeWidth: 0 }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="energy" 
+                      stroke="#eab308" 
+                      strokeWidth={3}
+                      dot={{ r: 4, fill: "#eab308", strokeWidth: 2, stroke: "hsl(var(--background))" }}
+                      activeDot={{ r: 6, strokeWidth: 0 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Bu tarih aralığında günlük verisi yok.</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Upcoming & Tasks List */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardContent className="p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground">Yaklaşan Etkinlikler ve Deadlinelar</h3>
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="space-y-4">
+              {data.events.length > 0 ? data.events.map((event) => (
+                <div key={event.id} className="flex items-center gap-3">
+                  <div className={`h-2 w-2 rounded-full ${event.type === 'meeting' ? 'bg-primary' : event.type === 'deadline' ? 'bg-destructive' : 'bg-amber-500'}`} />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{event.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(event.starts_at).toLocaleDateString("tr-TR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                </div>
+              )) : (
+                <div className="text-sm text-muted-foreground py-4 text-center border border-dashed rounded-sm border-border bg-muted/20">Yaklaşan etkinlik yok.</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  tone,
+}: {
+  label: string;
+  value: string;
+  icon: typeof FolderKanban;
+  tone: "green" | "blue" | "amber" | "red";
+}) {
+  const toneClass = {
+    green: "bg-emerald-50 text-emerald-700",
+    blue: "bg-blue-50 text-blue-700",
+    amber: "bg-amber-50 text-amber-700",
+    red: "bg-primary/10 text-primary",
+  }[tone];
+
+  return (
+    <Card>
+      <CardContent className="flex items-center justify-between gap-3 p-4">
+        <div>
+          <p className="text-sm text-muted-foreground">{label}</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
+        </div>
+        <div className={`flex h-10 w-10 items-center justify-center rounded-sm ${toneClass}`}>
+          <Icon className="h-5 w-5" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
