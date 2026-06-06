@@ -64,32 +64,56 @@ Cognis is built on a cutting-edge, high-performance tech stack:
 
 ---
 
-## 📦 Installation & Setup
+## 📦 Kurulum & Local Geliştirme
 
-1. **Clone the repository:**
+Projeyi kendi bilgisayarınızda çalıştırmak için aşağıdaki adımları izleyin:
+
+1. **Depoyu Klonlayın:**
    ```bash
    git clone https://github.com/yourusername/cognis-dashboard.git
+   cd cognis-dashboard
    ```
 
-2. **Install dependencies:**
+2. **Bağımlılıkları Yükleyin:**
    ```bash
    pnpm install
    ```
 
-3. **Configure Environment Variables:**
-   Create a `.env.local` file and add your Supabase credentials:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+3. **Çevresel Değişkenleri Ayarlayın:**
+   `.env.example` dosyasını kopyalayarak `.env.local` oluşturun:
+   ```bash
+   cp .env.example .env.local
    ```
+   *Not: Eğer Supabase Cloud kullanıyorsanız bilgilerinizi buraya girin.*
 
-4. **Initialize Database:**
-   Run the provided SQL scripts in your Supabase SQL Editor to create the necessary tables (`chat_sessions`, `chat_messages`, `user_settings`, `profiles`).
+4. **Veritabanı Kurulumu ve Örnek Veri (Local Supabase):**
+   Eğer projeyi tamamen lokalde denemek istiyorsanız Supabase CLI kullanabilirsiniz:
+   ```bash
+   npx supabase start
+   ```
+   Local veritabanınızı örnek verilerle doldurmak için:
+   ```bash
+   npx supabase db reset
+   ```
+   *Bu komut, `supabase/seed.sql` dosyasını çalıştırarak `demo@cognis.com` şifre `demo123456` olan örnek bir kullanıcı ve sahte finans/proje verileri ekler.*
 
-5. **Run the development server:**
+5. **Uygulamayı Başlatın:**
    ```bash
    pnpm dev
    ```
+
+---
+
+## 🐳 Self-Hosting (VPS & Docker)
+
+Cognis'i kendi sunucunuzda barındırmak (Self-host) için Docker altyapısı hazır durumdadır:
+
+1. Sunucunuzda projeyi klonlayın ve `.env.local` dosyanızı oluşturun.
+2. Production imajını inşa edip başlatmak için:
+   ```bash
+   docker-compose up -d --build
+   ```
+   *Uygulama `http://localhost:3000` portundan yayın yapmaya başlayacaktır. Bir reverse proxy (Nginx, Traefik, Caddy) ile dışarıya açabilirsiniz.*
 
 ---
 
