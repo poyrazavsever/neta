@@ -70,7 +70,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
           </div>
         ) : null}
 
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col min-w-0">
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Image
@@ -93,7 +93,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
             </Button>
           </header>
 
-          <main className="flex-1 p-4 lg:p-8">{children}</main>
+          <main className="flex-1 p-4 lg:p-8 min-w-0">{children}</main>
         </div>
       </div>
     </div>
