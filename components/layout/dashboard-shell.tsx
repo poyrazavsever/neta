@@ -48,7 +48,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
-        <aside className="sticky top-0 hidden h-dvh w-[280px] shrink-0 self-start border-r border-border bg-background lg:block">
+        <aside className="sticky top-0 hidden h-dvh shrink-0 self-start border-r border-border bg-background lg:block">
           <AppSidebar pathname={pathname} user={user} />
         </aside>
 
@@ -60,7 +60,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
               className="absolute inset-0 bg-overlay"
               onClick={() => setIsMobileSidebarOpen(false)}
             />
-            <aside className="relative h-dvh w-[min(88vw,300px)] border-r border-border bg-background">
+            <aside className="relative h-dvh border-r border-border bg-background">
               <AppSidebar
                 pathname={pathname}
                 user={user}
@@ -70,7 +70,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
           </div>
         ) : null}
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Image
@@ -78,7 +78,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                 alt="Cognis"
                 width={32}
                 height={32}
-                className="h-8 w-8 rounded-sm object-cover"
+                className="rounded-sm object-cover"
                 priority
               />
               Cognis

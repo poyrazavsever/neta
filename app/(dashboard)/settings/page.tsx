@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { User, Bell, Shield, Blocks, Brain, CreditCard, Save, Key, AlertTriangle } from "lucide-react";
+import { User, Shield, Brain, Save, Key, AlertTriangle } from "lucide-react";
 import { updatePassword, updateProfile } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Card, CardContent, Input, Label } from "poyraz-ui/atoms";
@@ -33,9 +33,6 @@ export default function SettingsPage() {
     { name: "Profile & Account", icon: User },
     { name: "AI Preferences", icon: Brain },
     { name: "Security", icon: Shield },
-    { name: "Integrations", icon: Blocks },
-    { name: "Notifications", icon: Bell },
-    { name: "Billing & Plans", icon: CreditCard },
   ];
 
   useEffect(() => {

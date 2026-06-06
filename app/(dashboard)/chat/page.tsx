@@ -5,6 +5,7 @@ import { Brain, Send, MessageSquare, Plus, Trash2, Loader2, Wrench } from "lucid
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "poyraz-ui/atoms";
 import { useChat } from "@ai-sdk/react";
+import toast from "react-hot-toast";
 
 interface ChatSession {
   id: string;
@@ -18,15 +19,21 @@ export default function AIChatPage() {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, input, setInput, handleInputChange, handleSubmit, append, setMessages, isLoading, stop } = useChat({
+  const [input, setInput] = useState("");
+  const { messages, append, setMessages, isLoading, stop } = useChat({
     api: "/api/chat",
     body: {
       sessionId: activeSessionId
     },
     onError: (err) => {
       console.error(err);
+      toast.error(err.message || "Yapay zeka ile iletişim kurulurken bir hata oluştu.");
     }
   });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+  };
 
   // Auto-scroll to bottom
   const scrollToBottom = () => {
