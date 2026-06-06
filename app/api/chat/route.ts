@@ -39,22 +39,37 @@ export async function POST(req: Request) {
       model = openai('gpt-4o');
     }
 
-    // Identify the latest user message to save to Supabase
+    // Identify the latest user message to save to Supabase and use for RAG
     const latestMessage = messages[messages.length - 1];
-    if (sessionId && latestMessage && latestMessage.role === 'user') {
-      // Sadece metin varsa kaydediyoruz
-      if (latestMessage.content) {
+    let ragContext = "";
+    
+    if (latestMessage && latestMessage.role === 'user' && latestMessage.content) {
+      if (sessionId) {
         await supabase.from("chat_messages").insert({
           session_id: sessionId,
           role: "user",
           content: latestMessage.content,
         });
       }
+
+      // Perform RAG search
+      try {
+        const { searchSimilarDocuments } = await import('@/lib/ai/embeddings');
+        const similarDocs = await searchSimilarDocuments(user.id, latestMessage.content, provider, apiKey, 3);
+        if (similarDocs && similarDocs.length > 0) {
+          ragContext = "Aşağıda kullanıcının veri tabanından sistemin otomatik bulduğu geçmiş notlar ve veriler (RAG Context) bulunmaktadır. Gerektiğinde soruları yanıtlarken bunlardan faydalan:\n\n" + similarDocs.map((doc: any) => `- ${doc.content}`).join("\n");
+        }
+      } catch (err) {
+        console.error("RAG araması başarısız:", err);
+      }
     }
 
     const systemPrompt = `Sen kullanıcının kişisel Freelancer İş Asistanı ve Danışmanısın. Cognis Freelancer OS içinde yaşıyorsun.
 Kullanıcının iş süreçlerini, projelerini ve finansal durumunu organize etmesine yardımcı oluyorsun.
 Gerektiğinde araçları (tools) kullanarak sistemden güncel verileri çek ve doğrudan veri ekle.
+
+${ragContext}
+
 Aşağıdaki yeteneklere sahipsin:
 - Finansal verileri listeleyebilir ve yeni finans kaydı (gelir/gider) girebilirsin.
 - Görevleri okuyabilir ve yeni görevler ekleyebilirsin.

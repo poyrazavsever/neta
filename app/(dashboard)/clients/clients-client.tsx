@@ -19,6 +19,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from "poyraz-ui/molecules";
 import {
   Archive,
@@ -31,10 +35,14 @@ import {
   UserCheck,
   Users,
   Wallet,
+  Clock,
+  ArrowRight,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { format, isPast, isToday } from "date-fns";
+import { tr } from "date-fns/locale";
 
 export type ClientListItem = {
   id: string;
@@ -48,6 +56,11 @@ export type ClientListItem = {
   created_at: string;
   projectCount: number;
   revenueTotal: number;
+  // CRM fields
+  pipeline_stage: "lead" | "contacted" | "proposal_sent" | "won" | "lost";
+  next_follow_up_date: string | null;
+  last_contact_date: string | null;
+  client_value_score: number;
 };
 
 const statusLabels = {
@@ -61,6 +74,14 @@ const statusClasses = {
   paused: "border-amber-200 bg-amber-50 text-amber-700",
   archived: "border-zinc-200 bg-zinc-50 text-zinc-600",
 };
+
+const pipelineStages = [
+  { id: "lead", label: "Potansiyel (Lead)", color: "border-slate-200 bg-slate-50 text-slate-700" },
+  { id: "contacted", label: "İletişime Geçildi", color: "border-blue-200 bg-blue-50 text-blue-700" },
+  { id: "proposal_sent", label: "Teklif İletildi", color: "border-amber-200 bg-amber-50 text-amber-700" },
+  { id: "won", label: "Kazanıldı (Won)", color: "border-emerald-200 bg-emerald-50 text-emerald-700" },
+  { id: "lost", label: "Kaybedildi (Lost)", color: "border-rose-200 bg-rose-50 text-rose-700" },
+];
 
 type ClientsClientProps = {
   clients: ClientListItem[];
@@ -79,6 +100,7 @@ export function ClientsClient({
 }: ClientsClientProps) {
   const [query, setQuery] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
+  
   const filteredClients = normalizedQuery
     ? clients.filter((client) =>
         [
@@ -95,20 +117,19 @@ export function ClientsClient({
     : clients;
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="h-4 w-4" />
-            Freelancer operasyonu
+            CRM & Operasyon
           </div>
           <div>
             <h1 className="text-3xl font-semibold tracking-normal text-foreground">
-              Müşteriler
+              CRM & Müşteriler
             </h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Çalıştığın müşterileri, iletişim bilgilerini ve temel iş durumunu tek
-              ekrandan yönet.
+              Potansiyel müşterilerini pipeline üzerinden takip et ve müşteri ilişkilerini yönet.
             </p>
           </div>
         </div>
@@ -118,25 +139,25 @@ export function ClientsClient({
 
       <div className="grid gap-3 md:grid-cols-4">
         <StatCard
-          label="Aktif müşteri"
+          label="Potansiyel (Lead)"
+          value={clients.filter(c => c.pipeline_stage === 'lead' || c.pipeline_stage === 'contacted').length.toString()}
+          icon={Users}
+          iconClassName="bg-blue-50 text-blue-700"
+        />
+        <StatCard
+          label="Aktif Müşteri"
           value={activeCount.toString()}
           icon={UserCheck}
           iconClassName="bg-emerald-50 text-emerald-700"
         />
         <StatCard
-          label="Duraklatıldı"
-          value={pausedCount.toString()}
-          icon={PauseCircle}
-          iconClassName="bg-amber-50 text-amber-700"
+          label="Bekleyen Follow-up"
+          value={clients.filter(c => c.next_follow_up_date && (isPast(new Date(c.next_follow_up_date)) || isToday(new Date(c.next_follow_up_date)))).length.toString()}
+          icon={Clock}
+          iconClassName="bg-rose-50 text-rose-700"
         />
         <StatCard
-          label="Arşiv"
-          value={archivedCount.toString()}
-          icon={Archive}
-          iconClassName="bg-zinc-100 text-zinc-700"
-        />
-        <StatCard
-          label="Kayıtlı gelir"
+          label="Kayıtlı Gelir"
           value={formatCurrency(totalRevenue)}
           description="Ödenmiş gelir işlemleri"
           icon={Wallet}
@@ -144,59 +165,112 @@ export function ClientsClient({
         />
       </div>
 
-      <Card>
-        <CardContent className="space-y-4 p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-foreground">
-                Müşteri listesi
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {filteredClients.length} kayıt görüntüleniyor.
-              </p>
-            </div>
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Müşteri, firma, e-posta veya not ara"
-              className="md:max-w-sm"
-            />
-          </div>
+      <Tabs defaultValue="pipeline" className="w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <TabsList>
+            <TabsTrigger value="pipeline">Pipeline (Kanban)</TabsTrigger>
+            <TabsTrigger value="list">Müşteri Listesi</TabsTrigger>
+          </TabsList>
+          
+          <Input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Müşteri, firma, e-posta veya not ara"
+            className="md:max-w-sm"
+          />
+        </div>
 
-          {filteredClients.length > 0 ? (
-            <div className="overflow-hidden rounded-sm border border-border">
-              <div className="hidden grid-cols-[1.5fr_1fr_1fr_0.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
-                <span>Müşteri</span>
-                <span>İletişim</span>
-                <span>Durum</span>
-                <span>Projeler</span>
-                <span className="text-right">İşlem</span>
-              </div>
-              <div className="divide-y divide-border">
-                {filteredClients.map((client) => (
-                  <ClientRow key={client.id} client={client} />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <EmptyState hasQuery={Boolean(normalizedQuery)} />
-          )}
-        </CardContent>
-      </Card>
+        <TabsContent value="pipeline" className="mt-0">
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+            {pipelineStages.map(stage => {
+              const stageClients = filteredClients.filter(c => c.pipeline_stage === stage.id && c.status !== 'archived');
+              return (
+                <div key={stage.id} className="flex-shrink-0 w-80 bg-muted/30 rounded-lg border border-border p-3 snap-start flex flex-col h-[calc(100vh-320px)] min-h-[500px]">
+                  <div className="flex items-center justify-between mb-3 px-1">
+                    <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${stage.color.split(' ')[1]}`}></span>
+                      {stage.label}
+                    </h3>
+                    <Badge variant="secondary" className="text-xs">{stageClients.length}</Badge>
+                  </div>
+                  <div className="flex-1 overflow-y-auto space-y-3 pr-1 tiny-scrollbar">
+                    {stageClients.map(client => (
+                      <Card key={client.id} className="cursor-pointer hover:border-primary/50 transition-colors">
+                        <CardContent className="p-3">
+                          <div className="flex justify-between items-start mb-2">
+                            <Link href={`/clients/${client.id}`} className="font-medium text-foreground hover:underline">
+                              {client.name}
+                            </Link>
+                            <ClientDialog mode="edit" client={client} trigger={<Button variant="ghost" className="h-6 w-6 p-0"><Pencil className="h-3 w-3" /></Button>} />
+                          </div>
+                          {client.company_name && <p className="text-xs text-muted-foreground mb-2">{client.company_name}</p>}
+                          
+                          {client.next_follow_up_date && (
+                            <div className="mt-3 flex items-center gap-1.5 text-xs">
+                              <Clock className={`h-3 w-3 ${isPast(new Date(client.next_follow_up_date)) ? 'text-rose-500' : 'text-muted-foreground'}`} />
+                              <span className={isPast(new Date(client.next_follow_up_date)) ? 'text-rose-500 font-medium' : 'text-muted-foreground'}>
+                                {format(new Date(client.next_follow_up_date), 'd MMM yyyy', { locale: tr })}
+                              </span>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                    {stageClients.length === 0 && (
+                      <div className="h-24 flex items-center justify-center border-2 border-dashed border-border rounded-md text-xs text-muted-foreground">
+                        Boş
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="list" className="mt-0">
+          <Card>
+            <CardContent className="p-0">
+              {filteredClients.length > 0 ? (
+                <div className="overflow-hidden rounded-sm border border-border">
+                  <div className="hidden grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
+                    <span>Müşteri</span>
+                    <span>İletişim</span>
+                    <span>Aşama</span>
+                    <span>Follow-up</span>
+                    <span>Projeler</span>
+                    <span className="text-right">İşlem</span>
+                  </div>
+                  <div className="divide-y divide-border">
+                    {filteredClients.map((client) => (
+                      <ClientRow key={client.id} client={client} />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <EmptyState hasQuery={Boolean(normalizedQuery)} />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
 
 function ClientRow({ client }: { client: ClientListItem }) {
+  const isFollowUpOverdue = client.next_follow_up_date && (isPast(new Date(client.next_follow_up_date)) || isToday(new Date(client.next_follow_up_date)));
+  const stage = pipelineStages.find(s => s.id === client.pipeline_stage) || pipelineStages[0];
+
   return (
-    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[1.5fr_1fr_1fr_0.8fr_0.8fr] lg:items-center">
+    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] lg:items-center">
       <div className="min-w-0">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-primary/10 text-sm font-semibold text-primary">
             {getInitials(client.name)}
           </div>
           <div className="min-w-0">
-            <div className="truncate font-medium text-foreground">{client.name}</div>
+            <Link href={`/clients/${client.id}`} className="truncate font-medium text-foreground hover:underline block">{client.name}</Link>
             <div className="truncate text-sm text-muted-foreground">
               {client.company_name || "Firma bilgisi yok"}
             </div>
@@ -217,43 +291,40 @@ function ClientRow({ client }: { client: ClientListItem }) {
             <span className="truncate">{client.phone}</span>
           </Link>
         ) : null}
-        {client.website ? (
-          <Link
-            href={getWebsiteHref(client.website)}
-            target="_blank"
-            className="flex items-center gap-2 hover:text-primary"
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-            <span className="truncate">{client.website.replace(/^https?:\/\//, "")}</span>
-          </Link>
-        ) : null}
         {!client.email && !client.phone && !client.website ? (
           <span>İletişim bilgisi yok</span>
         ) : null}
       </div>
 
       <div>
-        <Badge className={statusClasses[client.status]}>
-          {statusLabels[client.status]}
+        <Badge className={stage.color}>
+          {stage.label}
         </Badge>
       </div>
 
       <div className="text-sm">
-        <div className="font-medium text-foreground">{client.projectCount}</div>
+        {client.next_follow_up_date ? (
+          <div className={`flex items-center gap-1.5 ${isFollowUpOverdue ? 'text-rose-600 font-medium' : 'text-muted-foreground'}`}>
+            <Clock className="h-3.5 w-3.5" />
+            {format(new Date(client.next_follow_up_date), 'd MMM yyyy', { locale: tr })}
+          </div>
+        ) : (
+          <span className="text-muted-foreground opacity-50">-</span>
+        )}
+      </div>
+
+      <div className="text-sm">
+        <div className="font-medium text-foreground">{client.projectCount} Proje</div>
         <div className="text-muted-foreground">{formatCurrency(client.revenueTotal)}</div>
       </div>
 
       <div className="flex justify-start gap-2 lg:justify-end">
-        <ClientDialog mode="edit" client={client} />
-        {client.status !== "archived" ? (
-          <form action={archiveClientRecord}>
-            <input type="hidden" name="id" value={client.id} />
-            <Button type="submit" variant="outline" className="h-9 min-w-24 gap-2 px-3">
-              <Archive className="h-4 w-4" />
-              Arşivle
-            </Button>
-          </form>
-        ) : null}
+        <Link href={`/clients/${client.id}`}>
+          <Button variant="ghost" className="h-9 w-9 p-0">
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </Link>
+        <ClientDialog mode="edit" client={client} trigger={<Button variant="outline" className="h-9 min-w-20 gap-2 px-3"><Pencil className="h-4 w-4" /> Düzenle</Button>} />
       </div>
     </div>
   );
@@ -262,9 +333,11 @@ function ClientRow({ client }: { client: ClientListItem }) {
 function ClientDialog({
   mode,
   client,
+  trigger
 }: {
   mode: "create" | "edit";
   client?: ClientListItem;
+  trigger?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -284,15 +357,17 @@ function ClientDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant={mode === "create" ? "default" : "outline"}
-          className="h-9 min-w-24 gap-2 px-3"
-        >
-          {mode === "create" ? <Plus className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-          {mode === "create" ? "Müşteri ekle" : "Düzenle"}
-        </Button>
+        {trigger || (
+          <Button
+            variant={mode === "create" ? "default" : "outline"}
+            className="h-9 min-w-24 gap-2 px-3"
+          >
+            {mode === "create" ? <Plus className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+            {mode === "create" ? "Müşteri ekle" : "Düzenle"}
+          </Button>
+        )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95">
+      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
         <form action={handleSubmit} className="space-y-5">
           {client ? <input type="hidden" name="id" value={client.id} /> : null}
           <DialogHeader>
@@ -300,8 +375,7 @@ function ClientDialog({
               {mode === "create" ? "Yeni müşteri" : "Müşteriyi düzenle"}
             </DialogTitle>
             <DialogDescription>
-              Müşteri bilgilerini sade tut; proje ve finans bağlantıları sonraki
-              modüllerden otomatik görünecek.
+              Müşterinin iletişim ve CRM detaylarını girin.
             </DialogDescription>
           </DialogHeader>
 
@@ -326,28 +400,70 @@ function ClientDialog({
 function ClientFormFields({ client }: { client?: ClientListItem }) {
   return (
     <div className="grid gap-4">
-      <div className="grid gap-2">
-        <Label htmlFor={`name-${client?.id || "new"}`}>Müşteri adı</Label>
-        <Input
-          id={`name-${client?.id || "new"}`}
-          name="name"
-          defaultValue={client?.name || ""}
-          required
-          placeholder="Örn. Acme Corp"
-        />
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-2">
+          <Label htmlFor={`name-${client?.id || "new"}`}>Müşteri adı</Label>
+          <Input
+            id={`name-${client?.id || "new"}`}
+            name="name"
+            defaultValue={client?.name || ""}
+            required
+            placeholder="Örn. Acme Corp"
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor={`company-${client?.id || "new"}`}>Firma / marka adı</Label>
+          <Input
+            id={`company-${client?.id || "new"}`}
+            name="company_name"
+            defaultValue={client?.company_name || ""}
+            placeholder="Opsiyonel"
+          />
+        </div>
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor={`company-${client?.id || "new"}`}>Firma / marka adı</Label>
-        <Input
-          id={`company-${client?.id || "new"}`}
-          name="company_name"
-          defaultValue={client?.company_name || ""}
-          placeholder="Opsiyonel"
-        />
+      <div className="grid gap-4 md:grid-cols-2 border-t border-border pt-4 mt-2">
+        <div className="grid gap-2">
+          <Label>Satış Aşaması (Pipeline)</Label>
+          <Select name="pipeline_stage" defaultValue={client?.pipeline_stage || "lead"}>
+            <SelectTrigger>
+              <SelectValue placeholder="Aşama seç" />
+            </SelectTrigger>
+            <SelectContent>
+              {pipelineStages.map(stage => (
+                <SelectItem key={stage.id} value={stage.id}>{stage.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <Label>Durum</Label>
+          <Select name="status" defaultValue={client?.status || "active"}>
+            <SelectTrigger>
+              <SelectValue placeholder="Durum seç" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">Aktif</SelectItem>
+              <SelectItem value="paused">Duraklatıldı</SelectItem>
+              <SelectItem value="archived">Arşivlendi</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-2">
+          <Label htmlFor={`followup-${client?.id || "new"}`}>Sonraki Follow-up Tarihi</Label>
+          <Input
+            id={`followup-${client?.id || "new"}`}
+            name="next_follow_up_date"
+            type="date"
+            defaultValue={client?.next_follow_up_date ? new Date(client.next_follow_up_date).toISOString().slice(0, 10) : ""}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 border-t border-border pt-4 mt-2">
         <div className="grid gap-2">
           <Label htmlFor={`email-${client?.id || "new"}`}>E-posta</Label>
           <Input
@@ -368,55 +484,22 @@ function ClientFormFields({ client }: { client?: ClientListItem }) {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="grid gap-2">
-          <Label htmlFor={`website-${client?.id || "new"}`}>Web sitesi</Label>
-          <WebsiteInput
-            id={`website-${client?.id || "new"}`}
-            name="website"
-            defaultValue={client?.website || ""}
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label>Durum</Label>
-          <Select name="status" defaultValue={client?.status || "active"}>
-            <SelectTrigger>
-              <SelectValue placeholder="Durum seç" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Aktif</SelectItem>
-              <SelectItem value="paused">Duraklatıldı</SelectItem>
-              <SelectItem value="archived">Arşivlendi</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
       <div className="grid gap-2">
-        <Label htmlFor={`notes-${client?.id || "new"}`}>Notlar</Label>
+        <Label htmlFor={`notes-${client?.id || "new"}`}>Genel Notlar</Label>
         <Textarea
           id={`notes-${client?.id || "new"}`}
           name="notes"
           defaultValue={client?.notes || ""}
           placeholder="İletişim notları, beklentiler, özel bilgiler..."
-          rows={4}
+          rows={3}
         />
       </div>
     </div>
   );
 }
 
-function PhoneInput({
-  id,
-  name,
-  defaultValue,
-}: {
-  id: string;
-  name: string;
-  defaultValue: string;
-}) {
+function PhoneInput({ id, name, defaultValue }: { id: string; name: string; defaultValue: string; }) {
   const [value, setValue] = useState(defaultValue);
-
   return (
     <Input
       id={id}
@@ -429,43 +512,7 @@ function PhoneInput({
   );
 }
 
-function WebsiteInput({
-  id,
-  name,
-  defaultValue,
-}: {
-  id: string;
-  name: string;
-  defaultValue: string;
-}) {
-  const [value, setValue] = useState(defaultValue);
-
-  return (
-    <Input
-      id={id}
-      name={name}
-      value={value}
-      inputMode="url"
-      placeholder="https://poyrazavsever.com"
-      onChange={(event) => setValue(event.target.value.replace(/\s/g, ""))}
-      onBlur={() => setValue(normalizeWebsite(value))}
-    />
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  description,
-  icon: Icon,
-  iconClassName,
-}: {
-  label: string;
-  value: string;
-  description?: string;
-  icon: LucideIcon;
-  iconClassName: string;
-}) {
+function StatCard({ label, value, description, icon: Icon, iconClassName }: { label: string; value: string; description?: string; icon: LucideIcon; iconClassName: string; }) {
   return (
     <Card>
       <CardContent className="p-4">
@@ -473,9 +520,7 @@ function StatCard({
           <div>
             <p className="text-sm text-muted-foreground">{label}</p>
             <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
-            {description ? (
-              <p className="mt-1 text-xs text-muted-foreground">{description}</p>
-            ) : null}
+            {description ? <p className="mt-1 text-xs text-muted-foreground">{description}</p> : null}
           </div>
           <div className={`flex h-10 w-10 items-center justify-center rounded-sm ${iconClassName}`}>
             <Icon className="h-5 w-5" />
@@ -494,73 +539,33 @@ function EmptyState({ hasQuery }: { hasQuery: boolean }) {
         {hasQuery ? "Aramana uygun müşteri yok" : "Henüz müşteri eklenmedi"}
       </h3>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        {hasQuery
-          ? "Arama metnini sadeleştirerek tekrar deneyebilirsin."
-          : "İlk müşterini ekleyerek proje, görev ve finans kayıtlarını müşteriyle ilişkilendirmeye başlayabilirsin."}
+        İlk müşterini ekleyerek potansiyel satışlarını takip etmeye başla.
       </p>
     </div>
   );
 }
 
 function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
+  return name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("");
 }
 
 function formatPhone(input: string) {
   const digits = input.replace(/\D/g, "");
-
-  if (!digits) {
-    return "";
-  }
-
-  const local = digits.startsWith("90")
-    ? digits.slice(2, 12)
-    : digits.startsWith("0")
-      ? digits.slice(1, 11)
-      : digits.slice(0, 10);
-
+  if (!digits) return "";
+  const local = digits.startsWith("90") ? digits.slice(2, 12) : digits.startsWith("0") ? digits.slice(1, 11) : digits.slice(0, 10);
   const area = local.slice(0, 3);
   const first = local.slice(3, 6);
   const second = local.slice(6, 8);
   const third = local.slice(8, 10);
-
   let formatted = "+90";
   if (area) formatted += ` (${area}`;
   if (area.length === 3) formatted += ")";
   if (first) formatted += ` ${first}`;
   if (second) formatted += ` ${second}`;
   if (third) formatted += ` ${third}`;
-
   return formatted;
 }
 
-function normalizeWebsite(input: string) {
-  const value = input.trim().replace(/\s/g, "");
-
-  if (!value) {
-    return "";
-  }
-
-  if (/^https?:\/\//i.test(value)) {
-    return value;
-  }
-
-  return `https://${value}`;
-}
-
-function getWebsiteHref(input: string) {
-  return /^https?:\/\//i.test(input) ? input : `https://${input}`;
-}
-
 function formatCurrency(value: number) {
-  return new Intl.NumberFormat("tr-TR", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
+  return new Intl.NumberFormat("tr-TR", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
 }

@@ -10,6 +10,10 @@ type ClientRow = {
   website: string | null;
   status: "active" | "paused" | "archived";
   notes: string | null;
+  pipeline_stage: "lead" | "contacted" | "proposal_sent" | "won" | "lost";
+  next_follow_up_date: string | null;
+  last_contact_date: string | null;
+  client_value_score: number;
   created_at: string;
 };
 
@@ -38,7 +42,7 @@ export default async function ClientsPage() {
     await Promise.all([
       supabase
         .from("clients")
-        .select("id, name, company_name, email, phone, website, status, notes, created_at")
+        .select("id, name, company_name, email, phone, website, status, notes, created_at, pipeline_stage, next_follow_up_date, last_contact_date, client_value_score")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false }),
       supabase.from("projects").select("client_id").eq("user_id", user.id),

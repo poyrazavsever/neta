@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { Brain, Send, MessageSquare, Plus, Trash2, Loader2, Wrench } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "poyraz-ui/atoms";
-import { useChat } from "ai/react";
+import { useChat } from "@ai-sdk/react";
 
 interface ChatSession {
   id: string;
@@ -107,10 +107,10 @@ export default function AIChatPage() {
 
   const customHandleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!(input || "").trim() || isLoading) return;
 
     let sessionId = activeSessionId;
-    const currentInput = input;
+    const currentInput = input || "";
     setInput("");
 
     if (!sessionId) {
@@ -309,8 +309,8 @@ export default function AIChatPage() {
                   <Button 
                     type="submit" 
                     size="icon" 
-                    className={`h-10 w-10 rounded-lg ${input.trim() ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-muted text-muted-foreground'}`}
-                    disabled={!input.trim()}
+                    className={`h-10 w-10 rounded-lg ${(input || "").trim() ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-muted text-muted-foreground'}`}
+                    disabled={!(input || "").trim()}
                   >
                     <Send className="h-4 w-4 ml-0.5" />
                   </Button>

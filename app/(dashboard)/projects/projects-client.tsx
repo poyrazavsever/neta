@@ -32,6 +32,8 @@ import {
   Plus,
   Target,
   Wallet,
+  Brain,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -125,7 +127,10 @@ export function ProjectsClient({ projects, clients }: ProjectsClientProps) {
           </div>
         </div>
 
-        <ProjectDialog mode="create" clients={clients} />
+        <div className="flex gap-2">
+          <AIProjectRiskDialog />
+          <ProjectDialog mode="create" clients={clients} />
+        </div>
       </div>
 
       <div className="grid gap-3 md:grid-cols-4">
@@ -750,4 +755,87 @@ function formatCurrency(value: number) {
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+function AIProjectRiskDialog({ projectId }: { projectId?: string }) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+
+  const handleAnalyze = async () => {
+    setLoading(true);
+    setResult(null);
+    try {
+      const res = await fetch("/api/project-risk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Bilinmeyen bir hata oluştu.");
+      }
+      setResult(data.text);
+    } catch (err: any) {
+      setResult("Hata: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="gap-2 bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-800">
+          <Brain className="h-4 w-4" />
+          AI Risk Analizi
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-indigo-600" />
+            Proje Risk Analizi
+          </DialogTitle>
+          <DialogDescription>
+            Yapay zeka, projelerinizin ilerleme durumunu ve bitiş tarihlerini kontrol ederek riskleri tahmin eder.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="py-4">
+          {!result && !loading && (
+            <div className="text-center py-10">
+              <Button onClick={handleAnalyze} className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+                <Brain className="h-4 w-4" />
+                Raporu Oluştur
+              </Button>
+            </div>
+          )}
+
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-10 space-y-4 text-indigo-600">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <p className="text-sm font-medium">Projeler analiz ediliyor...</p>
+            </div>
+          )}
+
+          {result && (
+            <div className="bg-muted/50 border border-border rounded-lg p-5 text-sm prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
+              {result}
+            </div>
+          )}
+        </div>
+
+        {result && (
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Kapat</Button>
+            <Button variant="default" onClick={handleAnalyze} className="gap-2">
+              <Brain className="h-4 w-4" />
+              Yeniden Oluştur
+            </Button>
+          </DialogFooter>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 }

@@ -58,6 +58,8 @@ export async function createClientRecord(formData: FormData) {
     website: cleanWebsite(formData.get("website")),
     status: readStatus(formData.get("status")),
     notes: cleanText(formData.get("notes")),
+    pipeline_stage: formData.get("pipeline_stage") ? String(formData.get("pipeline_stage")) : "lead",
+    next_follow_up_date: cleanText(formData.get("next_follow_up_date")) || null,
   });
 
   if (error) {
@@ -86,6 +88,8 @@ export async function updateClientRecord(formData: FormData) {
       website: cleanWebsite(formData.get("website")),
       status: readStatus(formData.get("status")),
       notes: cleanText(formData.get("notes")),
+      pipeline_stage: formData.get("pipeline_stage") ? String(formData.get("pipeline_stage")) : "lead",
+      next_follow_up_date: cleanText(formData.get("next_follow_up_date")) || null,
     })
     .eq("id", id)
     .eq("user_id", userId);
