@@ -60,6 +60,7 @@ function readPayload(formData: FormData) {
     due_at: cleanText(formData.get("due_at")),
     estimated_minutes: readMinutes(formData.get("estimated_minutes")),
     actual_minutes: readMinutes(formData.get("actual_minutes")),
+    is_public_to_client: formData.get("is_public_to_client") === "on",
   };
 }
 

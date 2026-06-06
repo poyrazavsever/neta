@@ -33,6 +33,7 @@ type TaskRow = {
   status: string | null;
   priority: string | null;
   due_at: string | null;
+  is_public_to_client: boolean | null;
 };
 
 type FinanceRow = {
@@ -60,7 +61,7 @@ export default async function ProjectDetailPage({
     return null;
   }
 
-  const [{ data: projectRow }, { data: sectionRows }, { data: taskRows }, { data: financeRows }] =
+  const [{ data: projectRow }, { data: sectionRows }, { data: taskRows }, { data: financeRows }, { data: revisionRows }] =
     await Promise.all([
       supabase
         .from("projects")
@@ -79,7 +80,7 @@ export default async function ProjectDetailPage({
         .order("created_at", { ascending: true }),
       supabase
         .from("tasks")
-        .select("id, title, status, priority, due_at")
+        .select("id, title, status, priority, due_at, is_public_to_client")
         .eq("project_id", id)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false }),
@@ -89,6 +90,11 @@ export default async function ProjectDetailPage({
         .eq("project_id", id)
         .eq("user_id", user.id)
         .order("transaction_date", { ascending: false }),
+      supabase
+        .from("project_revisions")
+        .select("id, description, status, created_at, requested_by")
+        .eq("project_id", id)
+        .order("created_at", { ascending: false }),
     ]);
 
   if (!projectRow) {
@@ -129,7 +135,9 @@ export default async function ProjectDetailPage({
     status: normalizeTaskStatus(task.status),
     priority: normalizeTaskPriority(task.priority),
     due_at: task.due_at,
+    is_public_to_client: task.is_public_to_client || false,
   }));
+  const revisions = revisionRows || [];
   const financeTransactions: ProjectFinanceItem[] = ((financeRows || []) as FinanceRow[]).map(
     (transaction) => ({
       id: transaction.id,
@@ -148,6 +156,7 @@ export default async function ProjectDetailPage({
       sections={sections}
       tasks={tasks}
       financeTransactions={financeTransactions}
+      revisions={revisions}
     />
   );
 }

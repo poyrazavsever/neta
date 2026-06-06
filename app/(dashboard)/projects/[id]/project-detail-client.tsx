@@ -87,6 +87,7 @@ export type ProjectDetailTaskItem = {
   status: "todo" | "in_progress" | "done";
   priority: "low" | "medium" | "high" | "urgent";
   due_at: string | null;
+  is_public_to_client: boolean;
 };
 
 export type ProjectFinanceItem = {
@@ -104,6 +105,7 @@ type ProjectDetailClientProps = {
   sections: ProjectPlanningSectionItem[];
   tasks: ProjectDetailTaskItem[];
   financeTransactions: ProjectFinanceItem[];
+  revisions: any[];
 };
 
 const typeLabels = {
@@ -168,8 +170,9 @@ export function ProjectDetailClient({
   sections,
   tasks,
   financeTransactions,
+  revisions,
 }: ProjectDetailClientProps) {
-  const [activeTab, setActiveTab] = useState<"planning" | "design" | "tasks" | "finance">(
+  const [activeTab, setActiveTab] = useState<"planning" | "design" | "tasks" | "finance" | "revisions">(
     "planning",
   );
   const planningSections = sections.filter((section) =>
@@ -290,6 +293,14 @@ export function ProjectDetailClient({
         <TabButton active={activeTab === "finance"} onClick={() => setActiveTab("finance")}>
           Finans
         </TabButton>
+        {revisions.length > 0 && (
+          <TabButton active={activeTab === "revisions"} onClick={() => setActiveTab("revisions")}>
+            Revizyonlar
+            <Badge variant="secondary" className="ml-2 px-1 py-0 h-4 text-[10px]">
+              {revisions.filter(r => r.status === 'pending').length}
+            </Badge>
+          </TabButton>
+        )}
       </div>
 
       {activeTab === "planning" ? (
@@ -316,7 +327,63 @@ export function ProjectDetailClient({
         <TaskPanel projectId={project.id} clientId={project.client_id} tasks={tasks} />
       ) : null}
       {activeTab === "finance" ? <FinancePanel transactions={financeTransactions} /> : null}
+      {activeTab === "revisions" ? <RevisionsPanel projectId={project.id} revisions={revisions} /> : null}
     </div>
+  );
+}
+
+function RevisionsPanel({ projectId, revisions }: { projectId: string; revisions: any[] }) {
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  async function handleStatusChange(id: string, status: string) {
+    setIsUpdating(true);
+    try {
+      const { updateRevisionStatus } = await import("@/app/(dashboard)/projects/actions");
+      await updateRevisionStatus(id, projectId, status);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setIsUpdating(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardContent className="space-y-4 p-5">
+        <h2 className="text-lg font-semibold">Müşteri Revizyon Talepleri</h2>
+        {revisions.length === 0 ? (
+          <p className="text-muted-foreground text-sm">Bu proje için henüz bir revizyon talebi oluşturulmamış.</p>
+        ) : (
+          <div className="space-y-4">
+            {revisions.map(rev => (
+              <div key={rev.id} className="p-4 border rounded-md">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="text-sm text-muted-foreground">
+                    {new Date(rev.created_at).toLocaleString('tr-TR')}
+                  </div>
+                  <Select
+                    defaultValue={rev.status}
+                    onValueChange={(val) => handleStatusChange(rev.id, val)}
+                    disabled={isUpdating}
+                  >
+                    <SelectTrigger className="w-40 h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Bekliyor</SelectItem>
+                      <SelectItem value="in_progress">İşleniyor</SelectItem>
+                      <SelectItem value="completed">Tamamlandı</SelectItem>
+                      <SelectItem value="rejected">Reddedildi</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <p className="text-sm whitespace-pre-wrap">{rev.description}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -581,14 +648,19 @@ function TaskPanel({
                   className="grid gap-4 px-4 py-4 lg:grid-cols-[1.5fr_0.8fr_0.8fr_0.8fr] lg:items-center"
                 >
                   <div>
-                    <div
-                      className={
-                        task.status === "done"
-                          ? "font-medium text-muted-foreground line-through"
-                          : "font-medium text-foreground"
-                      }
-                    >
-                      {task.title}
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={
+                          task.status === "done"
+                            ? "font-medium text-muted-foreground line-through"
+                            : "font-medium text-foreground"
+                        }
+                      >
+                        {task.title}
+                      </div>
+                      {task.is_public_to_client && (
+                        <Badge variant="outline" className="h-5 px-1.5 text-[10px] text-emerald-600 border-emerald-200 bg-emerald-50">Müşteriye Açık</Badge>
+                      )}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {task.status === "done"
@@ -822,6 +894,27 @@ function ProjectTaskDialog({
                 </Select>
               </div>
             </div>
+            
+            <div className="flex items-center space-x-2 border rounded-md p-4 bg-muted/20">
+              <input 
+                type="checkbox" 
+                id="is_public_to_client" 
+                name="is_public_to_client" 
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="is_public_to_client"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Müşteri Portalında Göster
+                </label>
+                <p className="text-[13px] text-muted-foreground">
+                  Eğer müşteri hesabı varsa, bu görev müşteri portalındaki proje detayında da görünür olur.
+                </p>
+              </div>
+            </div>
+
             <div className="grid gap-5 md:grid-cols-3">
               <div className="grid gap-2">
                 <Label htmlFor="project-task-due">Son tarih</Label>

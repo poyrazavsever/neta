@@ -320,3 +320,19 @@ export async function deleteProjectPlanningSectionRecord(formData: FormData) {
   revalidatePath("/projects");
   revalidatePath(`/projects/${projectId}`);
 }
+
+export async function updateRevisionStatus(id: string, projectId: string, status: string) {
+  const { supabase } = await getCurrentUserId();
+  
+  const { error } = await supabase
+    .from("project_revisions")
+    .update({ status })
+    .eq("id", id)
+    .eq("project_id", projectId);
+
+  if (error) {
+    throw new Error(`Revizyon durumu güncellenemedi: ${error.message}`);
+  }
+
+  revalidatePath(`/projects/${projectId}`);
+}
