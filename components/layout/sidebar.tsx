@@ -24,7 +24,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 border-r border-border bg-secondary min-h-screen flex flex-col shrink-0">
+    <aside className="border-r border-border bg-secondary min-h-screen flex flex-col shrink-0">
       <div className="h-16 flex items-center px-6 border-b border-border text-primary">
         <BrainCircuit className="h-6 w-6 mr-2" />
         <h2 className="text-xl font-bold tracking-tight">MindSpace</h2>
