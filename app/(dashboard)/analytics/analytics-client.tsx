@@ -43,7 +43,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
   };
 
   const filteredFinances = data.finances.filter(f => filterByDate(f.transaction_date));
-  const filteredTasks = data.tasks.filter(t => filterByDate(t.created_at || t.due_at));
+  const filteredTasks = data.tasks.filter(t => filterByDate(t.created_at || t.due_at || null));
 
   // Project-based income
   const projectIncomeMap = new Map();
