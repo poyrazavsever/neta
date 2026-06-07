@@ -147,19 +147,37 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} dx={-10} />
                   <Tooltip 
-                    cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))', 
-                      borderColor: 'hsl(var(--border))',
-                      borderRadius: '0.375rem',
-                    }} 
+                    cursor={{ fill: 'transparent' }}
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-background border border-border rounded-xl p-3 shadow-lg shadow-black/5">
+                            <p className="font-medium text-foreground mb-2 text-sm">{label}</p>
+                            <div className="space-y-1.5">
+                              {payload.map((entry: any, index: number) => (
+                                <div key={index} className="flex items-center justify-between gap-6 text-xs">
+                                  <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                                    <span className="text-muted-foreground">Görev Sayısı</span>
+                                  </div>
+                                  <span className="font-semibold text-foreground">
+                                    {entry.value}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
                   />
                   <Bar 
                     dataKey="value" 
-                    fill="hsl(var(--primary))" 
+                    fill="#3b82f6" 
                     radius={[4, 4, 0, 0]} 
                     barSize={60} 
-                    activeBar={{ fill: "hsl(var(--primary))", opacity: 0.8 }}
+                    activeBar={{ fill: "#2563eb" }}
                   />
                 </BarChart>
               </ResponsiveContainer>
