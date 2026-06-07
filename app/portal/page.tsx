@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardContent } from "poyraz-ui/atoms";
-import { Badge } from "poyraz-ui/molecules";
+import { Card, CardContent, Badge } from "poyraz-ui/atoms";
 import { FolderKanban, CheckCircle2, Clock, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
