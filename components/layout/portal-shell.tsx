@@ -25,7 +25,7 @@ import {
 } from "poyraz-ui/organisms";
 import { portalSidebarData } from "@/config/portal-sidebar";
 import { cn } from "@/lib/utils";
-import { ChevronUp, LogOut, Menu, Settings } from "lucide-react";
+import { Activity, ChevronUp, LogOut, Menu, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -120,18 +120,33 @@ function AppSidebar({
       variant="bordered"
       className="flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0"
     >
-      <SidebarHeader className="shrink-0 border-b-0 px-6 py-6">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between text-sm font-medium">
-            <span className="text-muted-foreground">Aktif İlerleme</span>
-            <span className="text-primary">%{progress}</span>
+      <SidebarHeader className="shrink-0 border-b-0 px-4 py-6">
+        <div className="flex flex-col gap-3 rounded-xl bg-primary/5 border border-primary/10 p-4 relative overflow-hidden">
+          <div className="flex items-center gap-2 relative z-10">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-primary">
+              <Activity className="h-4 w-4" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Genel Durum</span>
+              <span className="text-sm font-semibold text-foreground">Proje İlerlemesi</span>
+            </div>
           </div>
-          <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-primary transition-all duration-500" 
-              style={{ width: `${progress}%` }} 
-            />
+          
+          <div className="space-y-1.5 mt-1 relative z-10">
+            <div className="flex items-center justify-between text-xs font-medium">
+              <span className="text-primary">%{progress} Tamamlandı</span>
+            </div>
+            <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary transition-all duration-700 ease-out relative" 
+                style={{ width: `${progress}%` }} 
+              >
+                <div className="absolute top-0 right-0 bottom-0 left-0 bg-white/20 animate-pulse" />
+              </div>
+            </div>
           </div>
+          
+          <div className="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full blur-xl" />
         </div>
       </SidebarHeader>
 
