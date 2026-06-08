@@ -73,7 +73,7 @@ export function PortalShell({ children, user, progress }: PortalShellProps) {
         ) : null}
 
         <div className="flex flex-1 flex-col min-w-0">
-          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur">
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
             <Link href="/portal" className="flex items-center gap-2 font-semibold">
               <Image
                 src="/logo/LogoWithBg.png"
@@ -120,7 +120,26 @@ function AppSidebar({
       variant="bordered"
       className="flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0"
     >
-      <SidebarContent className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto px-6 py-6 mt-4">
+      <SidebarHeader className="shrink-0 border-b-0 px-6 py-6">
+        <SidebarBranding
+          title="Cognis"
+          subtitle="Freelancer OS"
+          logo={
+            <Image
+              src="/logo/LogoWithBg.png"
+              alt="Cognis"
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-sm object-cover"
+              priority
+            />
+          }
+        />
+      </SidebarHeader>
+
+      <SidebarSeparator className="mx-0 my-0 w-full" />
+
+      <SidebarContent className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto px-6 py-6">
         {portalSidebarData.map((group, groupIndex) => (
           <div key={group.title}>
             <SidebarSection title={group.title} defaultOpen className="mb-0">
