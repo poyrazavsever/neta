@@ -1,4 +1,4 @@
-![Revanios Icon](public/logo/icon.png)
+<img src="public/logo/icon.png" width="80" alt="Revanios Icon" />
 
 # Revanios - Freelancer Operating System
 
