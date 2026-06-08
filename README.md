@@ -1,4 +1,4 @@
-<img src="public/logo/icon.png" width="80" alt="Revanios Icon" />
+<img src="public/logo/lightLogo.png" width="80" alt="Revanios Icon" />
 
 # Revanios - Freelancer Operating System
 
