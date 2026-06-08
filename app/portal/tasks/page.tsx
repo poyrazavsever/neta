@@ -5,6 +5,16 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 
+type PortalTaskRow = {
+  id: string;
+  title: string;
+  status: string;
+  project_id: string;
+  created_at: string;
+  date: string | null;
+  priority: string | null;
+};
+
 export default async function PortalTasksPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -32,7 +42,7 @@ export default async function PortalTasksPage() {
 
   const projectIds = projectsData?.map(p => p.id) || [];
   
-  let tasks = [];
+  let tasks: PortalTaskRow[] = [];
   if (projectIds.length > 0) {
     const { data: tasksData } = await supabase
       .from("tasks")

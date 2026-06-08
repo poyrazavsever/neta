@@ -7,6 +7,7 @@ This file is the canonical order of SQL files for database setup and migration.
 | 0001 | `supabase/schema.sql` | `docs/database/0001-initial-schema.md` | Baseline registered |
 | 0002 | `supabase/migrations/0002_add_freelancer_os_core_tables.sql` | `docs/database/0002-freelancer-os-core-tables.md` | Pending execution |
 | 0003 | `supabase/migrations/0003_add_project_planning_assets.sql` | `docs/database/0003-project-planning-assets.md` | Pending execution |
+| 0009 | `supabase/migrations/0009_lock_registration_after_first_admin.sql` | `docs/database/0009-lock-registration-after-first-admin.md` | Pending execution |
 | seed-0001 | `supabase/seeds/0001_demo_freelancer_os_data.sql` | `docs/database/seed-0001-demo-freelancer-os-data.md` | Optional demo seed, pending execution |
 
 ## How To Add The Next Query

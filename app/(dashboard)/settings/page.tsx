@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { User, Shield, Brain, Save, Key, AlertTriangle } from "lucide-react";
+import { AlertTriangle, Blocks, Brain, Key, Save, Shield, User } from "lucide-react";
 import { updatePassword, updateProfile } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Card, CardContent, Input, Label } from "poyraz-ui/atoms";

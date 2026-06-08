@@ -5,6 +5,14 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 
+type RevisionRow = {
+  id: string;
+  description: string;
+  status: string;
+  project_id: string;
+  created_at: string;
+};
+
 export default async function PortalRevisionsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -32,7 +40,7 @@ export default async function PortalRevisionsPage() {
 
   const projectIds = projectsData?.map(p => p.id) || [];
   
-  let revisions = [];
+  let revisions: RevisionRow[] = [];
   if (projectIds.length > 0) {
     const { data: revisionsData } = await supabase
       .from("project_revisions")

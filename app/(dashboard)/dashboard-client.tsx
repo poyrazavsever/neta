@@ -123,7 +123,7 @@ export function DashboardClient({ data }: DashboardClientProps) {
             <Plus className="h-4 w-4" />
             Hızlı Ekle
           </Button>
-          <QuickActionsSheet open={isQuickActionOpen} onOpenChange={setIsQuickActionOpen} />
+          <QuickActionsSheet isOpen={isQuickActionOpen} onClose={() => setIsQuickActionOpen(false)} />
         </div>
       </div>
 

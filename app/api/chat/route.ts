@@ -1,156 +1,57 @@
-import { streamText, tool } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { z } from 'zod';
-import { createClient } from '@/lib/supabase/server';
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createOpenAI } from "@ai-sdk/openai";
+import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import { createClient } from "@/lib/supabase/server";
 
-export const maxDuration = 30; // Allow longer execution for tool calls
+export const maxDuration = 30;
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      return new Response('Yetkisiz erişim', { status: 401 });
+      return new Response("Yetkisiz erişim", { status: 401 });
     }
 
-    const { messages, sessionId, provider: clientProvider, apiKey: clientApiKey } = await req.json();
+    const body = await request.json();
+    const messages = (body.messages || []) as UIMessage[];
+    const sessionId = body.sessionId as string | undefined;
+    const latestMessage = messages[messages.length - 1];
+    const latestText = latestMessage ? getMessageText(latestMessage) : "";
 
-    // Read App Settings for Provider/API Key
+    if (sessionId && latestMessage?.role === "user" && latestText) {
+      await supabase.from("chat_messages").insert({
+        session_id: sessionId,
+        role: "user",
+        content: latestText,
+      });
+    }
+
     const { data: appSettings } = await supabase
       .from("app_settings")
-      .select("*")
+      .select("ai_provider, ai_model, api_key")
       .eq("user_id", user.id)
       .single();
 
-    const provider = clientProvider || appSettings?.ai_provider || "openai";
-    const apiKey = clientApiKey || appSettings?.api_key || "";
-
-    let model;
-    if (provider === 'gemini') {
-      const google = createGoogleGenerativeAI({ apiKey });
-      model = google('gemini-1.5-pro-latest');
-    } else if (provider === 'groq') {
-      const groq = createOpenAI({ apiKey, baseURL: 'https://api.groq.com/openai/v1' });
-      model = groq('llama-3.1-8b-instant');
-    } else {
-      const openai = createOpenAI({ apiKey });
-      model = openai('gpt-4o');
-    }
-
-    // Identify the latest user message to save to Supabase and use for RAG
-    const latestMessage = messages[messages.length - 1];
-    let ragContext = "";
-    
-    if (latestMessage && latestMessage.role === 'user' && latestMessage.content) {
-      if (sessionId) {
-        await supabase.from("chat_messages").insert({
-          session_id: sessionId,
-          role: "user",
-          content: latestMessage.content,
-        });
-      }
-
-      // Perform RAG search
-      try {
-        const { searchSimilarDocuments } = await import('@/lib/ai/embeddings');
-        const similarDocs = await searchSimilarDocuments(user.id, latestMessage.content, provider, apiKey, 3);
-        if (similarDocs && similarDocs.length > 0) {
-          ragContext = "Aşağıda kullanıcının veri tabanından sistemin otomatik bulduğu geçmiş notlar ve veriler (RAG Context) bulunmaktadır. Gerektiğinde soruları yanıtlarken bunlardan faydalan:\n\n" + similarDocs.map((doc: any) => `- ${doc.content}`).join("\n");
-        }
-      } catch (err) {
-        console.error("RAG araması başarısız:", err);
-      }
-    }
-
-    const systemPrompt = `Sen kullanıcının kişisel Freelancer İş Asistanı ve Danışmanısın. Cognis Freelancer OS içinde yaşıyorsun.
-Kullanıcının iş süreçlerini, projelerini ve finansal durumunu organize etmesine yardımcı oluyorsun.
-Gerektiğinde araçları (tools) kullanarak sistemden güncel verileri çek ve doğrudan veri ekle.
-
-${ragContext}
-
-Aşağıdaki yeteneklere sahipsin:
-- Finansal verileri listeleyebilir ve yeni finans kaydı (gelir/gider) girebilirsin.
-- Görevleri okuyabilir ve yeni görevler ekleyebilirsin.
-- Projeleri sorgulayabilir ve projelerin detaylarını/tasarım sistemini çekebilirsin.
-Kullanıcıya her zaman proaktif, kısa ve profesyonel yanıtlar ver. Türkçe dilinde cevapla.`;
+    const provider = body.provider || appSettings?.ai_provider || "openai";
+    const apiKey = body.apiKey || appSettings?.api_key || "";
+    const modelName = appSettings?.ai_model || getDefaultModel(provider);
+    const model = getModel(provider, apiKey, modelName);
+    const context = await buildUserContext(user.id);
 
     const result = streamText({
       model,
-      system: systemPrompt,
-      messages,
-      tools: {
-        getFinancialSummary: tool({
-          description: 'Son X gündeki gelir ve gider işlemlerinin listesini getirir.',
-          parameters: z.object({ days: z.number().default(30) }),
-          execute: async ({ days }) => {
-            const pastDate = new Date();
-            pastDate.setDate(pastDate.getDate() - days);
-            const { data } = await supabase.from('finance_transactions')
-              .select('type, amount, category, transaction_date')
-              .gte('transaction_date', pastDate.toISOString());
-            return data || [];
-          }
-        }),
-        listTasks: tool({
-          description: 'Kullanıcının mevcut görevlerini belirli bir duruma göre listeler.',
-          parameters: z.object({ status: z.enum(['todo', 'in_progress', 'completed', 'all']).default('all') }),
-          execute: async ({ status }) => {
-            let query = supabase.from('tasks').select('id, title, status, due_at');
-            if (status !== 'all') query = query.eq('status', status);
-            const { data } = await query.order('created_at', { ascending: false }).limit(20);
-            return data || [];
-          }
-        }),
-        createTask: tool({
-          description: 'Sisteme yeni bir görev ekler.',
-          parameters: z.object({ 
-            title: z.string().describe('Görev başlığı'), 
-            description: z.string().optional().describe('Görevin detayı') 
-          }),
-          execute: async ({ title, description }) => {
-            const { data, error } = await supabase.from('tasks')
-              .insert({ user_id: user.id, title, description, status: 'todo' })
-              .select().single();
-            if (error) return { success: false, error: error.message };
-            return { success: true, task: data };
-          }
-        }),
-        searchProjects: tool({
-          description: 'Projeleri isimlerine veya durumlarına göre listeler',
-          parameters: z.object({ status: z.enum(['active', 'planning', 'completed', 'paused', 'all']).default('active') }),
-          execute: async ({ status }) => {
-            let query = supabase.from('projects').select('id, name, status, progress, budget');
-            if (status !== 'all') query = query.eq('status', status);
-            const { data } = await query.limit(10);
-            return data || [];
-          }
-        }),
-        addFinanceTransaction: tool({
-          description: 'Sisteme yeni bir finansal kayıt (gelir veya gider) ekler.',
-          parameters: z.object({ 
-            type: z.enum(['income', 'expense']).describe('income (gelir) veya expense (gider)'), 
-            amount: z.number().describe('Tutar'), 
-            category: z.string().describe('Kategori örn. Yazılım, Yemek, Vergi vb.')
-          }),
-          execute: async ({ type, amount, category }) => {
-            const { data, error } = await supabase.from('finance_transactions')
-              .insert({ 
-                user_id: user.id, 
-                type, 
-                amount, 
-                category, 
-                transaction_date: new Date().toISOString() 
-              })
-              .select().single();
-            if (error) return { success: false, error: error.message };
-            return { success: true, transaction: data };
-          }
-        })
-      },
+      system: `Sen Cognis içindeki kişisel Freelancer OS asistanısın.
+Kullanıcının kayıtlı verileri hakkında kısa, net ve Türkçe cevap ver.
+Veri yoksa bunu açıkça söyle. Klinik, finansal veya hukuki kesin hüküm verme.
+
+Kullanıcının güncel veri özeti:
+${context}`,
+      messages: await convertToModelMessages(messages),
       onFinish: async ({ text }) => {
-        // Save assistant response to DB
         if (sessionId && text) {
           await supabase.from("chat_messages").insert({
             session_id: sessionId,
@@ -158,12 +59,91 @@ Kullanıcıya her zaman proaktif, kısa ve profesyonel yanıtlar ver. Türkçe d
             content: text,
           });
         }
-      }
+      },
     });
 
-    return result.toDataStreamResponse();
-  } catch (error: any) {
+    return result.toUIMessageStreamResponse();
+  } catch (error) {
     console.error("Chat API error:", error);
-    return new Response(error.message || "Internal Server Error", { status: 500 });
+    return new Response(error instanceof Error ? error.message : "Internal Server Error", {
+      status: 500,
+    });
   }
+}
+
+function getDefaultModel(provider: string) {
+  if (provider === "gemini") return "gemini-1.5-pro-latest";
+  if (provider === "groq") return "llama-3.1-8b-instant";
+  return "gpt-4o";
+}
+
+function getModel(provider: string, apiKey: string, modelName: string) {
+  if (provider === "gemini") {
+    return createGoogleGenerativeAI({ apiKey })(modelName);
+  }
+
+  if (provider === "groq") {
+    return createOpenAI({ apiKey, baseURL: "https://api.groq.com/openai/v1" })(modelName);
+  }
+
+  return createOpenAI({ apiKey })(modelName);
+}
+
+async function buildUserContext(userId: string) {
+  const supabase = await createClient();
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+  const sinceDate = since.toISOString().slice(0, 10);
+
+  const [{ data: tasks }, { data: projects }, { data: finance }, { data: logs }] =
+    await Promise.all([
+      supabase
+        .from("tasks")
+        .select("title, status, priority, due_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(20),
+      supabase
+        .from("projects")
+        .select("name, status, progress, due_date")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(12),
+      supabase
+        .from("finance_transactions")
+        .select("type, amount, currency, category, payment_status, transaction_date")
+        .eq("user_id", userId)
+        .gte("transaction_date", sinceDate)
+        .order("transaction_date", { ascending: false })
+        .limit(20),
+      supabase
+        .from("daily_logs")
+        .select("log_date, mood_score, energy_score, work_satisfaction_score, note")
+        .eq("user_id", userId)
+        .gte("log_date", sinceDate)
+        .order("log_date", { ascending: false })
+        .limit(14),
+    ]);
+
+  return [
+    formatContextList("Görevler", tasks),
+    formatContextList("Projeler", projects),
+    formatContextList("Son 30 gün finans", finance),
+    formatContextList("Son günlük kayıtlar", logs),
+  ].join("\n\n");
+}
+
+function formatContextList(title: string, rows: unknown[] | null) {
+  if (!rows || rows.length === 0) return `${title}: kayıt yok.`;
+
+  return `${title}:\n${rows
+    .map((row) => `- ${JSON.stringify(row)}`)
+    .join("\n")}`;
+}
+
+function getMessageText(message: UIMessage) {
+  return message.parts
+    .filter((part) => part.type === "text")
+    .map((part) => part.text)
+    .join("");
 }

@@ -1,7 +1,8 @@
 import { login } from "@/app/login/actions";
 import { AuthPageShell } from "@/components/auth/auth-page-shell";
 import { ErrorToaster } from "@/components/error-toaster";
-import { LockKeyhole, LogIn, Mail, Search } from "lucide-react";
+import { getFirstAdminSetupState } from "@/lib/auth/first-admin-setup";
+import { LockKeyhole, LogIn, Mail } from "lucide-react";
 import Link from "next/link";
 import { Button, Input, Label } from "poyraz-ui/atoms";
 
@@ -10,7 +11,10 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const resolvedParams = await searchParams;
+  const [resolvedParams, setupState] = await Promise.all([
+    searchParams,
+    getFirstAdminSetupState(),
+  ]);
   const error = resolvedParams?.error;
   const message = resolvedParams?.message;
 
@@ -69,15 +73,19 @@ export default async function LoginPage({
         }
         secondaryAction={null}
         footer={
-          <div className="text-center text-sm">
-            Hesabın yok mu?{" "}
-            <Link
-              href="/register"
-              className="font-medium text-primary transition-colors hover:text-primary-hover"
-            >
-              Kayıt ol
-            </Link>
-          </div>
+          setupState.available ? (
+            <div className="text-center text-sm">
+              İlk kurulumu yapmadın mı?{" "}
+              <Link
+                href="/register"
+                className="font-medium text-primary transition-colors hover:text-primary-hover"
+              >
+                Admin hesabını oluştur
+              </Link>
+            </div>
+          ) : (
+            <span></span>
+          )
         }
       />
     </>

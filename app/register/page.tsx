@@ -1,8 +1,10 @@
 import { signup } from "@/app/login/actions";
 import { AuthPageShell } from "@/components/auth/auth-page-shell";
 import { ErrorToaster } from "@/components/error-toaster";
-import { LockKeyhole, Mail, Search, UserPlus } from "lucide-react";
+import { getFirstAdminSetupState } from "@/lib/auth/first-admin-setup";
+import { LockKeyhole, Mail, UserPlus } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Button, Input, Label } from "poyraz-ui/atoms";
 
 export default async function RegisterPage({
@@ -10,6 +12,20 @@ export default async function RegisterPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const setupState = await getFirstAdminSetupState();
+
+  if (setupState.errorMessage) {
+    redirect(`/login?error=true&message=${encodeURIComponent(setupState.errorMessage)}`);
+  }
+
+  if (!setupState.available) {
+    redirect(
+      `/login?error=true&message=${encodeURIComponent(
+        "Kayıt kapalı. Bu self-host kurulumunda ilk admin hesabı zaten oluşturulmuş.",
+      )}`,
+    );
+  }
+
   const resolvedParams = await searchParams;
   const error = resolvedParams?.error;
   const message = resolvedParams?.message;
@@ -18,8 +34,8 @@ export default async function RegisterPage({
     <>
       {error && message && <ErrorToaster message={String(message)} />}
       <AuthPageShell
-        title="Kayıt ol"
-        description="Freelancer operasyon panelini kullanmak için hesabını oluştur."
+        title="İlk admin hesabını oluştur"
+        description="Bu self-host kurulumu için Cognis çalışma alanının ilk yönetici hesabını oluştur."
         form={
           <form className="space-y-6">
             <div className="space-y-4">
@@ -55,7 +71,7 @@ export default async function RegisterPage({
 
             <Button formAction={signup} className="h-11 w-full gap-2">
               <UserPlus className="h-4 w-4" />
-              Hesap oluştur
+              Admin hesabını oluştur
             </Button>
           </form>
         }
