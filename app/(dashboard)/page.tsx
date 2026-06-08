@@ -49,20 +49,19 @@ export default async function DashboardPage() {
     .gte("log_date", thirtyDaysAgoStr)
     .order("log_date", { ascending: true });
 
-  // 5. Fetch calendar events (upcoming)
-  const { data: events } = await supabase
-    .from("calendar_events")
+  // 5. Fetch recent clients
+  const { data: clients } = await supabase
+    .from("clients")
     .select("*")
-    .gte("starts_at", todayStr)
-    .order("starts_at", { ascending: true })
-    .limit(10);
+    .order("created_at", { ascending: false })
+    .limit(5);
 
   const dashboardData = {
     tasks: tasks || [],
     projects: projects || [],
     finances: finances || [],
     logs: logs || [],
-    events: events || [],
+    clients: clients || [],
   };
 
   return <DashboardClient data={dashboardData} />;

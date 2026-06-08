@@ -1,18 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Badge, Button, Card, CardContent } from "poyraz-ui/atoms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "poyraz-ui/molecules";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Line, LineChart } from "recharts";
-import { CheckCircle2, Wallet, FolderKanban, Activity, CalendarDays, Plus } from "lucide-react";
+import { CheckCircle2, Wallet, FolderKanban, Activity, CalendarDays, Plus, Users } from "lucide-react";
 import { QuickActionsSheet } from "@/components/dashboard/quick-actions-sheet";
 
 export type DashboardData = {
   tasks: { id: string; status: string; created_at: string; updated_at?: string; due_at?: string }[];
-  projects: { id: string; status: string; name: string }[];
+  projects: { id: string; status: string; name: string; created_at: string }[];
   finances: { id: string; type: string; amount: number; transaction_date: string }[];
   logs: { id: string; log_date: string; mood_score: number; energy_score: number }[];
-  events: { id: string; title: string; type: string; starts_at: string }[];
+  clients: { id: string; name: string; company_name: string; created_at: string }[];
 };
 
 type DashboardClientProps = {
@@ -44,16 +45,16 @@ export function DashboardClient({ data }: DashboardClientProps) {
   };
 
   // KPIs
-  const filteredFinances = data.finances.filter(f => filterByDate(f.transaction_date));
+  const filteredFinances = (data.finances || []).filter(f => filterByDate(f.transaction_date));
   const income = filteredFinances.filter(f => f.type === "income").reduce((acc, curr) => acc + Number(curr.amount), 0);
   const expense = filteredFinances.filter(f => f.type === "expense").reduce((acc, curr) => acc + Number(curr.amount), 0);
   const netProfit = income - expense;
 
-  const activeProjectsCount = data.projects.filter(p => p.status === "active").length;
+  const activeProjectsCount = (data.projects || []).filter(p => p.status === "active").length;
   
-  const completedTasksCount = data.tasks.filter(t => t.status === "completed" && filterByDate(t.updated_at || t.created_at)).length;
+  const completedTasksCount = (data.tasks || []).filter(t => t.status === "completed" && filterByDate(t.updated_at || t.created_at)).length;
 
-  const filteredLogs = data.logs.filter(l => filterByDate(l.log_date));
+  const filteredLogs = (data.logs || []).filter(l => filterByDate(l.log_date));
   const avgMood = filteredLogs.length > 0 
     ? (filteredLogs.reduce((acc, curr) => acc + curr.mood_score, 0) / filteredLogs.length).toFixed(1) 
     : "0.0";
@@ -264,27 +265,62 @@ export function DashboardClient({ data }: DashboardClientProps) {
         </Card>
       </div>
 
-      {/* Upcoming & Tasks List */}
+      {/* Recent Items */}
       <div className="grid gap-6 lg:grid-cols-2">
+        {/* Recent Projects */}
         <Card>
           <CardContent className="p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-foreground">Yaklaşan Etkinlikler ve Deadlinelar</h3>
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+              <h3 className="text-sm font-semibold text-foreground">Son Eklenen Projeler</h3>
+              <FolderKanban className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="space-y-4">
-              {data.events.length > 0 ? data.events.map((event) => (
-                <div key={event.id} className="flex items-center gap-3">
-                  <div className={`h-2 w-2 rounded-full ${event.type === 'meeting' ? 'bg-primary' : event.type === 'deadline' ? 'bg-destructive' : 'bg-amber-500'}`} />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{event.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(event.starts_at).toLocaleDateString("tr-TR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                    </p>
+              {(data.projects || []).slice(0, 5).map((project) => (
+                <Link key={project.id} href={`/projects/${project.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 -mx-2 rounded-md transition-colors">
+                  <div className={`h-2 w-2 rounded-full ${project.status === 'completed' ? 'bg-emerald-500' : project.status === 'active' ? 'bg-blue-500' : 'bg-amber-500'}`} />
+                  <div className="flex-1 flex justify-between items-center">
+                    <div>
+                      <p className="text-sm font-medium">{project.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(project.created_at).toLocaleDateString("tr-TR", { month: "short", day: "numeric" })}
+                      </p>
+                    </div>
+                    <Badge variant={project.status === 'completed' ? 'secondary' : 'default'} className="capitalize text-[10px] px-1.5 py-0">
+                      {project.status === 'completed' ? 'Tamamlandı' : project.status === 'active' ? 'Aktif' : 'Beklemede'}
+                    </Badge>
                   </div>
-                </div>
+                </Link>
+              ))}
+              {data.projects.length === 0 && (
+                <div className="text-sm text-muted-foreground py-4 text-center border border-dashed rounded-sm border-border bg-muted/20">Henüz proje yok.</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Clients */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground">Son Eklenen Müşteriler</h3>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="space-y-4">
+              {(data.clients || []).length > 0 ? (data.clients || []).map((client) => (
+                <Link key={client.id} href={`/clients/${client.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 -mx-2 rounded-md transition-colors">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-xs">
+                    {client.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{client.name}</p>
+                    <p className="text-xs text-muted-foreground">{client.company_name || "Bireysel"}</p>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(client.created_at).toLocaleDateString("tr-TR", { month: "short", day: "numeric" })}
+                  </div>
+                </Link>
               )) : (
-                <div className="text-sm text-muted-foreground py-4 text-center border border-dashed rounded-sm border-border bg-muted/20">Yaklaşan etkinlik yok.</div>
+                <div className="text-sm text-muted-foreground py-4 text-center border border-dashed rounded-sm border-border bg-muted/20">Henüz müşteri yok.</div>
               )}
             </div>
           </CardContent>
