@@ -46,13 +46,13 @@ export default function TimeTrackingPage() {
     let interval: any = null;
     if (isActive) {
       interval = setInterval(() => {
-        setSeconds((seconds) => seconds + 1);
+        setSeconds((s) => s + 1);
       }, 1000);
-    } else if (!isActive && seconds !== 0) {
+    } else {
       clearInterval(interval);
     }
     return () => clearInterval(interval);
-  }, [isActive, seconds]);
+  }, [isActive]);
 
   const formatTime = (totalSeconds: number) => {
     const h = Math.floor(totalSeconds / 3600);
