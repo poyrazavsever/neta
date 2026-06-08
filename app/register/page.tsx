@@ -35,7 +35,7 @@ export default async function RegisterPage({
       {error && message && <ErrorToaster message={String(message)} />}
       <AuthPageShell
         title="İlk admin hesabını oluştur"
-        description="Bu self-host kurulumu için Cognis çalışma alanının ilk yönetici hesabını oluştur."
+        description="Bu self-host kurulumu için Revanios çalışma alanının ilk yönetici hesabını oluştur."
         form={
           <form className="space-y-6">
             <div className="space-y-4">

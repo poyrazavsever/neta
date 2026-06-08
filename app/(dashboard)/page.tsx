@@ -3,7 +3,7 @@ import { DashboardClient } from "./dashboard-client";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Dashboard - Cognis",
+  title: "Dashboard - Revanios",
 };
 
 export default async function DashboardPage() {

@@ -28,7 +28,7 @@ const goals = [
   },
   { 
     id: 2, 
-    title: "Launch Cognis AI Mobile App", 
+    title: "Launch Revanios AI Mobile App", 
     category: "Product", 
     progress: 85, 
     deadline: "May 25, 2026", 
@@ -238,7 +238,7 @@ export default function GoalsPage() {
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-blue-500/10 rounded-sm"><Briefcase className="h-4 w-4 text-blue-400" /></div>
                         <div>
-                          <div className="text-xs font-bold">Project: Cognis App</div>
+                          <div className="text-xs font-bold">Project: Revanios App</div>
                           <div className="text-[9px] text-muted-foreground uppercase mt-1">Core Requirement</div>
                         </div>
                       </div>

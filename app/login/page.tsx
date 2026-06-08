@@ -23,7 +23,7 @@ export default async function LoginPage({
       {error && message && <ErrorToaster message={String(message)} />}
       <AuthPageShell
         title="Giriş yap"
-        description="Cognis çalışma alanına erişmek için hesabına giriş yap."
+        description="Revanios çalışma alanına erişmek için hesabına giriş yap."
         form={
           <form className="space-y-6">
             <div className="space-y-4">

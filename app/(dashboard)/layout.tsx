@@ -24,7 +24,7 @@ export default async function DashboardLayout({
     redirect("/portal");
   }
 
-  const fallbackName = user?.email?.split("@")[0] ?? "Cognis Kullanıcısı";
+  const fallbackName = user?.email?.split("@")[0] ?? "Revanios Kullanıcısı";
   const displayName =
     [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
     fallbackName;
