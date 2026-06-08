@@ -44,19 +44,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { format, isPast, isToday } from "date-fns";
 import { tr } from "date-fns/locale";
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  closestCorners,
-  useDroppable,
-  useDraggable,
-} from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -117,35 +104,24 @@ export function ClientsClient({
   const [query, setQuery] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
   
-  const [activeDragClient, setActiveDragClient] = useState<ClientListItem | null>(null);
+  const [draggedClientId, setDraggedClientId] = useState<string | null>(null);
   const [localClients, setLocalClients] = useState(clients);
 
   useEffect(() => {
     setLocalClients(clients);
   }, [clients]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
-    })
-  );
-
-  function handleDragStart(event: DragStartEvent) {
-    const { active } = event;
-    const client = localClients.find(c => c.id === active.id);
-    if (client) setActiveDragClient(client);
+  function handleDragStart(event: React.DragEvent<HTMLDivElement>, clientId: string) {
+    setDraggedClientId(clientId);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", clientId);
   }
 
-  async function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    setActiveDragClient(null);
+  async function handleDrop(newStage: string) {
+    if (!draggedClientId) return;
 
-    if (!over) return;
-
-    const clientId = active.id as string;
-    const newStage = over.id as string;
+    const clientId = draggedClientId;
+    setDraggedClientId(null);
 
     const client = localClients.find(c => c.id === clientId);
     if (!client || client.pipeline_stage === newStage) return;
@@ -155,7 +131,7 @@ export function ClientsClient({
     );
 
     try {
-      await updateClientPipelineStage(clientId, newStage);
+      await updateClientPipelineStage(clientId, newStage as any);
     } catch (error) {
       setLocalClients(clients);
     }
@@ -241,41 +217,35 @@ export function ClientsClient({
         </div>
 
         <TabsContent value="pipeline" className="mt-0">
-          <DndContext 
-            sensors={sensors} 
-            collisionDetection={closestCorners} 
-            onDragStart={handleDragStart} 
-            onDragEnd={handleDragEnd}
-          >
-            <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-              {pipelineStages.map(stage => {
-                const stageClients = filteredClients.filter(c => c.pipeline_stage === stage.id && c.status !== 'archived');
-                return (
-                  <DroppableColumn 
-                    key={stage.id} 
-                    id={stage.id} 
-                    title={stage.label} 
-                    count={stageClients.length} 
-                    color={stage.color.split(' ')[1]}
-                  >
-                    {stageClients.map(client => (
-                      <DraggableClientCard key={client.id} client={client} />
-                    ))}
-                    {stageClients.length === 0 && (
-                      <div className="h-24 flex items-center justify-center border-2 border-dashed border-border rounded-md text-xs text-muted-foreground">
-                        Boş
-                      </div>
-                    )}
-                  </DroppableColumn>
-                );
-              })}
-            </div>
-            <DragOverlay>
-              {activeDragClient ? (
-                <DraggableClientCard client={activeDragClient} isOverlay />
-              ) : null}
-            </DragOverlay>
-          </DndContext>
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+            {pipelineStages.map(stage => {
+              const stageClients = filteredClients.filter(c => c.pipeline_stage === stage.id && c.status !== 'archived');
+              return (
+                <DroppableColumn 
+                  key={stage.id} 
+                  title={stage.label} 
+                  count={stageClients.length} 
+                  color={stage.color.split(' ')[1]}
+                  onDrop={() => handleDrop(stage.id)}
+                >
+                  {stageClients.map(client => (
+                    <DraggableClientCard 
+                      key={client.id} 
+                      client={client} 
+                      draggedClientId={draggedClientId}
+                      onDragStart={handleDragStart}
+                      onDragEnd={() => setDraggedClientId(null)}
+                    />
+                  ))}
+                  {stageClients.length === 0 && (
+                    <div className="h-24 flex items-center justify-center border-2 border-dashed border-border rounded-md text-xs text-muted-foreground">
+                      Boş
+                    </div>
+                  )}
+                </DroppableColumn>
+              );
+            })}
+          </div>
         </TabsContent>
 
         <TabsContent value="list" className="mt-0">
@@ -304,15 +274,17 @@ export function ClientsClient({
   );
 }
 
-function DroppableColumn({ id, title, count, color, children }: { id: string, title: string, count: number, color: string, children: React.ReactNode }) {
-  const { isOver, setNodeRef } = useDroppable({ id });
+function DroppableColumn({ title, count, color, onDrop, children }: { title: string, count: number, color: string, onDrop: () => void, children: React.ReactNode }) {
   return (
     <div
-      ref={setNodeRef}
       className={cn(
-        "flex-shrink-0 w-[340px] px-2 flex flex-col h-[calc(100vh-320px)] min-h-[500px] transition-colors rounded-lg",
-        isOver ? "bg-muted/30" : ""
+        "flex-shrink-0 w-[340px] px-2 flex flex-col h-[calc(100vh-320px)] min-h-[500px] transition-colors rounded-lg"
       )}
+      onDragOver={(event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+      }}
+      onDrop={onDrop}
     >
       <div className="flex items-center justify-between mb-3 px-1">
         <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
@@ -328,20 +300,26 @@ function DroppableColumn({ id, title, count, color, children }: { id: string, ti
   );
 }
 
-function DraggableClientCard({ client, isOverlay }: { client: ClientListItem, isOverlay?: boolean }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: client.id,
-    data: client,
-  });
-
-  const style = {
-    transform: CSS.Translate.toString(transform),
-    opacity: isDragging && !isOverlay ? 0.3 : 1,
-    zIndex: isDragging ? 999 : "auto",
-  };
+function DraggableClientCard({ 
+  client, 
+  draggedClientId,
+  onDragStart,
+  onDragEnd 
+}: { 
+  client: ClientListItem, 
+  draggedClientId: string | null,
+  onDragStart: (e: React.DragEvent<HTMLDivElement>, id: string) => void,
+  onDragEnd: () => void 
+}) {
+  const isDragging = draggedClientId === client.id;
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className={cn("touch-none cursor-grab active:cursor-grabbing", isOverlay && "rotate-2 scale-105 shadow-xl")}>
+    <div 
+      draggable
+      onDragStart={(e) => onDragStart(e, client.id)}
+      onDragEnd={onDragEnd}
+      className={cn("touch-none", isDragging ? "cursor-grabbing opacity-50 ring-2 ring-primary/20 transition" : "cursor-grab transition active:cursor-grabbing")}
+    >
       <Card className="hover:border-primary/50 transition-colors">
         <CardContent className="p-3">
           <div className="flex justify-between items-start mb-2">
