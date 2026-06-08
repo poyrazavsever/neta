@@ -74,14 +74,13 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Image
-                src="/logo/LogoWithBg.png"
-                alt="Cognis"
-                width={32}
+                src="/logo/blackLogo.png"
+                alt="Revanios"
+                width={120}
                 height={32}
-                className="rounded-sm object-cover"
+                className="h-8 w-auto object-contain"
                 priority
               />
-              Cognis
             </Link>
             <Button
               type="button"
@@ -115,20 +114,16 @@ function AppSidebar({
       className="flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0"
     >
       <SidebarHeader className="shrink-0 border-b-0 px-6 py-6">
-        <SidebarBranding
-          title="Cognis"
-          subtitle="Freelancer OS"
-          logo={
-            <Image
-              src="/logo/LogoWithBg.png"
-              alt="Cognis"
-              width={36}
-              height={36}
-              className="h-9 w-9 rounded-sm object-cover"
-              priority
-            />
-          }
-        />
+        <Link href="/">
+          <Image
+            src="/logo/blackLogo.png"
+            alt="Revanios"
+            width={160}
+            height={48}
+            className="h-12 w-auto object-contain"
+            priority
+          />
+        </Link>
       </SidebarHeader>
 
       <SidebarSeparator className="mx-0 my-0 w-full" />
