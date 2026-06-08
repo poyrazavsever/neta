@@ -6,7 +6,7 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import { Brain, Loader2, MessageSquare, Plus, Send, Trash2 } from "lucide-react";
 import { Button } from "poyraz-ui/atoms";
 import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "poyraz-ui/molecules";
 
 type ChatSession = {
   id: string;

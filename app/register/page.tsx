@@ -6,6 +6,7 @@ import { LockKeyhole, Mail, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Button, Input, Label } from "poyraz-ui/atoms";
+import { SubmitButton } from "@/components/auth/submit-button";
 
 export default async function RegisterPage({
   searchParams,
@@ -69,10 +70,10 @@ export default async function RegisterPage({
               </div>
             </div>
 
-            <Button formAction={signup} className="h-11 w-full gap-2">
+            <SubmitButton formAction={signup} className="h-11 w-full gap-2" pendingText="Oluşturuluyor...">
               <UserPlus className="h-4 w-4" />
               Admin hesabını oluştur
-            </Button>
+            </SubmitButton>
           </form>
         }
         secondaryAction={null}

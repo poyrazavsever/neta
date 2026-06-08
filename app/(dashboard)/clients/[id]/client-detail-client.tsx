@@ -7,7 +7,7 @@ import { Card, CardContent, Badge, Button, Input, Textarea, Label } from "poyraz
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, DialogDescription } from "poyraz-ui/molecules";
 import { Phone, Mail, ExternalLink, Calendar, Plus, MessageSquare, Briefcase, FileText, UserPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
-import toast from "react-hot-toast";
+import { toast } from "poyraz-ui/molecules";
 import { addClientActivity } from "./actions";
 
 export type ClientDetailData = {

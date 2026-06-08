@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'poyraz-ui/molecules'
 
 export function ErrorToaster({ message }: { message: string }) {
   useEffect(() => {

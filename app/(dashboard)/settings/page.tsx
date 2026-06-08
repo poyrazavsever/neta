@@ -5,6 +5,7 @@ import { AlertTriangle, Blocks, Brain, Key, Save, Shield, User } from "lucide-re
 import { updatePassword, updateProfile } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Card, CardContent, Input, Label } from "poyraz-ui/atoms";
+import { toast } from "poyraz-ui/molecules";
 
 type AiProvider = "groq" | "ollama" | "openai" | "gemini";
 
@@ -15,16 +16,13 @@ export default function SettingsPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [profileSaveStatus, setProfileSaveStatus] = useState("");
   
   // Security States
-  const [passwordSaveStatus, setPasswordSaveStatus] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
   // AI States
   const [aiProvider, setAiProvider] = useState<AiProvider>("gemini");
   const [apiKey, setApiKey] = useState("");
-  const [aiSaveStatus, setAiSaveStatus] = useState("");
   
   // Supabase
   const [supabase] = useState(() => createClient());
@@ -63,11 +61,11 @@ export default function SettingsPage() {
         .single();
         
       if (settings && isActive) {
-        setAiProvider((settings.ai_model as AiProvider) || "gemini");
+        setAiProvider((settings.ai_provider as AiProvider) || "gemini");
         setApiKey(settings.api_key || "");
         
         // Also sync to local storage for existing API route calls if they use it
-        localStorage.setItem("mindspace_ai_provider", settings.ai_model);
+        localStorage.setItem("mindspace_ai_provider", settings.ai_provider || "gemini");
         localStorage.setItem("mindspace_api_key", settings.api_key || "");
       }
     };
@@ -79,24 +77,22 @@ export default function SettingsPage() {
   const handleProfileAction = async (formData: FormData) => {
     const response = await updateProfile(formData);
     if (response?.error) {
-      setProfileSaveStatus(`Hata: ${response.error}`);
+      toast.error(`Hata: ${response.error}`);
     } else {
-      setProfileSaveStatus("Profil güncellendi!");
+      toast.success("Profil güncellendi!");
       const avatar = formData.get("avatar");
       if (avatar instanceof File && avatar.size > 0) window.location.reload();
     }
-    setTimeout(() => setProfileSaveStatus(""), 3000);
   };
 
   const handlePasswordAction = async (formData: FormData) => {
     const response = await updatePassword(formData);
     if (response?.error) {
-      setPasswordSaveStatus(`Hata: ${response.error}`);
+      toast.error(`Hata: ${response.error}`);
     } else {
-      setPasswordSaveStatus("Şifre güncellendi!");
+      toast.success("Şifre güncellendi!");
       formRef.current?.reset();
     }
-    setTimeout(() => setPasswordSaveStatus(""), 3000);
   };
 
   const handleSaveAI = async () => {
@@ -109,7 +105,8 @@ export default function SettingsPage() {
         .from("app_settings")
         .upsert({
           user_id: user.id,
-          ai_model: aiProvider,
+          ai_provider: aiProvider,
+          ai_model: null, // Reset to allow default model fallback
           api_key: apiKey,
           updated_at: new Date().toISOString()
         }, { onConflict: 'user_id' });
@@ -120,12 +117,11 @@ export default function SettingsPage() {
       localStorage.setItem("mindspace_ai_provider", aiProvider);
       localStorage.setItem("mindspace_api_key", apiKey);
 
-      setAiSaveStatus("Yapay Zeka ayarları kaydedildi!");
+      toast.success("Yapay Zeka ayarları kaydedildi!");
     } catch (e: any) {
       console.error(e);
-      setAiSaveStatus("Hata oluştu, veritabanına kaydedilemedi.");
+      toast.error("Hata oluştu, veritabanına kaydedilemedi.");
     }
-    setTimeout(() => setAiSaveStatus(""), 3000);
   };
 
   return (
@@ -204,7 +200,6 @@ export default function SettingsPage() {
                     <Button type="submit" className="gap-2">
                       <Save className="h-4 w-4" /> Profili Kaydet
                     </Button>
-                    {profileSaveStatus && <span className="text-sm font-medium text-emerald-500">{profileSaveStatus}</span>}
                   </div>
                 </form>
               </CardContent>
@@ -224,7 +219,6 @@ export default function SettingsPage() {
                     <Button type="submit" className="gap-2">
                       <Save className="h-4 w-4" /> Şifreyi Güncelle
                     </Button>
-                    {passwordSaveStatus && <span className="text-sm font-medium text-emerald-500">{passwordSaveStatus}</span>}
                   </div>
                 </form>
               </CardContent>
@@ -285,7 +279,6 @@ export default function SettingsPage() {
                     <Button onClick={handleSaveAI} className="gap-2">
                       <Save className="h-4 w-4" /> Ayarları Kaydet
                     </Button>
-                    {aiSaveStatus && <span className="text-sm font-medium text-emerald-500">{aiSaveStatus}</span>}
                   </div>
                 </div>
               </CardContent>

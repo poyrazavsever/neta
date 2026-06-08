@@ -6,7 +6,7 @@ import { tr } from "date-fns/locale";
 import { Card, CardContent, Badge, Button, Textarea, Label } from "poyraz-ui/atoms";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "poyraz-ui/molecules";
 import { CheckCircle2, Clock, MessageSquare, Loader2, RefreshCw } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "poyraz-ui/molecules";
 import { createRevisionRequest } from "./actions";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "poyraz-ui/molecules";

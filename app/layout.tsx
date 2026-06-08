@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "poyraz-ui/molecules";
 import { OfflineIndicator } from "@/components/ui/offline-indicator";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
@@ -36,7 +36,7 @@ export default function RootLayout({
       <body>
         {children}
         <OfflineIndicator />
-        <Toaster position="top-right" />
+        <Toaster />
       </body>
     </html>
   );

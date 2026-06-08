@@ -115,7 +115,7 @@ export function AuthPageShell({
           <div className="w-full relative z-10 p-10 text-sm text-primary-foreground/78">
             <span>Açık kaynak ve self-host edilebilir.</span>{" "}
             <Link
-              href="https://github.com/poyrazavsever/cognis"
+              href="https://github.com/poyrazavsever/revanios"
               className="font-semibold text-primary-foreground underline-offset-4 hover:underline"
               target="_blank"
             >

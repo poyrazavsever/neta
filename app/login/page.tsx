@@ -5,6 +5,7 @@ import { getFirstAdminSetupState } from "@/lib/auth/first-admin-setup";
 import { LockKeyhole, LogIn, Mail } from "lucide-react";
 import Link from "next/link";
 import { Button, Input, Label } from "poyraz-ui/atoms";
+import { SubmitButton } from "@/components/auth/submit-button";
 
 export default async function LoginPage({
   searchParams,
@@ -65,10 +66,10 @@ export default async function LoginPage({
               </div>
             </div>
 
-            <Button formAction={login} className="h-11 w-full gap-2">
+            <SubmitButton formAction={login} className="h-11 w-full gap-2" pendingText="Giriş yapılıyor...">
               <LogIn className="h-4 w-4" />
               Giriş yap
-            </Button>
+            </SubmitButton>
           </form>
         }
         secondaryAction={null}
