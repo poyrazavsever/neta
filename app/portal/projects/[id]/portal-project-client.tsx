@@ -32,6 +32,7 @@ export function PortalProjectClient({ project, sections, tasks, revisions, clien
   };
 
   const pendingRevisions = revisions.filter((r: any) => r.status === 'pending' || r.status === 'in_progress').length;
+  const hasRevisionQuota = project.revision_quota === null || project.revision_quota > 0;
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -44,38 +45,44 @@ export function PortalProjectClient({ project, sections, tasks, revisions, clien
         <div className="flex flex-col gap-2 md:items-end">
           <div className="flex gap-2">
             <Badge variant="outline" className="px-3 py-1 capitalize text-sm">{project.status}</Badge>
-            <Dialog open={openRevision} onOpenChange={setOpenRevision}>
-              <DialogTrigger asChild>
-                <Button className="gap-2 shrink-0">
-                  <RefreshCw className="h-4 w-4" /> Revizyon Talep Et
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <form onSubmit={handleRevision}>
-                  <DialogHeader>
-                    <DialogTitle>Yeni Revizyon Talebi</DialogTitle>
-                  </DialogHeader>
-                  <div className="py-4 space-y-4">
-                    {pendingRevisions > 0 && (
-                      <div className="p-3 bg-amber-500/10 text-amber-600 rounded-md text-sm border border-amber-500/20">
-                        Şu anda sonuçlanmamış {pendingRevisions} adet revizyon talebiniz var. Yeni bir tane eklemek istediğinize emin misiniz?
+            {hasRevisionQuota ? (
+              <Dialog open={openRevision} onOpenChange={setOpenRevision}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2 shrink-0">
+                    <RefreshCw className="h-4 w-4" /> Revizyon Talep Et
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <form onSubmit={handleRevision}>
+                    <DialogHeader>
+                      <DialogTitle>Yeni Revizyon Talebi</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4 space-y-4">
+                      {pendingRevisions > 0 && (
+                        <div className="p-3 bg-amber-500/10 text-amber-600 rounded-md text-sm border border-amber-500/20">
+                          Şu anda sonuçlanmamış {pendingRevisions} adet revizyon talebiniz var. Yeni bir tane eklemek istediğinize emin misiniz?
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        <Label>Lütfen yapılmasını istediğiniz değişiklikleri detaylıca açıklayın</Label>
+                        <Textarea name="description" required rows={5} placeholder="Şu kısmın rengi mavi olabilir mi? Ayrıca metinleri güncelleyelim..." />
                       </div>
-                    )}
-                    <div className="space-y-2">
-                      <Label>Lütfen yapılmasını istediğiniz değişiklikleri detaylıca açıklayın</Label>
-                      <Textarea name="description" required rows={5} placeholder="Şu kısmın rengi mavi olabilir mi? Ayrıca metinleri güncelleyelim..." />
                     </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="button" variant="ghost" onClick={() => setOpenRevision(false)}>İptal</Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                      {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Talebi Gönder
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+                    <DialogFooter>
+                      <Button type="button" variant="ghost" onClick={() => setOpenRevision(false)}>İptal</Button>
+                      <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Talebi Gönder
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            ) : (
+              <Button disabled className="gap-2 shrink-0 opacity-50">
+                <RefreshCw className="h-4 w-4" /> Revizyon Hakkı Bitti
+              </Button>
+            )}
           </div>
           {project.due_date && (
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -192,7 +199,9 @@ export function PortalProjectClient({ project, sections, tasks, revisions, clien
             <div className="flex flex-col items-center justify-center py-12 text-center space-y-3 border rounded-lg border-dashed text-muted-foreground">
               <MessageSquare className="h-8 w-8 text-muted-foreground/50" />
               <p>Henüz bir revizyon talebi oluşturmadınız.</p>
-              <Button variant="outline" size="sm" onClick={() => setOpenRevision(true)}>Yeni Talep Oluştur</Button>
+              {hasRevisionQuota && (
+                <Button variant="outline" size="sm" onClick={() => setOpenRevision(true)}>Yeni Talep Oluştur</Button>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
