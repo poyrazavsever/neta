@@ -96,7 +96,7 @@ export function ClientDetailClient({ client, activities }: { client: ClientDetai
   }
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header Info */}
       <div className="flex flex-col gap-4 md:flex-row md:items-start justify-between">
         <div className="flex items-center gap-4">

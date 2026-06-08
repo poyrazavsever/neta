@@ -250,8 +250,8 @@ export function ClientsClient({
 
         <TabsContent value="list" className="mt-0">
           {filteredClients.length > 0 ? (
-            <div className="overflow-hidden rounded-sm border border-border">
-              <div className="hidden grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
+            <div className="overflow-hidden">
+              <div className="hidden grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] gap-4 border-b border-border px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
                 <span>Müşteri</span>
                 <span>İletişim</span>
                 <span>Aşama</span>

@@ -297,14 +297,14 @@ export function ProjectDetailClient({
         <TabButton active={activeTab === "finance"} onClick={() => setActiveTab("finance")}>
           Finans
         </TabButton>
-        {revisions.length > 0 && (
-          <TabButton active={activeTab === "revisions"} onClick={() => setActiveTab("revisions")}>
-            Revizyonlar
+        <TabButton active={activeTab === "revisions"} onClick={() => setActiveTab("revisions")}>
+          Revizyonlar
+          {revisions.filter(r => r.status === 'pending').length > 0 && (
             <Badge variant="secondary" className="ml-2 px-1 py-0 h-4 text-[10px]">
               {revisions.filter(r => r.status === 'pending').length}
             </Badge>
-          </TabButton>
-        )}
+          )}
+        </TabButton>
       </div>
 
       {activeTab === "planning" ? (

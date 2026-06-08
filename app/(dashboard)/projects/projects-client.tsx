@@ -659,14 +659,24 @@ function ProjectFormFields({
         </div>
         <div className="grid gap-2">
           <Label htmlFor={`progress-${project?.id || "new"}`}>İlerleme (%)</Label>
-          <Input
-            id={`progress-${project?.id || "new"}`}
-            name="progress"
-            type="number"
-            min="0"
-            max="100"
-            defaultValue={project?.progress ?? 0}
-          />
+          <div className="flex items-center gap-3">
+            <Input
+              id={`progress-${project?.id || "new"}`}
+              name="progress"
+              type="range"
+              min="0"
+              max="100"
+              defaultValue={project?.progress ?? 0}
+              className="flex-1 cursor-pointer accent-primary"
+              onChange={(e) => {
+                const el = document.getElementById(`progress-val-${project?.id || "new"}`);
+                if (el) el.textContent = `%${e.target.value}`;
+              }}
+            />
+            <span id={`progress-val-${project?.id || "new"}`} className="w-10 text-sm font-medium text-right">
+              %{project?.progress ?? 0}
+            </span>
+          </div>
         </div>
       </div>
     </div>

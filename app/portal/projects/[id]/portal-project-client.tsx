@@ -9,6 +9,8 @@ import { CheckCircle2, Clock, MessageSquare, Loader2, RefreshCw } from "lucide-r
 import toast from "react-hot-toast";
 import { createRevisionRequest } from "./actions";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "poyraz-ui/molecules";
+
 export function PortalProjectClient({ project, sections, tasks, revisions, clientId }: any) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openRevision, setOpenRevision] = useState(false);
@@ -32,7 +34,7 @@ export function PortalProjectClient({ project, sections, tasks, revisions, clien
   const pendingRevisions = revisions.filter((r: any) => r.status === 'pending' || r.status === 'in_progress').length;
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="mx-auto flex max-w-7xl flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header Info */}
       <div className="flex flex-col gap-4 md:flex-row md:items-start justify-between">
         <div className="space-y-1">
@@ -84,22 +86,91 @@ export function PortalProjectClient({ project, sections, tasks, revisions, clien
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
-          {/* Project Planning / Milestones */}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="mb-6 w-full justify-start rounded-none border-b border-border bg-transparent h-auto p-0">
+          <TabsTrigger value="overview" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary px-6 py-3 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
+            Genel Bakış
+          </TabsTrigger>
+          <TabsTrigger value="plan" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary px-6 py-3 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
+            Plan & Aşamalar
+          </TabsTrigger>
+          <TabsTrigger value="revisions" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary px-6 py-3 data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2">
+            Revizyonlar
+            {pendingRevisions > 0 && (
+              <Badge variant="secondary" className="px-1.5 py-0 min-w-5 h-5 flex items-center justify-center">{pendingRevisions}</Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="mt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <h3 className="font-semibold">İlerleme Durumu</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-3xl font-bold">
+                    <span>%{project.progress}</span>
+                  </div>
+                  <div className="h-3 w-full bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary transition-all duration-500" 
+                      style={{ width: `${project.progress}%` }} 
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground">Projenizin anlık tamamlanma oranı.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" /> Yapılan İşler
+                </h3>
+                {tasks.length === 0 ? (
+                  <p className="text-sm text-muted-foreground italic">Listelenecek görev bulunmuyor.</p>
+                ) : (
+                  <ul className="space-y-3 max-h-60 overflow-y-auto tiny-scrollbar pr-2">
+                    {tasks.map((task: any) => (
+                      <li key={task.id} className="text-sm flex gap-3 p-2 rounded hover:bg-muted/30 transition-colors">
+                        {task.status === 'completed' || task.status === 'done' ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                        ) : (
+                          <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30 shrink-0 mt-0.5" />
+                        )}
+                        <div>
+                          <span className={task.status === 'completed' || task.status === 'done' ? "text-muted-foreground" : "text-foreground font-medium"}>
+                            {task.title}
+                          </span>
+                          {task.date && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {format(new Date(task.date), 'd MMM yyyy', { locale: tr })}
+                            </div>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="plan" className="mt-0">
           <Card>
-            <CardContent className="p-5 space-y-6">
+            <CardContent className="p-6 space-y-6">
               <h3 className="font-semibold text-lg border-b border-border pb-2">Proje Planı & Aşamalar</h3>
               {sections.length === 0 ? (
                 <p className="text-muted-foreground italic">Henüz bir plan yüklenmemiş.</p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {sections.map((section: any) => (
-                    <div key={section.id} className="space-y-2">
+                    <div key={section.id} className="space-y-3 p-4 rounded-lg bg-muted/20 border border-border/50">
                       <div className="flex items-center justify-between">
                         <h4 className="font-medium text-foreground">{section.title}</h4>
                         <Badge variant="secondary" className="text-xs">
-                          {section.type === 'milestone' ? 'Milestone' : section.type === 'deliverable' ? 'Teslimat' : 'Not'}
+                          {section.type === 'milestone' ? 'Aşama' : section.type === 'deliverable' ? 'Teslimat' : 'Not'}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground whitespace-pre-wrap">{section.content}</p>
@@ -109,91 +180,49 @@ export function PortalProjectClient({ project, sections, tasks, revisions, clien
               )}
             </CardContent>
           </Card>
+        </TabsContent>
 
-          {/* Revisions */}
-          {revisions.length > 0 && (
-            <Card>
-              <CardContent className="p-5 space-y-6">
-                <h3 className="font-semibold text-lg border-b border-border pb-2">Revizyon Talepleriniz</h3>
+        <TabsContent value="revisions" className="mt-0">
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center justify-between border-b border-border pb-2">
+                <h3 className="font-semibold text-lg">Revizyon Talepleriniz</h3>
+                <div className="text-sm text-muted-foreground">Kalan Hak: {project.revision_quota !== null ? project.revision_quota : 'Sınırsız'}</div>
+              </div>
+              
+              {revisions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 text-center space-y-3">
+                  <MessageSquare className="h-8 w-8 text-muted-foreground/50" />
+                  <p className="text-muted-foreground">Henüz bir revizyon talebi oluşturmadınız.</p>
+                  <Button variant="outline" size="sm" onClick={() => setOpenRevision(true)}>Yeni Talep Oluştur</Button>
+                </div>
+              ) : (
                 <div className="space-y-4">
                   {revisions.map((rev: any) => (
-                    <div key={rev.id} className="p-4 rounded-md border border-border bg-muted/20">
-                      <div className="flex justify-between items-start mb-2">
+                    <div key={rev.id} className="p-4 rounded-md border border-border bg-muted/10 hover:bg-muted/30 transition-colors">
+                      <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Clock className="h-3 w-3" />
+                          <Clock className="h-4 w-4" />
                           {format(new Date(rev.created_at), "d MMM yyyy, HH:mm", { locale: tr })}
                         </div>
                         <Badge variant={
                           rev.status === 'completed' ? 'default' : 
                           rev.status === 'rejected' ? 'destructive' : 'secondary'
-                        }>
+                        } className="capitalize">
                           {rev.status === 'pending' ? 'Bekliyor' : 
                            rev.status === 'in_progress' ? 'İşleniyor' : 
                            rev.status === 'completed' ? 'Tamamlandı' : 'Reddedildi'}
                         </Badge>
                       </div>
-                      <p className="text-sm text-foreground whitespace-pre-wrap">{rev.description}</p>
+                      <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{rev.description}</p>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="space-y-6">
-          <Card>
-            <CardContent className="p-5 space-y-4">
-              <h3 className="font-semibold">İlerleme Durumu</h3>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-2xl font-bold">
-                  <span>%{project.progress}</span>
-                </div>
-                <div className="h-3 w-full bg-secondary rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary transition-all duration-500" 
-                    style={{ width: `${project.progress}%` }} 
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-5 space-y-4">
-              <h3 className="font-semibold flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4" /> Tamamlanan İşler
-              </h3>
-              {tasks.length === 0 ? (
-                <p className="text-sm text-muted-foreground italic">Listelenecek açık görev bulunmuyor.</p>
-              ) : (
-                <ul className="space-y-3">
-                  {tasks.map((task: any) => (
-                    <li key={task.id} className="text-sm flex gap-2">
-                      {task.status === 'completed' ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-                      ) : (
-                        <div className="h-4 w-4 rounded-full border-2 border-muted-foreground shrink-0 mt-0.5" />
-                      )}
-                      <div>
-                        <span className={task.status === 'completed' ? "line-through text-muted-foreground" : "text-foreground"}>
-                          {task.title}
-                        </span>
-                        {task.date && (
-                          <div className="text-xs text-muted-foreground mt-0.5">
-                            {format(new Date(task.date), 'd MMM yyyy', { locale: tr })}
-                          </div>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
               )}
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

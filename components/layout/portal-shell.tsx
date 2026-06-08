@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "@/app/login/actions";
-import { Button } from "poyraz-ui/atoms";
+import { Button, Card, CardContent } from "poyraz-ui/atoms";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -120,39 +120,7 @@ function AppSidebar({
       variant="bordered"
       className="flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0"
     >
-      <SidebarHeader className="shrink-0 border-b-0 px-4 py-6">
-        <div className="flex flex-col gap-3 rounded-xl bg-primary/5 border border-primary/10 p-4 relative overflow-hidden">
-          <div className="flex items-center gap-2 relative z-10">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-primary">
-              <Activity className="h-4 w-4" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Genel Durum</span>
-              <span className="text-sm font-semibold text-foreground">Proje İlerlemesi</span>
-            </div>
-          </div>
-          
-          <div className="space-y-1.5 mt-1 relative z-10">
-            <div className="flex items-center justify-between text-xs font-medium">
-              <span className="text-primary">%{progress} Tamamlandı</span>
-            </div>
-            <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary transition-all duration-700 ease-out relative" 
-                style={{ width: `${progress}%` }} 
-              >
-                <div className="absolute top-0 right-0 bottom-0 left-0 bg-white/20 animate-pulse" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full blur-xl" />
-        </div>
-      </SidebarHeader>
-
-      <SidebarSeparator className="mx-0 my-0 w-full" />
-
-      <SidebarContent className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto px-6 py-6">
+      <SidebarContent className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto px-6 py-6 mt-4">
         {portalSidebarData.map((group, groupIndex) => (
           <div key={group.title}>
             <SidebarSection title={group.title} defaultOpen className="mb-0">
@@ -194,7 +162,27 @@ function AppSidebar({
 
       <SidebarSeparator className="mx-0 my-0 w-full" />
 
-      <SidebarFooter className="shrink-0 border-t-0 px-6 py-5">
+      <SidebarFooter className="shrink-0 border-t-0 px-6 py-5 flex flex-col gap-5">
+        <Card className="bg-primary/5 border-primary/10 shadow-none overflow-hidden relative">
+          <CardContent className="p-4 space-y-3">
+            <div className="text-sm font-semibold text-foreground relative z-10">Proje İlerlemesi</div>
+            <div className="space-y-1.5 mt-1 relative z-10">
+              <div className="flex items-center justify-between text-xs font-medium">
+                <span className="text-primary">%{progress} Tamamlandı</span>
+              </div>
+              <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary transition-all duration-700 ease-out relative" 
+                  style={{ width: `${progress}%` }} 
+                >
+                  <div className="absolute top-0 right-0 bottom-0 left-0 bg-white/20 animate-pulse" />
+                </div>
+              </div>
+            </div>
+            <div className="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full blur-xl" />
+          </CardContent>
+        </Card>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
