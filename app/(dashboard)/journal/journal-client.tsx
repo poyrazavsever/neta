@@ -59,12 +59,10 @@ const scoreLabels: Record<number, string> = {
 };
 
 export function JournalClient({ logs }: JournalClientProps) {
-  const [monthFilter, setMonthFilter] = useState(() => new Date().toISOString().slice(0, 7));
-  const filteredLogs = logs.filter((log) => log.log_date.startsWith(monthFilter));
-  const summary = useMemo(() => calculateSummary(filteredLogs), [filteredLogs]);
+  const summary = useMemo(() => calculateSummary(logs), [logs]);
   const chartData = useMemo(
     () =>
-      [...filteredLogs]
+      [...logs]
         .sort((a, b) => a.log_date.localeCompare(b.log_date))
         .map((log) => ({
           date: formatShortDate(log.log_date),
@@ -72,7 +70,7 @@ export function JournalClient({ logs }: JournalClientProps) {
           energy: log.energy_score,
           satisfaction: log.work_satisfaction_score,
         })),
-    [filteredLogs],
+    [logs],
   );
 
   return (
@@ -94,12 +92,6 @@ export function JournalClient({ logs }: JournalClientProps) {
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Input
-            type="month"
-            value={monthFilter}
-            onChange={(event) => setMonthFilter(event.target.value)}
-            className="sm:w-44"
-          />
           <DailyLogDialog mode="create" />
         </div>
       </div>
@@ -125,7 +117,7 @@ export function JournalClient({ logs }: JournalClientProps) {
         />
         <StatCard
           label="Kayıtlı gün"
-          value={String(filteredLogs.length)}
+          value={String(logs.length)}
           icon={<CalendarDays className="h-5 w-5" />}
           tone="amber"
         />
@@ -135,7 +127,7 @@ export function JournalClient({ logs }: JournalClientProps) {
         <Card>
           <CardContent className="space-y-4 p-4">
             <div>
-              <h2 className="text-base font-semibold text-foreground">Aylık trend</h2>
+              <h2 className="text-base font-semibold text-foreground">Genel trend</h2>
               <p className="text-sm text-muted-foreground">
                 Mood, enerji ve çalışma memnuniyetinin günlük değişimi.
               </p>
@@ -179,7 +171,7 @@ export function JournalClient({ logs }: JournalClientProps) {
           <CardContent className="space-y-4 p-4">
             <div>
               <h2 className="text-base font-semibold text-foreground">Kapasite sinyali</h2>
-              <p className="text-sm text-muted-foreground">Bu ayki günlük kayıtlardan kısa okuma.</p>
+              <p className="text-sm text-muted-foreground">Kayıtlardan kısa okuma.</p>
             </div>
             <div className="space-y-3 text-sm text-muted-foreground">
               {summary.insights.map((insight) => (
@@ -197,11 +189,11 @@ export function JournalClient({ logs }: JournalClientProps) {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-semibold text-foreground">Günlük kayıtlar</h2>
-              <p className="text-sm text-muted-foreground">{filteredLogs.length} kayıt görüntüleniyor.</p>
+              <p className="text-sm text-muted-foreground">{logs.length} kayıt görüntüleniyor.</p>
             </div>
           </div>
 
-          {filteredLogs.length > 0 ? (
+          {logs.length > 0 ? (
             <div className="overflow-hidden rounded-sm border border-border">
               <div className="hidden grid-cols-[0.7fr_0.7fr_0.7fr_1.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
                 <span>Tarih</span>
@@ -211,7 +203,7 @@ export function JournalClient({ logs }: JournalClientProps) {
                 <span className="text-right">İşlem</span>
               </div>
               <div className="divide-y divide-border">
-                {filteredLogs.map((log) => (
+                {logs.map((log) => (
                   <DailyLogRow key={log.id} log={log} />
                 ))}
               </div>
@@ -440,7 +432,7 @@ function EmptyState() {
   return (
     <div className="flex min-h-72 flex-col items-center justify-center rounded-sm border border-dashed border-border bg-muted/20 p-8 text-center">
       <Activity className="h-10 w-10 text-muted-foreground" />
-      <h3 className="mt-4 text-lg font-semibold text-foreground">Bu ay günlük kayıt yok</h3>
+      <h3 className="mt-4 text-lg font-semibold text-foreground">Henüz günlük kayıt yok</h3>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
         Mood ve enerji trendini görmek için ilk günlük kaydını ekle.
       </p>
@@ -460,9 +452,9 @@ function calculateSummary(logs: DailyLogItem[]) {
   const insights = [];
 
   if (logs.length === 0) {
-    insights.push("Bu ay için henüz okunabilir bir trend yok.");
+    insights.push("Henüz okunabilir bir trend yok.");
   } else {
-    insights.push(`Bu ay ${logs.length} günlük kayıt var.`);
+    insights.push(`Toplam ${logs.length} günlük kayıt var.`);
     insights.push(
       energyAverage && energyAverage < 3
         ? "Enerji ortalaması düşük. Dashboard raporlarında geciken işler ile birlikte okunmalı."

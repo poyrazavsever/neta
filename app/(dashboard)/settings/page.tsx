@@ -57,7 +57,7 @@ export default function SettingsPage() {
 
       // 2. Fetch User Settings from Supabase
       const { data: settings } = await supabase
-        .from("user_settings")
+        .from("app_settings")
         .select("*")
         .eq("user_id", user.id)
         .single();
@@ -104,9 +104,9 @@ export default function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Giriş yapılmamış");
 
-      // Save to Supabase user_settings table
+      // Save to Supabase app_settings table
       const { error } = await supabase
-        .from("user_settings")
+        .from("app_settings")
         .upsert({
           user_id: user.id,
           ai_model: aiProvider,
