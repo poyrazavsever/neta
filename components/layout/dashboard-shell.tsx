@@ -113,7 +113,7 @@ function AppSidebar({
       variant="bordered"
       className="flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0"
     >
-      <SidebarHeader className="shrink-0 border-b-0 px-6 py-6">
+      <SidebarHeader className="shrink-0 border-b-0 px-6 py-3">
         <Link href="/">
           <Image
             src="/logo/blackLogo.png"
