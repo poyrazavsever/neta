@@ -8,9 +8,6 @@ import {
   MessageCircleHeart,
   Sparkles,
   Wallet,
-  FileText,
-  Receipt,
-  CreditCard,
 } from "lucide-react";
 
 export type SidebarNavItem = {
@@ -41,14 +38,6 @@ export const sidebarData: SidebarNavGroup[] = [
       { title: "Projeler", href: "/projects", icon: FolderKanban },
       { title: "Görevler", href: "/tasks", icon: CheckSquare2 },
       { title: "Finans", href: "/finance", icon: Wallet },
-    ],
-  },
-  {
-    title: "BUSINESS OS",
-    items: [
-      { title: "Teklifler", href: "/business/proposals", icon: FileText },
-      { title: "Faturalar", href: "/business/invoices", icon: Receipt },
-      { title: "Abonelikler", href: "/business/subscriptions", icon: CreditCard },
     ],
   },
   {
