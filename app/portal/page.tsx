@@ -42,7 +42,7 @@ export default async function PortalDashboardPage() {
   const completedProjects = projects.filter(p => p.status === 'completed');
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="mx-auto flex max-w-7xl flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">Hoş Geldiniz, {clientData.name}</h1>
         <p className="text-muted-foreground">İş süreçlerinizi ve aktif projelerinizi buradan takip edebilirsiniz.</p>

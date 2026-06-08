@@ -39,9 +39,10 @@ type PortalShellProps = {
     shortName: string;
     avatarUrl: string | null;
   };
+  progress?: number;
 };
 
-export function PortalShell({ children, user }: PortalShellProps) {
+export function PortalShell({ children, user, progress }: PortalShellProps) {
   const pathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -49,7 +50,7 @@ export function PortalShell({ children, user }: PortalShellProps) {
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
         <aside className="sticky top-0 hidden h-dvh shrink-0 self-start border-r border-border bg-background lg:block">
-          <AppSidebar pathname={pathname} user={user} />
+          <AppSidebar pathname={pathname} user={user} progress={progress} />
         </aside>
 
         {isMobileSidebarOpen ? (
@@ -64,6 +65,7 @@ export function PortalShell({ children, user }: PortalShellProps) {
               <AppSidebar
                 pathname={pathname}
                 user={user}
+                progress={progress}
                 onNavigate={() => setIsMobileSidebarOpen(false)}
               />
             </aside>
@@ -71,7 +73,7 @@ export function PortalShell({ children, user }: PortalShellProps) {
         ) : null}
 
         <div className="flex flex-1 flex-col min-w-0">
-          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur">
             <Link href="/portal" className="flex items-center gap-2 font-semibold">
               <Image
                 src="/logo/LogoWithBg.png"
@@ -81,16 +83,18 @@ export function PortalShell({ children, user }: PortalShellProps) {
                 className="rounded-sm object-cover"
                 priority
               />
-              Cognis Portal
+              <span className="hidden sm:inline">Cognis Portal</span>
             </Link>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-9 w-9 p-0"
-              onClick={() => setIsMobileSidebarOpen(true)}
-            >
-              <Menu className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-9 w-9 p-0 lg:hidden"
+                onClick={() => setIsMobileSidebarOpen(true)}
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+            </div>
           </header>
 
           <main className="flex-1 p-4 lg:p-8 min-w-0">{children}</main>
@@ -103,10 +107,12 @@ export function PortalShell({ children, user }: PortalShellProps) {
 function AppSidebar({
   pathname,
   user,
+  progress = 0,
   onNavigate,
 }: {
   pathname: string;
   user: PortalShellProps["user"];
+  progress?: number;
   onNavigate?: () => void;
 }) {
   return (
@@ -115,20 +121,18 @@ function AppSidebar({
       className="flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0"
     >
       <SidebarHeader className="shrink-0 border-b-0 px-6 py-6">
-        <SidebarBranding
-          title="Cognis"
-          subtitle="Client Portal"
-          logo={
-            <Image
-              src="/logo/LogoWithBg.png"
-              alt="Cognis"
-              width={36}
-              height={36}
-              className="h-9 w-9 rounded-sm object-cover"
-              priority
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between text-sm font-medium">
+            <span className="text-muted-foreground">Aktif İlerleme</span>
+            <span className="text-primary">%{progress}</span>
+          </div>
+          <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary transition-all duration-500" 
+              style={{ width: `${progress}%` }} 
             />
-          }
-        />
+          </div>
+        </div>
       </SidebarHeader>
 
       <SidebarSeparator className="mx-0 my-0 w-full" />

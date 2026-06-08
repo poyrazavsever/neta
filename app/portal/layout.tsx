@@ -39,6 +39,24 @@ export default async function PortalLayout({
     .join("")
     .slice(0, 2) || "MS";
 
+  const { data: clientData } = await supabase
+    .from("clients")
+    .select("id")
+    .eq("client_auth_id", user.id)
+    .maybeSingle();
+
+  let avgProgress = 0;
+  if (clientData) {
+    const { data: projectsData } = await supabase
+      .from("projects")
+      .select("progress")
+      .eq("client_id", clientData.id)
+      .eq("status", "active");
+    if (projectsData && projectsData.length > 0) {
+      avgProgress = Math.round(projectsData.reduce((sum, p) => sum + p.progress, 0) / projectsData.length);
+    }
+  }
+
   return (
     <PortalShell
       user={{
@@ -47,6 +65,7 @@ export default async function PortalLayout({
         shortName,
         avatarUrl: profile?.avatar_url || null,
       }}
+      progress={avgProgress}
     >
       {children}
     </PortalShell>

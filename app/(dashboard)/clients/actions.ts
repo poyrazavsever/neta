@@ -121,3 +121,23 @@ export async function archiveClientRecord(formData: FormData) {
 
   revalidatePath("/clients");
 }
+
+export async function updateClientPipelineStage(id: string, stage: string) {
+  const { supabase, userId } = await getCurrentUserId();
+
+  if (!id || !stage) {
+    throw new Error("Eksik bilgi.");
+  }
+
+  const { error } = await supabase
+    .from("clients")
+    .update({ pipeline_stage: stage })
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(`Aşama güncellenemedi: ${error.message}`);
+  }
+
+  revalidatePath("/clients");
+}

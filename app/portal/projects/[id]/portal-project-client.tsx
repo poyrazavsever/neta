@@ -32,7 +32,7 @@ export function PortalProjectClient({ project, sections, tasks, revisions, clien
   const pendingRevisions = revisions.filter((r: any) => r.status === 'pending' || r.status === 'in_progress').length;
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header Info */}
       <div className="flex flex-col gap-4 md:flex-row md:items-start justify-between">
         <div className="space-y-1">

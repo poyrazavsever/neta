@@ -20,6 +20,8 @@ type ProjectRow = {
   budget_amount: number | string | null;
   currency: string;
   progress: number;
+  progress_type: "manual" | "auto" | null;
+  revision_quota: number | null;
   cover_image_path: string | null;
   cover_image_alt: string | null;
   clients: { name: string } | { name: string }[] | null;
@@ -66,7 +68,7 @@ export default async function ProjectDetailPage({
       supabase
         .from("projects")
         .select(
-          "id, client_id, name, type, description, status, start_date, due_date, budget_amount, currency, progress, cover_image_path, cover_image_alt, clients(name)",
+          "id, client_id, name, type, description, status, start_date, due_date, budget_amount, currency, progress, progress_type, revision_quota, cover_image_path, cover_image_alt, clients(name)",
         )
         .eq("id", id)
         .eq("user_id", user.id)
@@ -120,6 +122,8 @@ export default async function ProjectDetailPage({
       projectData.budget_amount === null ? null : Number(projectData.budget_amount),
     currency: projectData.currency,
     progress: Number(projectData.progress || 0),
+    progress_type: projectData.progress_type === "auto" ? "auto" : "manual",
+    revision_quota: Number(projectData.revision_quota || 0),
     cover_image_alt: projectData.cover_image_alt,
     coverImageUrl,
   };

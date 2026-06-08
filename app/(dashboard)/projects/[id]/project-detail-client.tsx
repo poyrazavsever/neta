@@ -38,6 +38,7 @@ import {
   Palette,
   Pencil,
   Plus,
+  Settings2,
   Target,
   Trash2,
   Wallet,
@@ -58,6 +59,8 @@ export type ProjectDetail = {
   budget_amount: number | null;
   currency: string;
   progress: number;
+  progress_type: "manual" | "auto";
+  revision_quota: number;
   cover_image_alt: string | null;
   coverImageUrl: string | null;
 };
@@ -215,6 +218,7 @@ export function ProjectDetailClient({
         </div>
 
         <div className="flex gap-2">
+          <ProjectSettingsDialog project={project} />
           <SectionDialog projectId={project.id} mode="create" defaultCategory="overview" />
           {project.status !== "completed" ? (
             <form action={completeProjectRecord}>
@@ -805,6 +809,101 @@ function ProjectTaskKanban({
     </div>
   );
 }
+
+function ProjectSettingsDialog({ project }: { project: ProjectDetail }) {
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [progressType, setProgressType] = useState<"manual" | "auto">(project.progress_type);
+  const [progress, setProgress] = useState(project.progress);
+  const [revisionQuota, setRevisionQuota] = useState(project.revision_quota);
+
+  async function handleSubmit() {
+    setIsSubmitting(true);
+    try {
+      const { updateProjectSettings } = await import("@/app/(dashboard)/projects/actions");
+      await updateProjectSettings(project.id, progressType, progress, revisionQuota);
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="h-9 gap-2 px-3">
+          <Settings2 className="h-4 w-4" />
+          <span className="hidden sm:inline">Ayarlar</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <form action={handleSubmit} className="space-y-5">
+          <DialogHeader>
+            <DialogTitle>Proje ayarları</DialogTitle>
+            <DialogDescription>
+              İlerleme hesaplama yöntemi ve revizyon kotasını belirle.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label>İlerleme Hesaplama</Label>
+              <Select value={progressType} onValueChange={(val: "manual" | "auto") => setProgressType(val)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">Manuel (Elle girilir)</SelectItem>
+                  <SelectItem value="auto">Otomatik (Görevlere göre)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {progressType === "manual" && (
+              <div className="grid gap-2">
+                <Label>İlerleme Durumu (%)</Label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={progress}
+                    onChange={(e) => setProgress(Number(e.target.value))}
+                    className="flex-1 accent-primary"
+                  />
+                  <span className="w-12 text-right text-sm font-medium">{progress}%</span>
+                </div>
+              </div>
+            )}
+            {progressType === "auto" && (
+              <p className="text-xs text-muted-foreground">İlerleme yüzdesi "Görevler" sekmesindeki görevlerin tamamlanma durumuna göre otomatik hesaplanacaktır.</p>
+            )}
+
+            <div className="grid gap-2">
+              <Label>Müşteri Revizyon Kotası</Label>
+              <Input
+                type="number"
+                min="0"
+                value={revisionQuota}
+                onChange={(e) => setRevisionQuota(Number(e.target.value))}
+              />
+              <p className="text-xs text-muted-foreground">Müşterinin portal üzerinden talep edebileceği toplam revizyon hakkı.</p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Kaydediliyor..." : "Kaydet"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 function ProjectTaskDialog({
   projectId,

@@ -4,6 +4,7 @@ import {
   archiveClientRecord,
   createClientRecord,
   updateClientRecord,
+  updateClientPipelineStage,
 } from "@/app/(dashboard)/clients/actions";
 import { Badge, Button, Card, CardContent, Input, Label, Textarea } from "poyraz-ui/atoms";
 import {
@@ -43,6 +44,21 @@ import Link from "next/link";
 import { useState } from "react";
 import { format, isPast, isToday } from "date-fns";
 import { tr } from "date-fns/locale";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCorners,
+  useDroppable,
+  useDraggable,
+} from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export type ClientListItem = {
   id: string;
@@ -101,8 +117,52 @@ export function ClientsClient({
   const [query, setQuery] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
   
+  const [activeDragClient, setActiveDragClient] = useState<ClientListItem | null>(null);
+  const [localClients, setLocalClients] = useState(clients);
+
+  useEffect(() => {
+    setLocalClients(clients);
+  }, [clients]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  );
+
+  function handleDragStart(event: DragStartEvent) {
+    const { active } = event;
+    const client = localClients.find(c => c.id === active.id);
+    if (client) setActiveDragClient(client);
+  }
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    setActiveDragClient(null);
+
+    if (!over) return;
+
+    const clientId = active.id as string;
+    const newStage = over.id as string;
+
+    const client = localClients.find(c => c.id === clientId);
+    if (!client || client.pipeline_stage === newStage) return;
+
+    setLocalClients(prev => 
+      prev.map(c => c.id === clientId ? { ...c, pipeline_stage: newStage as any } : c)
+    );
+
+    try {
+      await updateClientPipelineStage(clientId, newStage);
+    } catch (error) {
+      setLocalClients(clients);
+    }
+  }
+
   const filteredClients = normalizedQuery
-    ? clients.filter((client) =>
+    ? localClients.filter((client) =>
         [
           client.name,
           client.company_name,
@@ -114,7 +174,7 @@ export function ClientsClient({
           .filter(Boolean)
           .some((value) => value!.toLowerCase().includes(normalizedQuery)),
       )
-    : clients;
+    : localClients;
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -181,79 +241,129 @@ export function ClientsClient({
         </div>
 
         <TabsContent value="pipeline" className="mt-0">
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-            {pipelineStages.map(stage => {
-              const stageClients = filteredClients.filter(c => c.pipeline_stage === stage.id && c.status !== 'archived');
-              return (
-                <div key={stage.id} className="flex-shrink-0 w-80 bg-muted/30 rounded-lg border border-border p-3 snap-start flex flex-col h-[calc(100vh-320px)] min-h-[500px]">
-                  <div className="flex items-center justify-between mb-3 px-1">
-                    <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${stage.color.split(' ')[1]}`}></span>
-                      {stage.label}
-                    </h3>
-                    <Badge variant="secondary" className="text-xs">{stageClients.length}</Badge>
-                  </div>
-                  <div className="flex-1 overflow-y-auto space-y-3 pr-1 tiny-scrollbar">
+          <DndContext 
+            sensors={sensors} 
+            collisionDetection={closestCorners} 
+            onDragStart={handleDragStart} 
+            onDragEnd={handleDragEnd}
+          >
+            <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+              {pipelineStages.map(stage => {
+                const stageClients = filteredClients.filter(c => c.pipeline_stage === stage.id && c.status !== 'archived');
+                return (
+                  <DroppableColumn 
+                    key={stage.id} 
+                    id={stage.id} 
+                    title={stage.label} 
+                    count={stageClients.length} 
+                    color={stage.color.split(' ')[1]}
+                  >
                     {stageClients.map(client => (
-                      <Card key={client.id} className="cursor-pointer hover:border-primary/50 transition-colors">
-                        <CardContent className="p-3">
-                          <div className="flex justify-between items-start mb-2">
-                            <Link href={`/clients/${client.id}`} className="font-medium text-foreground hover:underline">
-                              {client.name}
-                            </Link>
-                            <ClientDialog mode="edit" client={client} trigger={<Button variant="ghost" className="h-6 w-6 p-0"><Pencil className="h-3 w-3" /></Button>} />
-                          </div>
-                          {client.company_name && <p className="text-xs text-muted-foreground mb-2">{client.company_name}</p>}
-                          
-                          {client.next_follow_up_date && (
-                            <div className="mt-3 flex items-center gap-1.5 text-xs">
-                              <Clock className={`h-3 w-3 ${isPast(new Date(client.next_follow_up_date)) ? 'text-rose-500' : 'text-muted-foreground'}`} />
-                              <span className={isPast(new Date(client.next_follow_up_date)) ? 'text-rose-500 font-medium' : 'text-muted-foreground'}>
-                                {format(new Date(client.next_follow_up_date), 'd MMM yyyy', { locale: tr })}
-                              </span>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
+                      <DraggableClientCard key={client.id} client={client} />
                     ))}
                     {stageClients.length === 0 && (
                       <div className="h-24 flex items-center justify-center border-2 border-dashed border-border rounded-md text-xs text-muted-foreground">
                         Boş
                       </div>
                     )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  </DroppableColumn>
+                );
+              })}
+            </div>
+            <DragOverlay>
+              {activeDragClient ? (
+                <DraggableClientCard client={activeDragClient} isOverlay />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
         </TabsContent>
 
         <TabsContent value="list" className="mt-0">
-          <Card>
-            <CardContent className="p-0">
-              {filteredClients.length > 0 ? (
-                <div className="overflow-hidden rounded-sm border border-border">
-                  <div className="hidden grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
-                    <span>Müşteri</span>
-                    <span>İletişim</span>
-                    <span>Aşama</span>
-                    <span>Follow-up</span>
-                    <span>Projeler</span>
-                    <span className="text-right">İşlem</span>
-                  </div>
-                  <div className="divide-y divide-border">
-                    {filteredClients.map((client) => (
-                      <ClientRow key={client.id} client={client} />
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <EmptyState hasQuery={Boolean(normalizedQuery)} />
-              )}
-            </CardContent>
-          </Card>
+          {filteredClients.length > 0 ? (
+            <div className="overflow-hidden rounded-sm border border-border">
+              <div className="hidden grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
+                <span>Müşteri</span>
+                <span>İletişim</span>
+                <span>Aşama</span>
+                <span>Follow-up</span>
+                <span>Projeler</span>
+                <span className="text-right">İşlem</span>
+              </div>
+              <div className="divide-y divide-border">
+                {filteredClients.map((client) => (
+                  <ClientRow key={client.id} client={client} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <EmptyState hasQuery={Boolean(normalizedQuery)} />
+          )}
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function DroppableColumn({ id, title, count, color, children }: { id: string, title: string, count: number, color: string, children: React.ReactNode }) {
+  const { isOver, setNodeRef } = useDroppable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "flex-shrink-0 w-[340px] px-2 flex flex-col h-[calc(100vh-320px)] min-h-[500px] transition-colors rounded-lg",
+        isOver ? "bg-muted/30" : ""
+      )}
+    >
+      <div className="flex items-center justify-between mb-3 px-1">
+        <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
+          <span className={`w-2 h-2 rounded-full ${color}`}></span>
+          {title}
+        </h3>
+        <Badge variant="secondary" className="text-xs">{count}</Badge>
+      </div>
+      <div className="flex-1 overflow-y-auto space-y-3 pr-1 tiny-scrollbar">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function DraggableClientCard({ client, isOverlay }: { client: ClientListItem, isOverlay?: boolean }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: client.id,
+    data: client,
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging && !isOverlay ? 0.3 : 1,
+    zIndex: isDragging ? 999 : "auto",
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className={cn("touch-none cursor-grab active:cursor-grabbing", isOverlay && "rotate-2 scale-105 shadow-xl")}>
+      <Card className="hover:border-primary/50 transition-colors">
+        <CardContent className="p-3">
+          <div className="flex justify-between items-start mb-2">
+            <Link href={`/clients/${client.id}`} className="font-medium text-foreground hover:underline" onPointerDown={(e) => e.stopPropagation()}>
+              {client.name}
+            </Link>
+            <div onPointerDown={(e) => e.stopPropagation()}>
+              <ClientDialog mode="edit" client={client} trigger={<Button variant="ghost" className="h-6 w-6 p-0"><Pencil className="h-3 w-3" /></Button>} />
+            </div>
+          </div>
+          {client.company_name && <p className="text-xs text-muted-foreground mb-2 pointer-events-none">{client.company_name}</p>}
+          
+          {client.next_follow_up_date && (
+            <div className="mt-3 flex items-center gap-1.5 text-xs pointer-events-none">
+              <Clock className={`h-3 w-3 ${isPast(new Date(client.next_follow_up_date)) ? 'text-rose-500' : 'text-muted-foreground'}`} />
+              <span className={isPast(new Date(client.next_follow_up_date)) ? 'text-rose-500 font-medium' : 'text-muted-foreground'}>
+                {format(new Date(client.next_follow_up_date), 'd MMM yyyy', { locale: tr })}
+              </span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

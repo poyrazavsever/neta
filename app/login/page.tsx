@@ -67,23 +67,7 @@ export default async function LoginPage({
             </Button>
           </form>
         }
-        secondaryAction={
-          <div className="space-y-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">veya</span>
-              </div>
-            </div>
-
-            <Button type="button" variant="outline" className="h-11 w-full gap-2">
-              <Search className="h-4 w-4" />
-              Google ile devam et
-            </Button>
-          </div>
-        }
+        secondaryAction={null}
         footer={
           <div className="text-center text-sm">
             Hesabın yok mu?{" "}

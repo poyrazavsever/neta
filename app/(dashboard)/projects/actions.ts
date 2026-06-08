@@ -336,3 +336,28 @@ export async function updateRevisionStatus(id: string, projectId: string, status
 
   revalidatePath(`/projects/${projectId}`);
 }
+
+export async function updateProjectSettings(projectId: string, progressType: "manual" | "auto", progress: number, revisionQuota: number) {
+  const { supabase, userId } = await getCurrentUserId();
+
+  if (!projectId) {
+    throw new Error("Proje ID zorunludur.");
+  }
+
+  const { error } = await supabase
+    .from("projects")
+    .update({ 
+      progress_type: progressType, 
+      progress: progress, 
+      revision_quota: revisionQuota 
+    })
+    .eq("id", projectId)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(`Ayarlar güncellenemedi: ${error.message}`);
+  }
+
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${projectId}`);
+}

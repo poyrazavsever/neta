@@ -22,4 +22,11 @@ export const portalSidebarData: PortalSidebarNavGroup[] = [
       { title: "Dashboard", href: "/portal", icon: Sparkles },
     ],
   },
+  {
+    title: "SÜREÇLER",
+    items: [
+      { title: "Görevlerim", href: "/portal/tasks", icon: FolderKanban },
+      { title: "Revizyon Talepleri", href: "/portal/revisions", icon: Sparkles },
+    ],
+  }
 ];
