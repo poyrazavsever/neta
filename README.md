@@ -1,126 +1,77 @@
-# Cognis - AI-Powered Strategic Productivity Dashboard
+![Revanios Icon](public/logo/icon.png)
 
-![Cognis Banner](https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000)
+# Revanios - Freelancer Operating System
 
-Cognis is a next-generation personal and professional productivity ecosystem designed to centralize your life's complexities into a single, high-performance interface. Built with a focus on "AI-Native" workflows, Cognis goes beyond simple tracking—it analyzes, suggests, and optimizes your strategic progress.
+[![Next.js](https://img.shields.io/badge/Next.js-16.2.7-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2.7-blue?style=flat-square&logo=react)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3.0-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-0.10.3-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
+[![AI SDK](https://img.shields.io/badge/Vercel_AI_SDK-6.0.197-black?style=flat-square&logo=vercel)](https://sdk.vercel.ai/)
+[![Poyraz UI](https://img.shields.io/badge/Poyraz_UI-2.1.0-indigo?style=flat-square)](https://github.com/poyrazavsever)
 
-## 🌌 Design Philosophy: The "Edge-to-Edge" Aesthetic
-Cognis utilizes a bespoke, premium dark-mode aesthetic centered around the color `#0A0710`.
-- **Flat Design:** Minimalist, sharp-cornered elements (`rounded-sm`) for a professional corporate feel.
-- **Visual Hierarchy:** Layered depth using `#150F1D` panels and subtle purple-tinted borders.
-- **Fluid Interactions:** Micro-animations powered by Framer Motion for a "living" interface.
+## Overview
 
----
+Revanios is a comprehensive, self-hosted workspace designed specifically for freelancers. It serves as a centralized operating system to manage daily operations, clients, projects, finances, and personal performance tracking. 
 
-## 🚀 Key Feature Modules
+Built with a focus on simplicity, security, and edge-to-edge aesthetic design, Revanios allows a single user (the freelancer) to operate their entire business from one dashboard without relying on multiple third-party SaaS subscriptions.
 
-### 1. Unified Dashboard (Command Center)
-Your tactical overview of current performance.
-- **KPI Visualization:** Real-time tracking of revenue, tasks completion, and deep-work hours.
-- **AI Strategic Insights:** A dedicated module that analyzes your data to provide proactive suggestions for your day.
-- **Activity Streams:** Visual chronological breakdown of your latest movements across all modules.
+## Features and Modules
 
-### 2. Freelance Management (Business OS)
-A professional-grade CRM and operations suite for the modern freelancer.
-- **Client Intelligence:** Manage your client base with AI-powered sentiment analysis and value-tracking.
-- **Proposals & Contracts:** High-conversion Kanban pipeline for managing leads to signed deals.
-- **Time Tracking:** Integrated live timers with the ability to "AI-Suggest" billable hours based on project activity.
+### 1. Unified Dashboard
+A command center providing a tactical overview of your current performance. It tracks active revenue, task completion, and upcoming deadlines, ensuring you always know what needs immediate attention.
 
-### 3. Financial Intelligence
-A sophisticated financial tracking system that understands your cash flow.
-- **Cashflow Analysis:** Interactive Recharts visualizations of income vs. expenses.
-- **Smart Invoicing:** Draft professional invoices in seconds, with AI suggesting rates based on tracked time and market data.
-- **Subscription Management:** Keep track of overhead and recurring costs effortlessly.
+### 2. Client Management
+A structured CRM to manage your client base. You can track client statuses, store communication notes, and link clients directly to ongoing projects and tasks.
 
-### 4. Personal Growth & Strategy
-- **Strategic Journaling:** A distraction-free markdown editor for daily reflection.
-- **Habit Alchemy:** Track daily rituals with "Streak" visualizations and trend analysis to see where you're gaining or losing momentum.
-- **Goal Milestones:** Break down massive long-term goals into executable tactical milestones with progress tracking.
+### 3. Project and Task Management
+A robust pipeline for tracking project milestones and individual tasks. Features include priority assignments, status tracking, deadline management, and automated project progress calculations.
 
-### 5. AI Assistant (Chat & Context)
-The core "brain" of Cognis, fully integrated with your data.
-- **Multi-Session Chat:** Organize different AI research threads into separate sessions.
-- **Provider Agnostic:** Support for Google Gemini (Pro/Flash), OpenAI (GPT-4o), Groq (Llama 3), and Local LLMs (Ollama).
-- **Context Awareness:** Chat with the AI about your journals, tasks, or financial data to get specific, localized insights.
+### 4. Financial Tracking
+An integrated ledger to monitor income, expenses, and cash flow. It provides graphical analysis and clear tabular data of your recent transactions, allowing you to stay on top of your financial health.
 
-### 6. Settings & AI Governance
-- **API Management:** Securely manage your AI provider keys.
-- **Otonomy Controls:** Configure how much control the AI has (e.g., automated invoicing, proactive rescheduling).
-- **Profile Customization:** Unified profile management with Supabase-backed storage.
+### 5. Journal and Performance Analytics
+A dedicated journaling module to record daily mood, energy levels, and work satisfaction. This data is aggregated to provide trend analysis, helping you understand how your personal well-being correlates with your professional output.
 
----
+### 6. Built-in AI Assistant
+A localized AI module integrated directly into your workspace. It connects to your choice of provider (Google Gemini, OpenAI, Groq, or local Ollama instances) and can query your existing database to provide instant summaries, insights, and answers regarding your tasks and finances.
 
-## 🛠 Technical Architecture
+### 7. Client Portal
+A restricted, read-only interface that you can share with your clients. They can log in to view the progress of their specific projects and public tasks, providing transparency without compromising your internal data security.
 
-Cognis is built on a cutting-edge, high-performance tech stack:
+## Technical Architecture
 
-- **Framework:** [Next.js 15+](https://nextjs.org/) (App Router, Server Components)
-- **Database:** [Supabase](https://supabase.com/) (PostgreSQL + Realtime Subscriptions)
-- **State Management:** React Hooks + Supabase Realtime + Optimistic UI Updates
-- **Styling:** Vanilla CSS + Tailwind CSS (Bespoke configuration)
-- **AI Integration:** Google Generative AI, OpenAI SDK, and Custom REST Bridges
-- **Charts:** [Recharts](https://recharts.org/) (Customized for Dark Corporate theme)
-- **Icons:** [Lucide React](https://lucide.dev/)
+Revanios is engineered using modern, high-performance web technologies:
 
----
+- **Frontend:** Next.js (App Router) combined with React Server Components.
+- **Styling:** Tailwind CSS with a custom, bespoke design system via Poyraz UI.
+- **Backend and Database:** Supabase (PostgreSQL) handling authentication, Row Level Security (RLS), and database migrations.
+- **AI Integration:** Vercel AI SDK for streaming responses and tool-calling capabilities.
+- **Deployment:** Fully containerized with Docker, optimized for standalone builds.
 
-## 📦 Kurulum & Local Geliştirme
+## Installation and Deployment
 
-Projeyi kendi bilgisayarınızda çalıştırmak için aşağıdaki adımları izleyin:
+Revanios is designed to be easily self-hosted. Follow these steps to deploy the application on your own infrastructure.
 
-1. **Depoyu Klonlayın:**
-   ```bash
-   git clone https://github.com/yourusername/cognis-dashboard.git
-   cd cognis-dashboard
-   ```
+### Prerequisites
+- Docker and Docker Compose
+- Node.js (for local development)
+- A Supabase instance (Cloud or Self-Hosted)
 
-2. **Bağımlılıkları Yükleyin:**
-   ```bash
-   pnpm install
-   ```
+### Setup Instructions
 
-3. **Çevresel Değişkenleri Ayarlayın:**
-   `.env.example` dosyasını kopyalayarak `.env.local` oluşturun:
-   ```bash
-   cp .env.example .env.local
-   ```
-   *Not: Eğer Supabase Cloud kullanıyorsanız bilgilerinizi buraya girin.*
+1. Clone the repository to your local machine or server.
+2. Copy the `.env.example` file to `.env.local` and populate the variables with your Supabase credentials.
+3. Run the database migrations located in `supabase/migrations` against your PostgreSQL database to set up the schemas, policies, and functions.
+4. Build and start the Docker container using the provided `docker-compose.yml` or `Dockerfile`.
 
-4. **Veritabanı Kurulumu ve Örnek Veri (Local Supabase):**
-   Eğer projeyi tamamen lokalde denemek istiyorsanız Supabase CLI kullanabilirsiniz:
-   ```bash
-   npx supabase start
-   ```
-   Local veritabanınızı örnek verilerle doldurmak için:
-   ```bash
-   npx supabase db reset
-   ```
-   *Bu komut, `supabase/seed.sql` dosyasını çalıştırarak `demo@cognis.com` şifre `demo123456` olan örnek bir kullanıcı ve sahte finans/proje verileri ekler.*
+Example deployment command:
+```bash
+docker-compose up -d --build
+```
 
-5. **Uygulamayı Başlatın:**
-   ```bash
-   pnpm dev
-   ```
+### First Administrator Account
+To ensure data security, Revanios is locked to a single administrator. Upon launching the application for the first time, navigate to the `/register` route to create the initial admin account. Once this account is created, public registration is permanently disabled.
 
----
+## License
 
-## 🐳 Self-Hosting (VPS & Docker)
-
-Cognis'i kendi sunucunuzda barındırmak (Self-host) için Docker altyapısı hazır durumdadır:
-
-1. Sunucunuzda projeyi klonlayın ve `.env.local` dosyanızı oluşturun.
-2. Production imajını inşa edip başlatmak için:
-   ```bash
-   docker-compose up -d --build
-   ```
-   *Uygulama `http://localhost:3000` portundan yayın yapmaya başlayacaktır. Bir reverse proxy (Nginx, Traefik, Caddy) ile dışarıya açabilirsiniz.*
-
----
-
-## 🛡 Security & Privacy
-- **RLS Policies:** Row Level Security ensures that every user only has access to their own data at the database level.
-- **Local Fallback:** Support for local Ollama models ensures that sensitive strategic data can stay on your own hardware if required.
-
----
-
-**Cognis** — *Design the life you want, strategize the steps to get there.*
+This project is proprietary and intended for personal self-hosting.
