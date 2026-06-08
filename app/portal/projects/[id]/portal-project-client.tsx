@@ -157,70 +157,68 @@ export function PortalProjectClient({ project, sections, tasks, revisions, clien
           </div>
         </TabsContent>
 
-        <TabsContent value="plan" className="mt-0">
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <h3 className="font-semibold text-lg border-b border-border pb-2">Proje Planı & Aşamalar</h3>
-              {sections.length === 0 ? (
-                <p className="text-muted-foreground italic">Henüz bir plan yüklenmemiş.</p>
-              ) : (
-                <div className="space-y-6">
-                  {sections.map((section: any) => (
-                    <div key={section.id} className="space-y-3 p-4 rounded-lg bg-muted/20 border border-border/50">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-foreground">{section.title}</h4>
-                        <Badge variant="secondary" className="text-xs">
-                          {section.type === 'milestone' ? 'Aşama' : section.type === 'deliverable' ? 'Teslimat' : 'Not'}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{section.content}</p>
+        <TabsContent value="plan" className="mt-6">
+          {sections.length === 0 ? (
+            <div className="py-10 text-center border rounded-lg border-dashed text-muted-foreground">
+              Henüz bir plan yüklenmemiş.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {sections.map((section: any) => (
+                <Card key={section.id}>
+                  <CardContent className="p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-foreground">{section.title}</h4>
+                      <Badge variant="secondary" className="text-xs">
+                        {section.type === 'milestone' ? 'Aşama' : section.type === 'deliverable' ? 'Teslimat' : 'Not'}
+                      </Badge>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{section.content}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
-        <TabsContent value="revisions" className="mt-0">
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center justify-between border-b border-border pb-2">
-                <h3 className="font-semibold text-lg">Revizyon Talepleriniz</h3>
-                <div className="text-sm text-muted-foreground">Kalan Hak: {project.revision_quota !== null ? project.revision_quota : 'Sınırsız'}</div>
-              </div>
-              
-              {revisions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 text-center space-y-3">
-                  <MessageSquare className="h-8 w-8 text-muted-foreground/50" />
-                  <p className="text-muted-foreground">Henüz bir revizyon talebi oluşturmadınız.</p>
-                  <Button variant="outline" size="sm" onClick={() => setOpenRevision(true)}>Yeni Talep Oluştur</Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {revisions.map((rev: any) => (
-                    <div key={rev.id} className="p-4 rounded-md border border-border bg-muted/10 hover:bg-muted/30 transition-colors">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4" />
-                          {format(new Date(rev.created_at), "d MMM yyyy, HH:mm", { locale: tr })}
-                        </div>
-                        <Badge variant={
-                          rev.status === 'completed' ? 'default' : 
-                          rev.status === 'rejected' ? 'destructive' : 'secondary'
-                        } className="capitalize">
-                          {rev.status === 'pending' ? 'Bekliyor' : 
-                           rev.status === 'in_progress' ? 'İşleniyor' : 
-                           rev.status === 'completed' ? 'Tamamlandı' : 'Reddedildi'}
-                        </Badge>
+        <TabsContent value="revisions" className="mt-6">
+          <div className="flex items-center justify-end mb-4">
+            <div className="text-sm font-medium text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-md">
+              Kalan Hak: <span className="text-foreground ml-1">{project.revision_quota !== null ? project.revision_quota : 'Sınırsız'}</span>
+            </div>
+          </div>
+          
+          {revisions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center space-y-3 border rounded-lg border-dashed text-muted-foreground">
+              <MessageSquare className="h-8 w-8 text-muted-foreground/50" />
+              <p>Henüz bir revizyon talebi oluşturmadınız.</p>
+              <Button variant="outline" size="sm" onClick={() => setOpenRevision(true)}>Yeni Talep Oluştur</Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {revisions.map((rev: any) => (
+                <Card key={rev.id} className="transition-colors hover:border-primary/30">
+                  <CardContent className="p-5">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        {format(new Date(rev.created_at), "d MMM yyyy, HH:mm", { locale: tr })}
                       </div>
-                      <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{rev.description}</p>
+                      <Badge variant={
+                        rev.status === 'completed' ? 'default' : 
+                        rev.status === 'rejected' ? 'destructive' : 'secondary'
+                      } className="capitalize">
+                        {rev.status === 'pending' ? 'Bekliyor' : 
+                         rev.status === 'in_progress' ? 'İşleniyor' : 
+                         rev.status === 'completed' ? 'Tamamlandı' : 'Reddedildi'}
+                      </Badge>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{rev.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

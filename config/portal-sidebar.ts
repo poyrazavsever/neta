@@ -1,6 +1,7 @@
 import {
   FolderKanban,
   Sparkles,
+  CheckSquare2,
 } from "lucide-react";
 
 export type PortalSidebarNavItem = {
@@ -25,7 +26,8 @@ export const portalSidebarData: PortalSidebarNavGroup[] = [
   {
     title: "SÜREÇLER",
     items: [
-      { title: "Yapılan Görevler", href: "/portal/tasks", icon: FolderKanban },
+      { title: "Projeleriniz", href: "/portal/projects", icon: FolderKanban },
+      { title: "Yapılan Görevler", href: "/portal/tasks", icon: CheckSquare2 },
       { title: "Revizyon Talepleri", href: "/portal/revisions", icon: Sparkles },
     ],
   }
