@@ -194,18 +194,20 @@ export function JournalClient({ logs }: JournalClientProps) {
           </div>
 
           {logs.length > 0 ? (
-            <div className="overflow-hidden rounded-sm border border-border">
-              <div className="hidden grid-cols-[0.7fr_0.7fr_0.7fr_1.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
-                <span>Tarih</span>
-                <span>Mood</span>
-                <span>Enerji</span>
-                <span>Not</span>
-                <span className="text-right">İşlem</span>
-              </div>
-              <div className="divide-y divide-border">
+            <div className="overflow-x-auto rounded-sm border border-border">
+              <div className="min-w-[800px]">
+                <div className="grid grid-cols-[0.7fr_0.7fr_0.7fr_1.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground">
+                  <span>Tarih</span>
+                  <span>Mood</span>
+                  <span>Enerji</span>
+                  <span>Not</span>
+                  <span className="text-right">İşlem</span>
+                </div>
+                <div className="divide-y divide-border">
                 {logs.map((log) => (
                   <DailyLogRow key={log.id} log={log} />
                 ))}
+                </div>
               </div>
             </div>
           ) : (
@@ -219,7 +221,7 @@ export function JournalClient({ logs }: JournalClientProps) {
 
 function DailyLogRow({ log }: { log: DailyLogItem }) {
   return (
-    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[0.7fr_0.7fr_0.7fr_1.8fr_0.8fr] lg:items-center">
+    <div className="grid gap-4 px-4 py-4 grid-cols-[0.7fr_0.7fr_0.7fr_1.8fr_0.8fr] items-center">
       <div>
         <div className="font-medium text-foreground">{formatDate(log.log_date)}</div>
         <div className="text-xs text-muted-foreground">{formatWeekday(log.log_date)}</div>

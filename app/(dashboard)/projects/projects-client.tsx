@@ -187,18 +187,20 @@ export function ProjectsClient({ projects, clients }: ProjectsClientProps) {
                 ))}
               </div>
             ) : (
-              <div className="overflow-hidden rounded-sm border border-border">
-                <div className="hidden grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
-                  <span>Proje</span>
-                  <span>Tür</span>
-                  <span>Durum</span>
-                  <span>İlerleme</span>
-                  <span className="text-right">İşlem</span>
-                </div>
-                <div className="divide-y divide-border">
-                  {filteredProjects.map((project) => (
-                    <ProjectRow key={project.id} project={project} clients={clients} />
-                  ))}
+              <div className="overflow-x-auto rounded-sm border border-border">
+                <div className="min-w-[800px]">
+                  <div className="grid grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground">
+                    <span>Proje</span>
+                    <span>Tür</span>
+                    <span>Durum</span>
+                    <span>İlerleme</span>
+                    <span className="text-right">İşlem</span>
+                  </div>
+                  <div className="divide-y divide-border">
+                    {filteredProjects.map((project) => (
+                      <ProjectRow key={project.id} project={project} clients={clients} />
+                    ))}
+                  </div>
                 </div>
               </div>
             )
@@ -292,7 +294,7 @@ function ProjectRow({
   clients: ProjectClientOption[];
 }) {
   return (
-    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] lg:items-center">
+    <div className="grid gap-4 px-4 py-4 grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] items-center">
       <div className="min-w-0">
         <div className="font-medium text-foreground">{project.name}</div>
         <div className="truncate text-sm text-muted-foreground">
@@ -306,7 +308,7 @@ function ProjectRow({
       <div>
         <ProgressBar progress={project.progress} compact />
       </div>
-      <div className="flex justify-start lg:justify-end">
+      <div className="flex justify-end gap-2">
         <ProjectActions project={project} clients={clients} showDetail />
       </div>
     </div>

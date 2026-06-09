@@ -250,19 +250,21 @@ export function ClientsClient({
 
         <TabsContent value="list" className="mt-0">
           {filteredClients.length > 0 ? (
-            <div className="overflow-hidden">
-              <div className="hidden grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] gap-4 border-b border-border px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
-                <span>Müşteri</span>
-                <span>İletişim</span>
-                <span>Aşama</span>
-                <span>Follow-up</span>
-                <span>Projeler</span>
-                <span className="text-right">İşlem</span>
-              </div>
-              <div className="divide-y divide-border">
-                {filteredClients.map((client) => (
-                  <ClientRow key={client.id} client={client} />
-                ))}
+            <div className="overflow-x-auto rounded-sm border border-border">
+              <div className="min-w-[900px]">
+                <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground">
+                  <span>Müşteri</span>
+                  <span>İletişim</span>
+                  <span>Aşama</span>
+                  <span>Follow-up</span>
+                  <span>Projeler</span>
+                  <span className="text-right">İşlem</span>
+                </div>
+                <div className="divide-y divide-border">
+                  {filteredClients.map((client) => (
+                    <ClientRow key={client.id} client={client} />
+                  ))}
+                </div>
               </div>
             </div>
           ) : (
@@ -351,7 +353,7 @@ function ClientRow({ client }: { client: ClientListItem }) {
   const stage = pipelineStages.find(s => s.id === client.pipeline_stage) || pipelineStages[0];
 
   return (
-    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] lg:items-center">
+    <div className="grid gap-4 px-4 py-4 grid-cols-[1.5fr_1fr_1fr_1fr_0.8fr_0.8fr] items-center">
       <div className="min-w-0">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-primary/10 text-sm font-semibold text-primary">
@@ -406,7 +408,7 @@ function ClientRow({ client }: { client: ClientListItem }) {
         <div className="text-muted-foreground">{formatCurrency(client.revenueTotal)}</div>
       </div>
 
-      <div className="flex justify-start gap-2 lg:justify-end">
+      <div className="flex justify-end gap-2">
         <Link href={`/clients/${client.id}`}>
           <Button variant="ghost" className="h-9 w-9 p-0">
             <ArrowRight className="h-4 w-4" />

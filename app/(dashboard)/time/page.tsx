@@ -137,8 +137,8 @@ export default function TimeTrackingPage() {
               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Today's Activity Ledger</h3>
               <button className="text-[10px] font-bold text-primary uppercase tracking-widest">Full History</button>
             </div>
-            <div className="flex-1 overflow-y-auto tiny-scrollbar">
-              <div className="divide-y divide-white/5">
+            <div className="flex-1 overflow-y-auto overflow-x-auto tiny-scrollbar">
+              <div className="min-w-[600px] divide-y divide-white/5">
                 {recentLogs.map(log => (
                   <div key={log.id} className="grid grid-cols-12 gap-4 p-5 items-center hover:bg-white/[0.02] transition-all group">
                     <div className="col-span-5 flex items-center gap-4">
@@ -155,6 +155,7 @@ export default function TimeTrackingPage() {
                     </div>
                   </div>
                 ))}
+                </div>
               </div>
             </div>
           </div>

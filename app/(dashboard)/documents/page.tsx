@@ -206,14 +206,15 @@ export default function DocumentsPage() {
                 ))}
               </div>
             ) : (
-              <div className="bg-[#0A0710] border border-white/5 rounded-sm overflow-hidden shadow-2xl mb-8">
-                <div className="grid grid-cols-12 gap-4 p-5 border-b border-white/5 bg-[#0F0B15]/50 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">
-                  <div className="col-span-6 px-2">Document Name</div>
-                  <div className="col-span-2">File Weight</div>
-                  <div className="col-span-2">Ownership</div>
-                  <div className="col-span-2 text-right">Strategic Date</div>
-                </div>
-                <div className="divide-y divide-white/5">
+              <div className="overflow-x-auto bg-[#0A0710] border border-white/5 rounded-sm shadow-2xl mb-8">
+                <div className="min-w-[800px]">
+                  <div className="grid grid-cols-12 gap-4 p-5 border-b border-white/5 bg-[#0F0B15]/50 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                    <div className="col-span-6 px-2">Document Name</div>
+                    <div className="col-span-2">File Weight</div>
+                    <div className="col-span-2">Ownership</div>
+                    <div className="col-span-2 text-right">Strategic Date</div>
+                  </div>
+                  <div className="divide-y divide-white/5">
                   {documents.map(doc => (
                     <div key={doc.id} onClick={() => setSelectedDoc(doc)} className="grid grid-cols-12 gap-4 p-6 items-center hover:bg-white/[0.02] transition-all group cursor-pointer border-l-2 border-transparent hover:border-primary">
                       <div className="col-span-6 flex items-center gap-5">
@@ -226,11 +227,12 @@ export default function DocumentsPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="col-span-2 text-[11px] text-muted-foreground font-black uppercase tracking-tighter">{doc.size}</div>
-                      <div className="col-span-2 text-[11px] text-muted-foreground font-black uppercase tracking-widest">{doc.owner}</div>
-                      <div className="col-span-2 text-right text-[11px] text-muted-foreground font-black uppercase tracking-tighter">{doc.date.split(',')[0]}</div>
-                    </div>
-                  ))}
+                        <div className="col-span-2 text-[11px] text-muted-foreground font-black uppercase tracking-tighter">{doc.size}</div>
+                        <div className="col-span-2 text-[11px] text-muted-foreground font-black uppercase tracking-widest">{doc.owner}</div>
+                        <div className="col-span-2 text-right text-[11px] text-muted-foreground font-black uppercase tracking-tighter">{doc.date.split(',')[0]}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

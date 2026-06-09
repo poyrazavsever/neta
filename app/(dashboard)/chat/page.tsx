@@ -242,7 +242,7 @@ export default function AIChatPage() {
                   className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-sm px-4 py-3 text-sm ${
+                    className={`max-w-[92%] md:max-w-[85%] rounded-sm px-4 py-3 text-sm ${
                       message.role === "user"
                         ? "bg-primary text-primary-foreground"
                         : "border border-border bg-muted/40 text-foreground"
@@ -264,7 +264,7 @@ export default function AIChatPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        <form onSubmit={handleSubmit} className="border-t border-border p-4">
+        <form onSubmit={handleSubmit} className="border-t border-border p-4 shrink-0">
           <div className="mx-auto flex max-w-4xl items-end gap-2 rounded-sm border border-border bg-background p-2 focus-within:border-primary">
             <textarea
               value={input}

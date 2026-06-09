@@ -170,15 +170,16 @@ export function FinanceClient({ transactions, clients, projects }: FinanceClient
             </div>
 
             {filteredTransactions.length > 0 ? (
-              <div className="overflow-hidden rounded-sm border border-border">
-                <div className="hidden grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
-                  <span>İşlem</span>
-                  <span>Tarih</span>
-                  <span>Tutar</span>
-                  <span>Durum</span>
-                  <span className="text-right">İşlem</span>
-                </div>
-                <div className="divide-y divide-border">
+              <div className="overflow-x-auto rounded-sm border border-border">
+                <div className="min-w-[800px]">
+                  <div className="grid grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground">
+                    <span>İşlem</span>
+                    <span>Tarih</span>
+                    <span>Tutar</span>
+                    <span>Durum</span>
+                    <span className="text-right">İşlem</span>
+                  </div>
+                  <div className="divide-y divide-border">
                   {filteredTransactions.map((transaction) => (
                     <TransactionRow
                       key={transaction.id}
@@ -187,6 +188,7 @@ export function FinanceClient({ transactions, clients, projects }: FinanceClient
                       projects={projects}
                     />
                   ))}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -240,7 +242,7 @@ function TransactionRow({
   const isIncome = transaction.type === "income";
 
   return (
-    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1fr] lg:items-center">
+    <div className="grid gap-4 px-4 py-4 grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1fr] items-center">
       <div className="flex min-w-0 items-start gap-3">
         <div className={isIncome ? "rounded-sm bg-emerald-50 p-2 text-emerald-700" : "rounded-sm bg-rose-50 p-2 text-rose-700"}>
           {isIncome ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
@@ -264,7 +266,7 @@ function TransactionRow({
           {paymentStatusLabels[transaction.payment_status]}
         </Badge>
       </div>
-      <div className="flex justify-start gap-2 lg:justify-end">
+      <div className="flex justify-end gap-2">
         <FinanceDialog mode="edit" transaction={transaction} clients={clients} projects={projects} />
         <form action={deleteFinanceTransactionRecord}>
           <input type="hidden" name="id" value={transaction.id} />
@@ -542,6 +544,29 @@ function calculateSummary(transactions: FinanceTransactionItem[]) {
   );
 }
 
+function formatMessageContent(text: string) {
+  if (!text) return null;
+  const lines = text.split("\n");
+  return lines.map((line, i) => (
+    <span key={i}>
+      {line.split(/(\*\*.*?\*\*|\*.*?\*)/g).map((part, j) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return (
+            <strong key={j} className="font-semibold text-foreground">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        if (part.startsWith("*") && part.endsWith("*")) {
+          return <em key={j}>{part.slice(1, -1)}</em>;
+        }
+        return <span key={j}>{part}</span>;
+      })}
+      {i !== lines.length - 1 && <br />}
+    </span>
+  ));
+}
+
 function AIFinanceDialog() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -572,7 +597,7 @@ function AIFinanceDialog() {
           AI Analizi
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[80vh] overflow-y-auto rounded-lg p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-indigo-600" />
@@ -602,13 +627,13 @@ function AIFinanceDialog() {
 
           {result && (
             <div className="bg-muted/50 border border-border rounded-lg p-5 text-sm prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
-              {result}
+              {formatMessageContent(result)}
             </div>
           )}
         </div>
 
         {result && (
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setOpen(false)}>Kapat</Button>
             <Button variant="default" onClick={handleAnalyze} className="gap-2">
               <Brain className="h-4 w-4" />

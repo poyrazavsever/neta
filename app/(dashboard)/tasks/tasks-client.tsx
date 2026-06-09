@@ -236,18 +236,20 @@ function TaskList({
   projects: TaskRelationOption[];
 }) {
   return (
-    <div className="overflow-hidden rounded-sm border border-border">
-      <div className="hidden grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground lg:grid">
-        <span>Görev</span>
-        <span>Bağlantı</span>
-        <span>Öncelik</span>
-        <span>Son tarih</span>
-        <span className="text-right">İşlem</span>
-      </div>
-      <div className="divide-y divide-border">
+    <div className="overflow-x-auto rounded-sm border border-border">
+      <div className="min-w-[800px]">
+        <div className="grid grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground">
+          <span>Görev</span>
+          <span>Bağlantı</span>
+          <span>Öncelik</span>
+          <span>Son tarih</span>
+          <span className="text-right">İşlem</span>
+        </div>
+        <div className="divide-y divide-border">
         {tasks.map((task) => (
           <TaskRow key={task.id} task={task} clients={clients} projects={projects} />
         ))}
+        </div>
       </div>
     </div>
   );
@@ -263,7 +265,7 @@ function TaskRow({
   projects: TaskRelationOption[];
 }) {
   return (
-    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] lg:items-center">
+    <div className="grid gap-4 px-4 py-4 grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] items-center">
       <div className="min-w-0">
         <div className={task.status === "done" ? "font-medium text-muted-foreground line-through" : "font-medium text-foreground"}>
           {task.title}

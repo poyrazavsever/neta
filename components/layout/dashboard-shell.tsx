@@ -48,9 +48,11 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
-        <aside className="sticky top-0 hidden h-dvh shrink-0 self-start border-r border-border bg-background lg:block">
-          <AppSidebar pathname={pathname} user={user} />
-        </aside>
+        <AppSidebar 
+          pathname={pathname} 
+          user={user} 
+          className="sticky top-0 hidden shrink-0 self-start lg:block"
+        />
 
         {/* Mobile Sidebar Overlay */}
         {isMobileSidebarOpen && (
@@ -61,17 +63,14 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
         )}
 
         {/* Mobile Sidebar Drawer */}
-        <aside
-          className={`fixed inset-y-0 left-0 z-50 w-72 transform border-r border-border bg-background transition-transform duration-300 ease-in-out lg:hidden ${
+        <AppSidebar
+          pathname={pathname}
+          user={user}
+          onNavigate={() => setIsMobileSidebarOpen(false)}
+          className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
             isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
-        >
-          <AppSidebar
-            pathname={pathname}
-            user={user}
-            onNavigate={() => setIsMobileSidebarOpen(false)}
-          />
-        </aside>
+        />
 
         <div className="flex flex-1 flex-col min-w-0">
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
@@ -107,15 +106,17 @@ function AppSidebar({
   pathname,
   user,
   onNavigate,
+  className,
 }: {
   pathname: string;
   user: DashboardShellProps["user"];
   onNavigate?: () => void;
+  className?: string;
 }) {
   return (
     <Sidebar
       variant="bordered"
-      className="flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0"
+      className={cn("flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0", className)}
     >
       <SidebarHeader className="shrink-0 border-b-0 px-6 py-3">
         <Link href="/" className="flex w-full items-center justify-center">
@@ -196,7 +197,7 @@ function AppSidebar({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            side="right"
+            side="top"
             sideOffset={8}
             className="w-64"
           >

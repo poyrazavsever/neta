@@ -133,14 +133,16 @@ export function CalendarClient({ events, clients, projects, tasks }: CalendarCli
               </div>
             </div>
 
-            <div className="grid grid-cols-7 border border-border text-center text-xs font-medium uppercase text-muted-foreground">
-              {["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((day) => (
-                <div key={day} className="border-r border-border px-2 py-2 last:border-r-0">
-                  {day}
+            <div className="overflow-x-auto pb-4">
+              <div className="min-w-[600px]">
+                <div className="grid grid-cols-7 border border-border text-center text-xs font-medium uppercase text-muted-foreground">
+                  {["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((day) => (
+                    <div key={day} className="border-r border-border px-2 py-2 last:border-r-0">
+                      {day}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 border-x border-border">
+                <div className="grid grid-cols-7 border-x border-border">
               {days.map((day) => {
                 const dayEvents = eventsByDay.get(day.key) || [];
                 const isSelected = selectedDate === day.key;
@@ -173,6 +175,8 @@ export function CalendarClient({ events, clients, projects, tasks }: CalendarCli
                   </button>
                 );
               })}
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
