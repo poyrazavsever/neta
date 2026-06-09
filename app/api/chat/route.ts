@@ -1,5 +1,6 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
+import { createGroq } from "@ai-sdk/groq";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createClient } from "@/lib/supabase/server";
 
@@ -83,7 +84,7 @@ function getModel(provider: string, apiKey: string, modelName: string) {
   }
 
   if (provider === "groq") {
-    return createOpenAI({ apiKey, baseURL: "https://api.groq.com/openai/v1" })(modelName);
+    return createGroq({ apiKey })(modelName);
   }
 
   return createOpenAI({ apiKey })(modelName);

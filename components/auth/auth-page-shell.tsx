@@ -69,6 +69,7 @@ export function AuthPageShell({
               width={240}
               height={64}
               className="h-16 w-auto object-contain"
+              style={{ width: "auto" }}
               priority
             />
           </div>
@@ -155,6 +156,7 @@ export function AuthPageShell({
                 width={180}
                 height={56}
                 className="h-14 w-auto object-contain"
+                style={{ width: "auto" }}
                 priority
               />
             </div>

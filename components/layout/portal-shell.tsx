@@ -81,6 +81,7 @@ export function PortalShell({ children, user, progress }: PortalShellProps) {
                 width={120}
                 height={32}
                 className="h-8 w-auto object-contain"
+                style={{ width: "auto" }}
                 priority
               />
             </Link>
@@ -127,6 +128,7 @@ function AppSidebar({
             width={160}
             height={48}
             className="h-12 w-auto object-contain"
+            style={{ width: "auto" }}
             priority
           />
         </Link>

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",
+    "@ai-sdk/groq": "^3.0.39",
     "@ai-sdk/openai": "^3.0.68",
     "@ai-sdk/react": "^3.0.199",
     "@base-ui/react": "^1.5.0",
