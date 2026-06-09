@@ -27,7 +27,7 @@ export default async function PortalProjectsPage() {
 
   const { data: projectsData } = await supabase
     .from("projects")
-    .select("id, name, status, progress, due_date, budget_amount, currency")
+    .select("id, name, status, progress, due_date")
     .eq("client_id", clientData.id)
     .order("created_at", { ascending: false });
 

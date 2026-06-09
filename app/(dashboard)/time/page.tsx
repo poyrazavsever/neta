@@ -159,7 +159,6 @@ export default function TimeTrackingPage() {
               </div>
             </div>
           </div>
-        </div>
 
         {/* Right: Analytics & AI */}
         <div className="flex flex-col gap-8">

@@ -120,7 +120,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                       ))}
                     </Pie>
                     <Tooltip 
-                      formatter={(value: number) => `₺${value}`}
+                      formatter={(value) => `₺${Number(value ?? 0)}`}
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--background))', 
                         borderColor: 'hsl(var(--border))',

@@ -1,5 +1,5 @@
 # ── Production Dockerfile (Dokploy / Coolify ready) ──────────────
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # ── 1. Install dependencies ─────────────────────────────────────
 FROM base AS deps

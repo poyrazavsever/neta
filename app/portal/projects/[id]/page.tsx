@@ -23,7 +23,7 @@ export default async function PortalProjectPage({ params }: { params: Promise<{ 
   // 2. Get Project
   const { data: project, error } = await supabase
     .from("projects")
-    .select("*")
+    .select("id, name, description, status, progress, due_date, revision_quota")
     .eq("id", id)
     .eq("client_id", clientData.id)
     .single();
