@@ -8,6 +8,29 @@ import { Button } from "poyraz-ui/atoms";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "poyraz-ui/molecules";
 
+function formatMessageContent(text: string) {
+  if (!text) return null;
+  const lines = text.split("\n");
+  return lines.map((line, i) => (
+    <span key={i}>
+      {line.split(/(\*\*.*?\*\*|\*.*?\*)/g).map((part, j) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return (
+            <strong key={j} className="font-semibold">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        if (part.startsWith("*") && part.endsWith("*")) {
+          return <em key={j}>{part.slice(1, -1)}</em>;
+        }
+        return <span key={j}>{part}</span>;
+      })}
+      {i !== lines.length - 1 && <br />}
+    </span>
+  ));
+}
+
 type ChatSession = {
   id: string;
   title: string;
@@ -225,7 +248,7 @@ export default function AIChatPage() {
                         : "border border-border bg-muted/40 text-foreground"
                     }`}
                   >
-                    {text}
+                    {formatMessageContent(text)}
                   </div>
                 </div>
               );
