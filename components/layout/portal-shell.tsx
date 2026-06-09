@@ -53,7 +53,7 @@ export function PortalShell({ children, user, progress }: PortalShellProps) {
           pathname={pathname} 
           user={user} 
           progress={progress}
-          className="sticky top-0 hidden shrink-0 self-start lg:block"
+          className="sticky top-0 hidden h-screen shrink-0 self-stretch lg:flex"
         />
 
         {/* Mobile Sidebar Overlay */}
@@ -123,7 +123,10 @@ function AppSidebar({
   return (
     <Sidebar
       variant="bordered"
-      className={cn("flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-0", className)}
+      className={cn(
+        "flex h-dvh max-h-dvh flex-col overflow-hidden rounded-none border-y-0 border-l-0 border-r border-border",
+        className
+      )}
     >
       <SidebarHeader className="shrink-0 border-b-0 px-6 py-3">
         <Link href="/portal" className="flex w-full items-center justify-center">
@@ -181,9 +184,7 @@ function AppSidebar({
         ))}
       </SidebarContent>
 
-      <SidebarSeparator className="mx-0 my-0 w-full" />
-
-      <SidebarFooter className="shrink-0 border-t-0 px-6 py-5 flex flex-col gap-5">
+      <SidebarFooter className="mt-auto flex shrink-0 flex-col gap-5 border-t border-border px-6 py-5">
         <Card className="bg-primary/5 border-primary/10 shadow-none overflow-hidden relative">
           <CardContent className="p-4 space-y-3">
             <div className="text-sm font-semibold text-foreground relative z-10">Proje İlerlemesi</div>
@@ -226,7 +227,7 @@ function AppSidebar({
             align="end"
             side="top"
             sideOffset={8}
-            className="w-64"
+            className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-0"
           >
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col gap-1">
