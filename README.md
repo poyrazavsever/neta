@@ -57,14 +57,21 @@ Neta is designed to be easily self-hosted. Follow these steps to deploy the appl
 - Node.js (for local development)
 - A Supabase instance (Cloud or Self-Hosted)
 
-### Setup Instructions
+### 1-Click Installation (Recommended)
 
-1. Clone the repository to your local machine or server.
-2. Copy the `.env.example` file to `.env.local` and populate the variables with your Supabase credentials.
-3. Run the database migrations located in `supabase/migrations` against your PostgreSQL database to set up the schemas, policies, and functions.
-4. Build and start the Docker container using the provided `docker-compose.yml` or `Dockerfile`.
+You can install and start Neta immediately using our automated setup script. Simply run the following command in your terminal:
 
-Example deployment command:
+```bash
+curl -sL https://raw.githubusercontent.com/poyrazavsever/neta/main/install.sh | bash
+```
+
+### Manual Installation
+
+If you prefer to set up Neta manually:
+
+1. Clone the repository: `git clone https://github.com/poyrazavsever/neta.git`
+2. Navigate to the directory and copy the `.env.example` file to `.env.local`.
+3. Build and start the Docker container:
 ```bash
 docker-compose up -d --build
 ```
