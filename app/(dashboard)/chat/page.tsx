@@ -42,6 +42,7 @@ export default function AIChatPage() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [input, setInput] = useState("");
+  const [isMobileSessionsOpen, setIsMobileSessionsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { messages, sendMessage, setMessages, status, stop } = useChat({
@@ -158,55 +159,85 @@ export default function AIChatPage() {
     await sendMessage({ text: currentInput }, { body: { sessionId } });
   }
 
-  return (
-    <div className="flex h-[calc(100dvh-6rem)] w-full overflow-hidden rounded-sm border border-border bg-background">
-      <aside className="hidden w-80 flex-col border-r border-border bg-muted/20 md:flex">
-        <div className="flex items-center justify-between border-b border-border p-4">
-          <h2 className="flex items-center gap-2 font-semibold text-foreground">
-            <MessageSquare className="h-4 w-4" />
-            Sohbetler
-          </h2>
-          <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleNewChat}>
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
+  const SessionsSidebarContent = (
+    <>
+      <div className="flex items-center justify-between border-b border-border p-4 shrink-0">
+        <h2 className="flex items-center gap-2 font-semibold text-foreground">
+          <MessageSquare className="h-4 w-4" />
+          Sohbetler
+        </h2>
+        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => {
+          handleNewChat();
+          setIsMobileSessionsOpen(false);
+        }}>
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
 
-        <div className="tiny-scrollbar flex-1 space-y-2 overflow-y-auto p-3">
-          {sessions.length === 0 ? (
-            <div className="mt-10 text-center text-sm text-muted-foreground">
-              Henüz sohbet yok.
-            </div>
-          ) : (
-            sessions.map((session) => (
-              <button
-                key={session.id}
-                type="button"
-                onClick={() => setActiveSessionId(session.id)}
-                className={`group flex w-full items-center justify-between rounded-sm p-3 text-left transition-colors ${
-                  activeSessionId === session.id
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground hover:bg-muted/50"
-                }`}
+      <div className="tiny-scrollbar flex-1 space-y-2 overflow-y-auto p-3">
+        {sessions.length === 0 ? (
+          <div className="mt-10 text-center text-sm text-muted-foreground">
+            Henüz sohbet yok.
+          </div>
+        ) : (
+          sessions.map((session) => (
+            <button
+              key={session.id}
+              type="button"
+              onClick={() => {
+                setActiveSessionId(session.id);
+                setIsMobileSessionsOpen(false);
+              }}
+              className={`group flex w-full items-center justify-between rounded-sm p-3 text-left transition-colors ${
+                activeSessionId === session.id
+                  ? "bg-primary/10 text-primary"
+                  : "text-foreground hover:bg-muted/50"
+              }`}
+            >
+              <span className="truncate pr-2 text-sm font-medium">
+                {session.title || "İsimsiz sohbet"}
+              </span>
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(event) => void handleDeleteSession(session.id, event)}
+                className="rounded-sm p-1 opacity-0 transition-all hover:bg-rose-50 hover:text-rose-600 lg:group-hover:opacity-100"
               >
-                <span className="truncate pr-2 text-sm font-medium">
-                  {session.title || "İsimsiz sohbet"}
-                </span>
-                <span
-                  role="button"
-                  tabIndex={0}
-                  onClick={(event) => void handleDeleteSession(session.id, event)}
-                  className="rounded-sm p-1 opacity-0 transition-all hover:bg-rose-50 hover:text-rose-600 group-hover:opacity-100"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </span>
-              </button>
-            ))
-          )}
-        </div>
+                <Trash2 className="h-3.5 w-3.5" />
+              </span>
+            </button>
+          ))
+        )}
+      </div>
+    </>
+  );
+
+  return (
+    <div className="flex flex-col md:flex-row h-[calc(100dvh-3.5rem)] md:h-[calc(100dvh-6rem)] w-[calc(100%+2rem)] md:w-full -mx-4 -my-4 md:mx-0 md:my-0 overflow-hidden md:rounded-sm border-0 md:border md:border-border bg-background">
+      
+      {/* Desktop Sidebar */}
+      <aside className="hidden w-80 flex-col border-r border-border bg-muted/20 md:flex">
+        {SessionsSidebarContent}
       </aside>
 
-      <section className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 items-center justify-between border-b border-border px-6">
+      {/* Mobile Sidebar Overlay */}
+      {isMobileSessionsOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden transition-opacity"
+          onClick={() => setIsMobileSessionsOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar Drawer */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-72 transform border-r border-border bg-background transition-transform duration-300 ease-in-out md:hidden flex flex-col ${
+          isMobileSessionsOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {SessionsSidebarContent}
+      </aside>
+      <section className="flex min-w-0 flex-1 flex-col h-full">
+        <header className="flex h-14 items-center justify-between border-b border-border px-4 md:px-6 shrink-0">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-primary/10 text-primary">
               <Brain className="h-4 w-4" />
@@ -216,8 +247,8 @@ export default function AIChatPage() {
               <p className="text-xs text-muted-foreground">Kayıtlı verilerin hakkında soru sor.</p>
             </div>
           </div>
-          <Button variant="outline" size="icon" className="h-8 w-8 md:hidden" onClick={handleNewChat}>
-            <Plus className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="h-8 md:hidden text-xs px-3" onClick={() => setIsMobileSessionsOpen(true)}>
+            <MessageSquare className="h-3.5 w-3.5 mr-1.5" /> Sohbetler
           </Button>
         </header>
 
@@ -264,8 +295,8 @@ export default function AIChatPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        <form onSubmit={handleSubmit} className="border-t border-border p-4 shrink-0">
-          <div className="mx-auto flex max-w-4xl items-end gap-2 rounded-sm border border-border bg-background p-2 focus-within:border-primary">
+        <form onSubmit={handleSubmit} className="border-t border-border p-3 md:p-4 shrink-0 bg-background">
+          <div className="mx-auto flex max-w-4xl items-end gap-2 rounded-sm border border-border bg-background p-1.5 focus-within:border-primary">
             <textarea
               value={input}
               onChange={(event) => setInput(event.target.value)}
@@ -275,17 +306,17 @@ export default function AIChatPage() {
                   void handleSubmit(event);
                 }
               }}
-              placeholder="Örn. Bu hafta geciken işlerim neler?"
-              className="min-h-10 max-h-40 flex-1 resize-none bg-transparent px-2 py-2 text-sm outline-none placeholder:text-muted-foreground"
+              placeholder="Mesaj gönder..."
+              className="min-h-9 max-h-40 flex-1 resize-none bg-transparent px-2 py-2 text-sm outline-none placeholder:text-muted-foreground placeholder:truncate"
               rows={1}
               disabled={isLoading}
             />
             {isLoading ? (
-              <Button type="button" variant="outline" size="icon" onClick={() => void stop()}>
+              <Button type="button" variant="outline" size="icon" className="shrink-0 h-9 w-9" onClick={() => void stop()}>
                 <span className="h-3 w-3 bg-current" />
               </Button>
             ) : (
-              <Button type="submit" size="icon" disabled={!input.trim()}>
+              <Button type="submit" size="icon" className="shrink-0 h-9 w-9" disabled={!input.trim()}>
                 <Send className="h-4 w-4" />
               </Button>
             )}
