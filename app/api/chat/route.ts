@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
     const result = streamText({
       model,
-      system: `Sen Revanios içindeki kişisel Freelancer OS asistanısın.
+      system: `Sen Neta içindeki kişisel Freelancer OS asistanısın.
 Kullanıcının kayıtlı verileri hakkında kısa, net ve Türkçe cevap ver.
 Veri yoksa bunu açıkça söyle. Klinik, finansal veya hukuki kesin hüküm verme.
 

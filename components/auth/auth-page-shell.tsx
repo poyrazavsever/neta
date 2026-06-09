@@ -64,8 +64,8 @@ export function AuthPageShell({
           <div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(255,255,255,.18)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.18)_1px,transparent_1px)] bg-size-[32px_32px]" />
           <div className="relative z-10 flex items-center gap-4 p-10">
             <Image
-              src="/logo/lightLogo.png"
-              alt="Revanios"
+              src="/logo/lightLogoLong.png"
+              alt="Neta"
               width={240}
               height={64}
               className="h-16 w-auto object-contain"
@@ -85,7 +85,7 @@ export function AuthPageShell({
                 variant="lead"
                 className="mt-6 max-w-xl text-primary-foreground/78"
               >
-                Revanios, günlük operasyonunu, projelerini, side projectlerini ve
+                Neta, günlük operasyonunu, projelerini, side projectlerini ve
                 temel finans durumunu sade raporlarla takip etmen için
                 tasarlanır.
               </Typography>
@@ -115,7 +115,7 @@ export function AuthPageShell({
           <div className="w-full relative z-10 p-10 text-sm text-primary-foreground/78">
             <span>Açık kaynak ve self-host edilebilir.</span>{" "}
             <Link
-              href="https://github.com/poyrazavsever/revanios"
+              href="https://github.com/poyrazavsever/neta"
               className="font-semibold text-primary-foreground underline-offset-4 hover:underline"
               target="_blank"
             >
@@ -150,8 +150,8 @@ export function AuthPageShell({
           >
             <div className="mb-8 flex justify-center lg:hidden">
               <Image
-                src="/logo/blackLogo.png"
-                alt="Revanios logo"
+                src="/logo/blackLogoLong.png"
+                alt="Neta logo"
                 width={180}
                 height={56}
                 className="h-14 w-auto object-contain"

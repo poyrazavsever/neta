@@ -3,7 +3,7 @@ import { AnalyticsClient } from "./analytics-client";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Analizler - Revanios",
+  title: "Analizler - Neta",
 };
 
 export default async function AnalyticsPage() {

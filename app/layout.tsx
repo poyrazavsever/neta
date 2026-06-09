@@ -8,13 +8,13 @@ import { OfflineIndicator } from "@/components/ui/offline-indicator";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Revanios",
+  title: "Neta",
   description: "Self-hosted freelancer operating dashboard",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Revanios",
+    title: "Neta",
   },
 };
 

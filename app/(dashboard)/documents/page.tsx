@@ -33,7 +33,7 @@ const documents = [
     date: "May 08, 2026", 
     category: "Design", 
     starred: false,
-    summary: "Core design tokens, typography, and color palette for the Revanios rebrand.",
+    summary: "Core design tokens, typography, and color palette for the Neta rebrand.",
     owner: "Alex R.",
     tags: ["Design", "UI", "Branding"],
     aiAnalysis: "Identifies 'Cyber-Lavender' as the primary action color. Typography is set to Geist Sans."

@@ -1,6 +1,6 @@
-<img src="public/logo/lightLogo.png" height="200" alt="Revanios Icon" />
+<img src="public/logo/lightLogoLong.png" height="200" alt="Neta Icon" />
 
-# Revanios - Freelancer Operating System
+# Neta - Freelancer Operating System
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.7-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.7-blue?style=flat-square&logo=react)](https://react.dev/)
@@ -11,9 +11,9 @@
 
 ## Overview
 
-Revanios is a comprehensive, self-hosted workspace designed specifically for freelancers. It serves as a centralized operating system to manage daily operations, clients, projects, finances, and personal performance tracking. 
+Neta is a comprehensive, self-hosted workspace designed specifically for freelancers. It serves as a centralized operating system to manage daily operations, clients, projects, finances, and personal performance tracking. 
 
-Built with a focus on simplicity, security, and edge-to-edge aesthetic design, Revanios allows a single user (the freelancer) to operate their entire business from one dashboard without relying on multiple third-party SaaS subscriptions.
+Built with a focus on simplicity, security, and edge-to-edge aesthetic design, Neta allows a single user (the freelancer) to operate their entire business from one dashboard without relying on multiple third-party SaaS subscriptions.
 
 ## Features and Modules
 
@@ -40,7 +40,7 @@ A restricted, read-only interface that you can share with your clients. They can
 
 ## Technical Architecture
 
-Revanios is engineered using modern, high-performance web technologies:
+Neta is engineered using modern, high-performance web technologies:
 
 - **Frontend:** Next.js (App Router) combined with React Server Components.
 - **Styling:** Tailwind CSS with a custom, bespoke design system via Poyraz UI.
@@ -50,7 +50,7 @@ Revanios is engineered using modern, high-performance web technologies:
 
 ## Installation and Deployment
 
-Revanios is designed to be easily self-hosted. Follow these steps to deploy the application on your own infrastructure.
+Neta is designed to be easily self-hosted. Follow these steps to deploy the application on your own infrastructure.
 
 ### Prerequisites
 - Docker and Docker Compose
@@ -70,7 +70,7 @@ docker-compose up -d --build
 ```
 
 ### First Administrator Account
-To ensure data security, Revanios is locked to a single administrator. Upon launching the application for the first time, navigate to the `/register` route to create the initial admin account. Once this account is created, public registration is permanently disabled.
+To ensure data security, Neta is locked to a single administrator. Upon launching the application for the first time, navigate to the `/register` route to create the initial admin account. Once this account is created, public registration is permanently disabled.
 
 ## License
 

@@ -76,8 +76,8 @@ export function PortalShell({ children, user, progress }: PortalShellProps) {
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
             <Link href="/portal" className="flex items-center gap-2 font-semibold">
               <Image
-                src="/logo/blackLogo.png"
-                alt="Revanios"
+                src="/logo/blackLogoLong.png"
+                alt="Neta"
                 width={120}
                 height={32}
                 className="h-8 w-auto object-contain"
@@ -122,8 +122,8 @@ function AppSidebar({
       <SidebarHeader className="shrink-0 border-b-0 px-6 py-3">
         <Link href="/portal">
           <Image
-            src="/logo/blackLogo.png"
-            alt="Revanios"
+            src="/logo/blackLogoLong.png"
+            alt="Neta"
             width={160}
             height={48}
             className="h-12 w-auto object-contain"
