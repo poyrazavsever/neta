@@ -161,7 +161,7 @@ export function AuthPageShell({
               />
             </div>
 
-            <div className="hidden space-y-2 text-center lg:block lg:text-left">
+            <div className="space-y-2 text-center lg:text-left">
               <Typography variant="h2" className="text-3xl">
                 {title}
               </Typography>

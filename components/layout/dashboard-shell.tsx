@@ -52,23 +52,26 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
           <AppSidebar pathname={pathname} user={user} />
         </aside>
 
-        {isMobileSidebarOpen ? (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            <button
-              type="button"
-              aria-label="Menuyu kapat"
-              className="absolute inset-0 bg-overlay"
-              onClick={() => setIsMobileSidebarOpen(false)}
-            />
-            <aside className="relative h-dvh border-r border-border bg-background">
-              <AppSidebar
-                pathname={pathname}
-                user={user}
-                onNavigate={() => setIsMobileSidebarOpen(false)}
-              />
-            </aside>
-          </div>
-        ) : null}
+        {/* Mobile Sidebar Overlay */}
+        {isMobileSidebarOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden transition-opacity"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+        )}
+
+        {/* Mobile Sidebar Drawer */}
+        <aside
+          className={`fixed inset-y-0 left-0 z-50 w-72 transform border-r border-border bg-background transition-transform duration-300 ease-in-out lg:hidden ${
+            isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <AppSidebar
+            pathname={pathname}
+            user={user}
+            onNavigate={() => setIsMobileSidebarOpen(false)}
+          />
+        </aside>
 
         <div className="flex flex-1 flex-col min-w-0">
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
