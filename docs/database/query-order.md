@@ -34,7 +34,7 @@ They must also be documented and registered in this file, but they should only b
 Use the migration helper from the repository root:
 
 ```bash
-DATABASE_URL='postgresql://postgres:password@host:5432/postgres' bash ./scripts/apply-migrations.sh
+DATABASE_URL='postgresql://postgres:password@host:5432/postgres' sh ./scripts/apply-migrations.sh
 ```
 
 The helper applies `0001` through `0009` in the order listed above. It uses local `psql` when available, otherwise it runs `psql` through Docker.

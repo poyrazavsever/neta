@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "selfhost:env": "node scripts/generate-full-stack-env.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",

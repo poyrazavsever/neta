@@ -50,13 +50,14 @@ Neta is engineered using modern, high-performance web technologies:
 
 ## Installation and Deployment
 
-Neta is designed for self-hosting. The current Docker Compose file runs the Neta web application and connects it to a Supabase-compatible backend. A bundled Supabase Compose profile is planned for the full-stack self-host mode.
+Neta is designed for self-hosting. It supports two Docker deployment modes:
+
+- **Full-stack:** Neta + bundled Postgres/Auth/PostgREST/Storage.
+- **App-only:** Neta connected to an existing Supabase-compatible backend.
 
 ### Prerequisites
 - Docker and Docker Compose
-- A Supabase project or self-hosted Supabase backend
-- Supabase API URL, anon key, and service role key
-- A direct Postgres `DATABASE_URL` if you want the installer to apply migrations automatically
+- For app-only mode: Supabase API URL, anon key, service role key, and a direct Postgres `DATABASE_URL` for migrations
 
 ### 1-Click Installation (Recommended)
 
@@ -66,28 +67,39 @@ You can install Neta using the interactive setup script:
 curl -sL https://raw.githubusercontent.com/poyrazavsever/neta/main/install.sh | bash
 ```
 
-The installer asks for the required Supabase values, writes a `.env` file, optionally applies database migrations, validates Docker Compose configuration, and starts the application.
+The installer asks for the deployment mode, writes a `.env` file, validates Docker Compose configuration, and starts the application. In full-stack mode it generates Supabase JWT secrets and applies Neta migrations automatically through the `neta-migrations` service.
 
 ### Manual Installation
 
 If you prefer to set up Neta manually:
 
 1. Clone the repository: `git clone https://github.com/poyrazavsever/neta.git`
-2. Navigate to the directory and copy the `.env.example` file to `.env`.
-3. Fill every required value in `.env`.
-4. Apply database migrations:
+2. Navigate to the directory.
+3. For full-stack mode, generate a `.env` file and run:
 
 ```bash
-DATABASE_URL='postgresql://postgres:password@host:5432/postgres' bash ./scripts/apply-migrations.sh
+node scripts/generate-full-stack-env.mjs > .env
 ```
 
-5. Build and start the Docker container:
+```bash
+docker compose -f docker-compose.full.yml up -d --build
+```
+
+4. For app-only mode, copy `.env.example` to `.env`, fill every required value, and apply database migrations:
+
+```bash
+DATABASE_URL='postgresql://postgres:password@host:5432/postgres' sh ./scripts/apply-migrations.sh
+```
+
+5. Start the app-only Docker container:
 
 ```bash
 docker compose up -d --build
 ```
 
 Docker Compose intentionally fails fast when required Supabase environment values are missing.
+
+Coolify and Dokploy users should use `docker-compose.full.yml` for the no-external-service setup, or `docker-compose.yml` when connecting to an existing Supabase backend. See `docs/deployment/self-hosting.md` for the deployment checklist.
 
 ### First Administrator Account
 To ensure data security, Neta is locked to a single administrator. Upon launching the application for the first time, navigate to the `/register` route to create the initial admin account. Once this account is created, public registration is permanently disabled.

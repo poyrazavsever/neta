@@ -6,6 +6,7 @@ set -euo pipefail
 
 REPO_URL="${NETA_REPO_URL:-https://github.com/poyrazavsever/neta.git}"
 TARGET_DIR="${NETA_TARGET_DIR:-neta-os}"
+INSTALL_MODE="${NETA_INSTALL_MODE:-}"
 
 info() {
   printf "\n%s\n" "$1"
@@ -89,15 +90,133 @@ prompt_secret_required() {
   done
 }
 
+choose_install_mode() {
+  if [ -n "$INSTALL_MODE" ]; then
+    case "$INSTALL_MODE" in
+      full|full-stack|bundled)
+        INSTALL_MODE="full-stack"
+        ;;
+      app|app-only|external)
+        INSTALL_MODE="app-only"
+        ;;
+      *)
+        fail "Invalid NETA_INSTALL_MODE. Use full-stack or app-only."
+        ;;
+    esac
+    export INSTALL_MODE
+    return
+  fi
+
+  echo "Choose install mode:"
+  echo "  1) full-stack  Neta + bundled Supabase/Postgres/Auth/Storage"
+  echo "  2) app-only    Neta app connected to an existing Supabase project"
+
+  while true; do
+    read -r -p "Install mode [full-stack]: " answer
+    case "${answer:-full-stack}" in
+      1|full|full-stack|bundled)
+        INSTALL_MODE="full-stack"
+        export INSTALL_MODE
+        return
+        ;;
+      2|app|app-only|external)
+        INSTALL_MODE="app-only"
+        export INSTALL_MODE
+        return
+        ;;
+      *)
+        echo "Please choose full-stack or app-only."
+        ;;
+    esac
+  done
+}
+
+run_node_script() {
+  local script="$1"
+
+  if command -v node >/dev/null 2>&1; then
+    node -e "$script"
+  else
+    docker run --rm \
+      -e ROLE="${ROLE:-}" \
+      -e JWT_SECRET="${JWT_SECRET:-}" \
+      node:22-alpine node -e "$script"
+  fi
+}
+
+random_secret() {
+  run_node_script "console.log(require('crypto').randomBytes(32).toString('hex'))"
+}
+
+generate_supabase_jwt() {
+  local role="$1"
+  local secret="$2"
+  ROLE="$role" JWT_SECRET="$secret" run_node_script "const crypto=require('crypto'); const b64=(v)=>Buffer.from(v).toString('base64url'); const header=b64(JSON.stringify({alg:'HS256',typ:'JWT'})); const payload=b64(JSON.stringify({iss:'supabase',ref:'neta',role:process.env.ROLE,iat:1700000000,exp:4102444800})); const unsigned=header+'.'+payload; const sig=crypto.createHmac('sha256', process.env.JWT_SECRET).update(unsigned).digest('base64url'); console.log(unsigned+'.'+sig);"
+}
+
 write_env_file() {
   cat > .env <<EOF
+NETA_INSTALL_MODE=$INSTALL_MODE
 NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 NETA_PORT=$NETA_PORT
 NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
 EOF
+
+  if [ "$INSTALL_MODE" = "full-stack" ]; then
+    cat >> .env <<EOF
+SUPABASE_API_PORT=$SUPABASE_API_PORT
+POSTGRES_PORT=$POSTGRES_PORT
+POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+JWT_SECRET=$JWT_SECRET
+JWT_EXPIRY=${JWT_EXPIRY:-3600}
+SMTP_ADMIN_EMAIL=${SMTP_ADMIN_EMAIL:-admin@neta.local}
+EOF
+  fi
+
   chmod 600 .env || true
+}
+
+configure_app_only() {
+  prompt_optional NEXT_PUBLIC_SITE_URL "Public Neta URL" "http://localhost:3000"
+  prompt_optional NETA_PORT "Host port for Neta" "3000"
+  prompt_required NEXT_PUBLIC_SUPABASE_URL "Supabase API URL"
+  prompt_secret_required NEXT_PUBLIC_SUPABASE_ANON_KEY "Supabase anon key"
+  prompt_secret_required SUPABASE_SERVICE_ROLE_KEY "Supabase service role key"
+}
+
+configure_full_stack() {
+  prompt_optional NEXT_PUBLIC_SITE_URL "Public Neta URL" "http://localhost:3000"
+  prompt_optional NETA_PORT "Host port for Neta" "3000"
+  prompt_optional NEXT_PUBLIC_SUPABASE_URL "Public Supabase API URL" "http://localhost:8000"
+  prompt_optional SUPABASE_API_PORT "Host port for bundled Supabase API" "8000"
+  prompt_optional POSTGRES_PORT "Host port for bundled Postgres" "54322"
+
+  POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-$(random_secret)}"
+  JWT_SECRET="${JWT_SECRET:-$(random_secret)}"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-$(generate_supabase_jwt anon "$JWT_SECRET")}"
+  SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-$(generate_supabase_jwt service_role "$JWT_SECRET")}"
+
+  export POSTGRES_PASSWORD JWT_SECRET NEXT_PUBLIC_SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY
+}
+
+run_compose() {
+  local compose="$1"
+
+  if [ "$INSTALL_MODE" = "full-stack" ]; then
+    info "Validating full-stack Docker Compose configuration"
+    $compose -f docker-compose.full.yml config >/dev/null
+
+    info "Building and starting bundled Neta stack"
+    $compose -f docker-compose.full.yml up -d --build
+  else
+    info "Validating Docker Compose configuration"
+    $compose config >/dev/null
+
+    info "Building and starting Neta"
+    $compose up -d --build
+  fi
 }
 
 main() {
@@ -115,36 +234,42 @@ main() {
   git clone "$REPO_URL" "$TARGET_DIR"
   cd "$TARGET_DIR"
 
-  prompt_optional NEXT_PUBLIC_SITE_URL "Public Neta URL" "http://localhost:3000"
-  prompt_optional NETA_PORT "Host port for Neta" "3000"
-  prompt_required NEXT_PUBLIC_SUPABASE_URL "Supabase API URL"
-  prompt_secret_required NEXT_PUBLIC_SUPABASE_ANON_KEY "Supabase anon key"
-  prompt_secret_required SUPABASE_SERVICE_ROLE_KEY "Supabase service role key"
+  choose_install_mode
+
+  if [ "$INSTALL_MODE" = "full-stack" ]; then
+    configure_full_stack
+  else
+    configure_app_only
+  fi
 
   write_env_file
   info "Wrote .env"
 
-  read -r -p "Apply Neta database migrations now? Requires a direct Postgres DATABASE_URL. [y/N]: " apply_migrations
-  if [ "$apply_migrations" = "y" ] || [ "$apply_migrations" = "Y" ]; then
-    prompt_secret_required DATABASE_URL "Postgres DATABASE_URL"
-    DATABASE_URL="$DATABASE_URL" bash ./scripts/apply-migrations.sh
+  if [ "$INSTALL_MODE" = "app-only" ]; then
+    read -r -p "Apply Neta database migrations now? Requires a direct Postgres DATABASE_URL. [y/N]: " apply_migrations
+    if [ "$apply_migrations" = "y" ] || [ "$apply_migrations" = "Y" ]; then
+      prompt_secret_required DATABASE_URL "Postgres DATABASE_URL"
+      DATABASE_URL="$DATABASE_URL" sh ./scripts/apply-migrations.sh
+    else
+      echo "Skipping migrations. Run them later with:"
+      echo "  DATABASE_URL='postgresql://...' sh ./scripts/apply-migrations.sh"
+    fi
   else
-    echo "Skipping migrations. Run them later with:"
-    echo "  DATABASE_URL='postgresql://...' bash ./scripts/apply-migrations.sh"
+    echo "Bundled mode applies migrations automatically through the neta-migrations service."
   fi
 
   local compose
   compose="$(compose_cmd)"
 
-  info "Validating Docker Compose configuration"
-  $compose config >/dev/null
-
-  info "Building and starting Neta"
-  $compose up -d --build
+  run_compose "$compose"
 
   info "Neta is starting"
   echo "Open: $NEXT_PUBLIC_SITE_URL"
   echo "Create the first admin account at: $NEXT_PUBLIC_SITE_URL/register"
+  if [ "$INSTALL_MODE" = "full-stack" ]; then
+    echo "Bundled Supabase API: $NEXT_PUBLIC_SUPABASE_URL"
+    echo "Bundled Postgres host port: $POSTGRES_PORT"
+  fi
 }
 
 main "$@"
