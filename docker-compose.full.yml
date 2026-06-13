@@ -13,7 +13,7 @@ services:
       neta-migrations:
         condition: service_completed_successfully
       neta-supabase-proxy:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "${NETA_PORT:-3000}:3000"
     environment:
@@ -39,9 +39,14 @@ services:
       - "${SUPABASE_API_PORT:-8000}:8000"
     volumes:
       - ./deploy/supabase/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8000/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 
   neta-auth:
-    image: supabase/gotrue:v2.177.0
+    image: supabase/gotrue:v2.189.0
     container_name: neta-auth
     restart: unless-stopped
     depends_on:

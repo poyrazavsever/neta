@@ -42,6 +42,18 @@ Start:
 docker compose -f docker-compose.full.yml up -d --build
 ```
 
+Check the running stack:
+
+```bash
+sh ./scripts/selfhost-doctor.sh
+```
+
+To run a real Auth signup/login smoke test, enable the optional check:
+
+```bash
+NETA_DOCTOR_AUTH_SMOKE=1 sh ./scripts/selfhost-doctor.sh
+```
+
 ## App-Only Mode
 
 Use this when Neta connects to an existing Supabase or Supabase-compatible backend.
@@ -83,6 +95,34 @@ Set the generated full-stack env values in Coolify's environment variables. Rout
 Create a Compose app from this repository. Use `docker-compose.full.yml` for full-stack deployments and paste the generated env values into the environment panel.
 
 Route the Neta domain to `neta-web` port `3000`. Route the bundled Supabase API domain, if used, to `neta-supabase-proxy` port `8000`.
+
+## Backup And Restore
+
+Full-stack mode stores the database in the `neta-db-data` Docker volume and uploaded files in the `neta-storage-data` Docker volume.
+
+Create a backup:
+
+```bash
+sh ./scripts/selfhost-backup.sh
+```
+
+The backup is written to `./backups/<timestamp>/` and contains:
+
+- `postgres.dump`: custom-format Postgres dump
+- `storage.tar.gz`: local storage archive
+- `manifest.txt`: backup metadata
+
+Restore a backup:
+
+```bash
+sh ./scripts/selfhost-restore.sh ./backups/20260101T120000Z
+```
+
+Set `NETA_RESTORE_FORCE=1` for non-interactive restores:
+
+```bash
+NETA_RESTORE_FORCE=1 sh ./scripts/selfhost-restore.sh ./backups/20260101T120000Z
+```
 
 ## First Admin
 

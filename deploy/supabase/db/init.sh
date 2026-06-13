@@ -12,6 +12,8 @@ create role supabase_storage_admin noinherit login password '$POSTGRES_PASSWORD'
 grant anon, authenticated, service_role to authenticator;
 grant all privileges on database postgres to supabase_auth_admin;
 grant all privileges on database postgres to supabase_storage_admin;
+alter role supabase_auth_admin set search_path = auth, public;
+alter role supabase_storage_admin set search_path = storage, public;
 
 create schema if not exists auth authorization supabase_auth_admin;
 create schema if not exists storage authorization supabase_storage_admin;

@@ -101,6 +101,27 @@ Docker Compose intentionally fails fast when required Supabase environment value
 
 Coolify and Dokploy users should use `docker-compose.full.yml` for the no-external-service setup, or `docker-compose.yml` when connecting to an existing Supabase backend. See `docs/deployment/self-hosting.md` for the deployment checklist.
 
+### Operations
+
+For full-stack installs, run health diagnostics and backups from the repository root:
+
+```bash
+sh ./scripts/selfhost-doctor.sh
+sh ./scripts/selfhost-backup.sh
+```
+
+To also verify real Auth signup and password login, run:
+
+```bash
+NETA_DOCTOR_AUTH_SMOKE=1 sh ./scripts/selfhost-doctor.sh
+```
+
+Restore requires an existing backup directory and explicit confirmation:
+
+```bash
+sh ./scripts/selfhost-restore.sh ./backups/20260101T120000Z
+```
+
 ### First Administrator Account
 To ensure data security, Neta is locked to a single administrator. Upon launching the application for the first time, navigate to the `/register` route to create the initial admin account. Once this account is created, public registration is permanently disabled.
 

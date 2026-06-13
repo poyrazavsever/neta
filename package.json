@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "selfhost:env": "node scripts/generate-full-stack-env.mjs"
+    "selfhost:env": "node scripts/generate-full-stack-env.mjs",
+    "selfhost:doctor": "sh scripts/selfhost-doctor.sh",
+    "selfhost:backup": "sh scripts/selfhost-backup.sh",
+    "selfhost:restore": "sh scripts/selfhost-restore.sh"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",

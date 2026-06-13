@@ -3,6 +3,7 @@ node_modules
 out
 dist
 build
+backups/
 .env*
 !.env.example
 !.env.full.example
