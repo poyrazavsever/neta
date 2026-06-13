@@ -56,7 +56,7 @@ ENV HOSTNAME="0.0.0.0"
 
 # Health check for Dokploy / Coolify / Docker orchestrators
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-  CMD wget -qO- http://localhost:3000/api/health || exit 1
+  CMD wget -qO- http://127.0.0.1:3000/api/health || exit 1
 
 # Runtime env vars (Supabase keys, AI keys etc.) are injected by
 # Dokploy / Coolify as environment variables — no .env file needed.

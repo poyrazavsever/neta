@@ -16,6 +16,8 @@ grant all privileges on database postgres to supabase_storage_admin;
 create schema if not exists auth authorization supabase_auth_admin;
 create schema if not exists storage authorization supabase_storage_admin;
 
+grant usage, create on schema public to supabase_auth_admin;
+grant usage, create on schema public to supabase_storage_admin;
 grant usage on schema public to anon, authenticated, service_role;
 grant usage on schema auth to supabase_auth_admin;
 grant usage on schema storage to anon, authenticated, service_role, supabase_storage_admin;
@@ -24,29 +26,14 @@ create extension if not exists "uuid-ossp";
 create extension if not exists pgcrypto;
 create extension if not exists vector;
 
-create or replace function auth.uid()
-returns uuid
-language sql
-stable
-as \$\$
-  select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
+do \$\$
+begin
+  create type auth.factor_type as enum ('totp', 'webauthn');
+exception
+  when duplicate_object then null;
+end
 \$\$;
-
-create or replace function auth.role()
-returns text
-language sql
-stable
-as \$\$
-  select nullif(current_setting('request.jwt.claim.role', true), '')::text;
-\$\$;
-
-create or replace function auth.email()
-returns text
-language sql
-stable
-as \$\$
-  select nullif(current_setting('request.jwt.claim.email', true), '')::text;
-\$\$;
+alter type auth.factor_type owner to supabase_auth_admin;
 
 alter default privileges in schema public grant select, insert, update, delete on tables to anon, authenticated, service_role;
 alter default privileges in schema public grant usage, select on sequences to anon, authenticated, service_role;
