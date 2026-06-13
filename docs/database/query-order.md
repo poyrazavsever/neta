@@ -7,6 +7,11 @@ This file is the canonical order of SQL files for database setup and migration.
 | 0001 | `supabase/schema.sql` | `docs/database/0001-initial-schema.md` | Baseline registered |
 | 0002 | `supabase/migrations/0002_add_freelancer_os_core_tables.sql` | `docs/database/0002-freelancer-os-core-tables.md` | Pending execution |
 | 0003 | `supabase/migrations/0003_add_project_planning_assets.sql` | `docs/database/0003-project-planning-assets.md` | Pending execution |
+| 0004 | `supabase/migrations/0004_add_business_os_tables.sql` | `docs/database/0004-business-os-tables.md` | Pending execution |
+| 0005 | `supabase/migrations/0005_add_advanced_crm_tables.sql` | `docs/database/0005-advanced-crm-tables.md` | Pending execution |
+| 0006 | `supabase/migrations/0006_add_pgvector_and_embeddings.sql` | `docs/database/0006-pgvector-and-embeddings.md` | Pending execution |
+| 0007 | `supabase/migrations/0007_add_client_portal_tables.sql` | `docs/database/0007-client-portal-tables.md` | Pending execution |
+| 0008 | `supabase/migrations/0008_add_project_progress_and_quota.sql` | `docs/database/0008-project-progress-and-quota.md` | Pending execution |
 | 0009 | `supabase/migrations/0009_lock_registration_after_first_admin.sql` | `docs/database/0009-lock-registration-after-first-admin.md` | Pending execution |
 | seed-0001 | `supabase/seeds/0001_demo_freelancer_os_data.sql` | `docs/database/seed-0001-demo-freelancer-os-data.md` | Optional demo seed, pending execution |
 
@@ -23,3 +28,13 @@ This file is the canonical order of SQL files for database setup and migration.
 Seed files are optional and should live under `supabase/seeds/`.
 
 They must also be documented and registered in this file, but they should only be run in local/demo environments unless explicitly approved.
+
+## Applying The Ordered SQL
+
+Use the migration helper from the repository root:
+
+```bash
+DATABASE_URL='postgresql://postgres:password@host:5432/postgres' bash ./scripts/apply-migrations.sh
+```
+
+The helper applies `0001` through `0009` in the order listed above. It uses local `psql` when available, otherwise it runs `psql` through Docker.

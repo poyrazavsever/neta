@@ -1,57 +1,150 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Neta - Freelancer Operating System Installation Script
+# Neta - Freelancer Operating System installer
 
-set -e
+set -euo pipefail
 
-echo "🚀 Neta kurulumu başlıyor..."
+REPO_URL="${NETA_REPO_URL:-https://github.com/poyrazavsever/neta.git}"
+TARGET_DIR="${NETA_TARGET_DIR:-neta-os}"
 
-# 1. Check for Git
-if ! [ -x "$(command -v git)" ]; then
-  echo "Hata: Git yüklü değil. Lütfen önce Git'i kurun." >&2
+info() {
+  printf "\n%s\n" "$1"
+}
+
+fail() {
+  echo "Error: $1" >&2
   exit 1
-fi
+}
 
-# 2. Check for Docker
-if ! [ -x "$(command -v docker)" ]; then
-  echo "Hata: Docker yüklü değil. Lütfen önce Docker'ı kurun." >&2
-  exit 1
-fi
+require_command() {
+  command -v "$1" >/dev/null 2>&1 || fail "$1 is required."
+}
 
-# 3. Target directory
-TARGET_DIR="neta-os"
+compose_cmd() {
+  if docker compose version >/dev/null 2>&1; then
+    echo "docker compose"
+  elif command -v docker-compose >/dev/null 2>&1; then
+    echo "docker-compose"
+  else
+    fail "Docker Compose is required."
+  fi
+}
 
-if [ -d "$TARGET_DIR" ]; then
-  echo "Hata: '$TARGET_DIR' dizini zaten var. Lütfen farklı bir dizinde deneyin veya mevcut dizini silin." >&2
-  exit 1
-fi
+prompt_required() {
+  local var_name="$1"
+  local label="$2"
+  local current_value="${!var_name:-}"
+  local value
 
-# 4. Clone repository
-echo "📦 GitHub'dan kodlar indiriliyor..."
-git clone https://github.com/poyrazavsever/neta.git "$TARGET_DIR"
-cd "$TARGET_DIR"
+  if [ -n "$current_value" ]; then
+    return
+  fi
 
-# 5. Setup environment variables
-echo "⚙️ Çevresel değişkenler ayarlanıyor..."
-if [ -f ".env.example" ]; then
-  cp .env.example .env.local
-else
-  echo "Uyarı: .env.example dosyası bulunamadı."
-fi
+  while true; do
+    read -r -p "$label: " value
+    if [ -n "$value" ]; then
+      printf -v "$var_name" "%s" "$value"
+      export "$var_name"
+      return
+    fi
+    echo "This value is required."
+  done
+}
 
-# 6. Start with Docker Compose
-echo "🐳 Docker container'ları inşa ediliyor ve başlatılıyor..."
-if docker compose version > /dev/null 2>&1; then
-  docker compose up -d --build
-elif docker-compose version > /dev/null 2>&1; then
-  docker-compose up -d --build
-else
-  echo "Hata: docker-compose komutu bulunamadı." >&2
-  exit 1
-fi
+prompt_optional() {
+  local var_name="$1"
+  local label="$2"
+  local default_value="$3"
+  local current_value="${!var_name:-}"
+  local value
 
-echo ""
-echo "✅ Kurulum tamamlandı!"
-echo "Neta başarıyla ayağa kaldırıldı."
-echo "Tarayıcınızdan http://localhost:3000 adresine giderek Neta'yı kullanmaya başlayabilirsiniz."
-echo "İlk girişte oluşturacağınız hesap, sistemin tek yöneticisi (admin) olacaktır."
+  if [ -n "$current_value" ]; then
+    return
+  fi
+
+  read -r -p "$label [$default_value]: " value
+  printf -v "$var_name" "%s" "${value:-$default_value}"
+  export "$var_name"
+}
+
+prompt_secret_required() {
+  local var_name="$1"
+  local label="$2"
+  local current_value="${!var_name:-}"
+  local value
+
+  if [ -n "$current_value" ]; then
+    return
+  fi
+
+  while true; do
+    read -r -s -p "$label: " value
+    echo
+    if [ -n "$value" ]; then
+      printf -v "$var_name" "%s" "$value"
+      export "$var_name"
+      return
+    fi
+    echo "This value is required."
+  done
+}
+
+write_env_file() {
+  cat > .env <<EOF
+NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+NETA_PORT=$NETA_PORT
+NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
+EOF
+  chmod 600 .env || true
+}
+
+main() {
+  info "Neta self-host installer"
+
+  require_command git
+  require_command docker
+  docker info >/dev/null 2>&1 || fail "Docker is installed but the daemon is not reachable."
+
+  if [ -d "$TARGET_DIR" ]; then
+    fail "'$TARGET_DIR' already exists. Set NETA_TARGET_DIR or remove the directory."
+  fi
+
+  info "Cloning Neta into $TARGET_DIR"
+  git clone "$REPO_URL" "$TARGET_DIR"
+  cd "$TARGET_DIR"
+
+  prompt_optional NEXT_PUBLIC_SITE_URL "Public Neta URL" "http://localhost:3000"
+  prompt_optional NETA_PORT "Host port for Neta" "3000"
+  prompt_required NEXT_PUBLIC_SUPABASE_URL "Supabase API URL"
+  prompt_secret_required NEXT_PUBLIC_SUPABASE_ANON_KEY "Supabase anon key"
+  prompt_secret_required SUPABASE_SERVICE_ROLE_KEY "Supabase service role key"
+
+  write_env_file
+  info "Wrote .env"
+
+  read -r -p "Apply Neta database migrations now? Requires a direct Postgres DATABASE_URL. [y/N]: " apply_migrations
+  if [ "$apply_migrations" = "y" ] || [ "$apply_migrations" = "Y" ]; then
+    prompt_secret_required DATABASE_URL "Postgres DATABASE_URL"
+    DATABASE_URL="$DATABASE_URL" bash ./scripts/apply-migrations.sh
+  else
+    echo "Skipping migrations. Run them later with:"
+    echo "  DATABASE_URL='postgresql://...' bash ./scripts/apply-migrations.sh"
+  fi
+
+  local compose
+  compose="$(compose_cmd)"
+
+  info "Validating Docker Compose configuration"
+  $compose config >/dev/null
+
+  info "Building and starting Neta"
+  $compose up -d --build
+
+  info "Neta is starting"
+  echo "Open: $NEXT_PUBLIC_SITE_URL"
+  echo "Create the first admin account at: $NEXT_PUBLIC_SITE_URL/register"
+}
+
+main "$@"

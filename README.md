@@ -50,31 +50,44 @@ Neta is engineered using modern, high-performance web technologies:
 
 ## Installation and Deployment
 
-Neta is designed to be easily self-hosted. Follow these steps to deploy the application on your own infrastructure.
+Neta is designed for self-hosting. The current Docker Compose file runs the Neta web application and connects it to a Supabase-compatible backend. A bundled Supabase Compose profile is planned for the full-stack self-host mode.
 
 ### Prerequisites
 - Docker and Docker Compose
-- Node.js (for local development)
-- A Supabase instance (Cloud or Self-Hosted)
+- A Supabase project or self-hosted Supabase backend
+- Supabase API URL, anon key, and service role key
+- A direct Postgres `DATABASE_URL` if you want the installer to apply migrations automatically
 
 ### 1-Click Installation (Recommended)
 
-You can install and start Neta immediately using our automated setup script. Simply run the following command in your terminal:
+You can install Neta using the interactive setup script:
 
 ```bash
 curl -sL https://raw.githubusercontent.com/poyrazavsever/neta/main/install.sh | bash
 ```
+
+The installer asks for the required Supabase values, writes a `.env` file, optionally applies database migrations, validates Docker Compose configuration, and starts the application.
 
 ### Manual Installation
 
 If you prefer to set up Neta manually:
 
 1. Clone the repository: `git clone https://github.com/poyrazavsever/neta.git`
-2. Navigate to the directory and copy the `.env.example` file to `.env.local`.
-3. Build and start the Docker container:
+2. Navigate to the directory and copy the `.env.example` file to `.env`.
+3. Fill every required value in `.env`.
+4. Apply database migrations:
+
 ```bash
-docker-compose up -d --build
+DATABASE_URL='postgresql://postgres:password@host:5432/postgres' bash ./scripts/apply-migrations.sh
 ```
+
+5. Build and start the Docker container:
+
+```bash
+docker compose up -d --build
+```
+
+Docker Compose intentionally fails fast when required Supabase environment values are missing.
 
 ### First Administrator Account
 To ensure data security, Neta is locked to a single administrator. Upon launching the application for the first time, navigate to the `/register` route to create the initial admin account. Once this account is created, public registration is permanently disabled.

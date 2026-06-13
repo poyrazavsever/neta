@@ -29,4 +29,21 @@ Do not overwrite already executed SQL without also creating a new ordered migrat
 
 1. `schema.sql`
 2. `migrations/0002_add_freelancer_os_core_tables.sql`
-3. Optional: `seeds/0001_demo_freelancer_os_data.sql`
+3. `migrations/0003_add_project_planning_assets.sql`
+4. `migrations/0004_add_business_os_tables.sql`
+5. `migrations/0005_add_advanced_crm_tables.sql`
+6. `migrations/0006_add_pgvector_and_embeddings.sql`
+7. `migrations/0007_add_client_portal_tables.sql`
+8. `migrations/0008_add_project_progress_and_quota.sql`
+9. `migrations/0009_lock_registration_after_first_admin.sql`
+10. Optional local/demo data: `seeds/0001_demo_freelancer_os_data.sql`
+
+## Apply Migrations
+
+From the repository root:
+
+```bash
+DATABASE_URL='postgresql://postgres:password@host:5432/postgres' bash ./scripts/apply-migrations.sh
+```
+
+The script applies all required schema files in canonical order. It requires either local `psql` or Docker. If `psql` is not installed, it runs `psql` through the `postgres:16-alpine` Docker image.
