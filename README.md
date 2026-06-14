@@ -64,7 +64,7 @@ Neta is designed for self-hosting. It supports two Docker deployment modes:
 You can install Neta using the interactive setup script:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/poyrazavsever/neta/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/poyrazavsever/neta/main/install.sh | bash
 ```
 
 The installer asks for the deployment mode, writes a `.env` file, validates Docker Compose configuration, and starts the application. In full-stack mode it generates Supabase JWT secrets and applies Neta migrations automatically through the `neta-migrations` service.

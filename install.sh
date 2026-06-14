@@ -7,6 +7,8 @@ set -euo pipefail
 REPO_URL="${NETA_REPO_URL:-https://github.com/poyrazavsever/neta.git}"
 TARGET_DIR="${NETA_TARGET_DIR:-neta-os}"
 INSTALL_MODE="${NETA_INSTALL_MODE:-}"
+APPLY_MIGRATIONS="${NETA_APPLY_MIGRATIONS:-}"
+TTY_PATH="${NETA_TTY_PATH:-/dev/tty}"
 
 info() {
   printf "\n%s\n" "$1"
@@ -19,6 +21,35 @@ fail() {
 
 require_command() {
   command -v "$1" >/dev/null 2>&1 || fail "$1 is required."
+}
+
+ensure_tty() {
+  if ! ( : < "$TTY_PATH" ) 2>/dev/null || ! ( : > "$TTY_PATH" ) 2>/dev/null; then
+    fail "Interactive input requires a TTY. Run with a terminal attached or provide the required NETA_* environment variables."
+  fi
+}
+
+read_from_tty() {
+  local label="$1"
+  local value
+
+  ensure_tty
+
+  printf "%s" "$label" > "$TTY_PATH"
+  IFS= read -r value < "$TTY_PATH" || fail "Input cancelled."
+  printf "%s" "$value"
+}
+
+read_secret_from_tty() {
+  local label="$1"
+  local value
+
+  ensure_tty
+
+  printf "%s" "$label" > "$TTY_PATH"
+  IFS= read -r -s value < "$TTY_PATH" || fail "Input cancelled."
+  printf "\n" > "$TTY_PATH"
+  printf "%s" "$value"
 }
 
 compose_cmd() {
@@ -42,7 +73,7 @@ prompt_required() {
   fi
 
   while true; do
-    read -r -p "$label: " value
+    value="$(read_from_tty "$label: ")"
     if [ -n "$value" ]; then
       printf -v "$var_name" "%s" "$value"
       export "$var_name"
@@ -63,7 +94,7 @@ prompt_optional() {
     return
   fi
 
-  read -r -p "$label [$default_value]: " value
+  value="$(read_from_tty "$label [$default_value]: ")"
   printf -v "$var_name" "%s" "${value:-$default_value}"
   export "$var_name"
 }
@@ -79,8 +110,7 @@ prompt_secret_required() {
   fi
 
   while true; do
-    read -r -s -p "$label: " value
-    echo
+    value="$(read_secret_from_tty "$label: ")"
     if [ -n "$value" ]; then
       printf -v "$var_name" "%s" "$value"
       export "$var_name"
@@ -112,7 +142,7 @@ choose_install_mode() {
   echo "  2) app-only    Neta app connected to an existing Supabase project"
 
   while true; do
-    read -r -p "Install mode [full-stack]: " answer
+    answer="$(read_from_tty "Install mode [full-stack]: ")"
     case "${answer:-full-stack}" in
       1|full|full-stack|bundled)
         INSTALL_MODE="full-stack"
@@ -246,7 +276,12 @@ main() {
   info "Wrote .env"
 
   if [ "$INSTALL_MODE" = "app-only" ]; then
-    read -r -p "Apply Neta database migrations now? Requires a direct Postgres DATABASE_URL. [y/N]: " apply_migrations
+    local apply_migrations="$APPLY_MIGRATIONS"
+
+    if [ -z "$apply_migrations" ]; then
+      apply_migrations="$(read_from_tty "Apply Neta database migrations now? Requires a direct Postgres DATABASE_URL. [y/N]: ")"
+    fi
+
     if [ "$apply_migrations" = "y" ] || [ "$apply_migrations" = "Y" ]; then
       prompt_secret_required DATABASE_URL "Postgres DATABASE_URL"
       DATABASE_URL="$DATABASE_URL" sh ./scripts/apply-migrations.sh
