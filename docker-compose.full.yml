@@ -121,7 +121,9 @@ services:
       neta-storage:
         condition: service_started
     environment:
+      NETA_MIGRATION_RUNNER_VERSION: "2026-06-14.1"
       DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@neta-db:5432/postgres
+      NETA_POSTGREST_RELOAD_WAIT_SECONDS: ${NETA_POSTGREST_RELOAD_WAIT_SECONDS:-2}
     volumes:
       - ./supabase:/app/supabase:ro
       - ./scripts:/app/scripts:ro

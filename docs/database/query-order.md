@@ -37,4 +37,4 @@ Use the migration helper from the repository root:
 DATABASE_URL='postgresql://postgres:password@host:5432/postgres' sh ./scripts/apply-migrations.sh
 ```
 
-The helper applies `0001` through `0009` in the order listed above. It uses local `psql` when available, otherwise it runs `psql` through Docker.
+The helper applies missing queries from `0001` through `0009` in the order listed above and records completed migrations in `neta_internal.schema_migrations`. It uses local `psql` when available, otherwise it runs `psql` through Docker. After migrations, it sends `NOTIFY pgrst, 'reload schema'` so PostgREST can see new RPC functions without a manual restart.

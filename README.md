@@ -99,7 +99,7 @@ docker compose up -d --build
 
 Docker Compose intentionally fails fast when required Supabase environment values are missing.
 
-Coolify and Dokploy users should use `docker-compose.full.yml` for the no-external-service setup, or `docker-compose.yml` when connecting to an existing Supabase backend. See `docs/deployment/self-hosting.md` for the deployment checklist.
+Coolify users should use `docker-compose.full.yml` for the no-external-service setup. Dokploy users should use `docker-compose.dokploy.yml`, which avoids fixed container names and host port bindings. Use `docker-compose.yml` only when connecting to an existing Supabase backend. See `docs/deployment/self-hosting.md` for the deployment checklist.
 
 ### Operations
 

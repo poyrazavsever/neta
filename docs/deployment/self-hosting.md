@@ -20,7 +20,7 @@ Services:
 - `neta-rest`: PostgREST
 - `neta-storage`: Supabase Storage with local disk backend
 - `neta-supabase-proxy`: single public API entrypoint
-- `neta-migrations`: one-shot Neta database migration runner
+- `neta-migrations`: Neta database migration runner
 
 Generate production secrets:
 
@@ -92,7 +92,7 @@ Set the generated full-stack env values in Coolify's environment variables. Rout
 
 ## Dokploy
 
-Create a Compose app from this repository. Use `docker-compose.full.yml` for full-stack deployments and paste the generated env values into the environment panel.
+Create a Compose app from this repository. Use `docker-compose.dokploy.yml` for full-stack deployments and paste the generated env values into the environment panel. This compose file avoids fixed container names and host port bindings so Dokploy can route services itself.
 
 Route the Neta domain to `neta-web` port `3000`. Route the bundled Supabase API domain, if used, to `neta-supabase-proxy` port `8000`.
 
@@ -127,3 +127,5 @@ NETA_RESTORE_FORCE=1 sh ./scripts/selfhost-restore.sh ./backups/20260101T120000Z
 ## First Admin
 
 Open `/register` after the stack starts. The first registered user becomes the admin, and public registration is locked after that.
+
+Full-stack deployments apply the first-admin registration guard automatically through `neta-migrations`; the installer should not run SQL manually.
