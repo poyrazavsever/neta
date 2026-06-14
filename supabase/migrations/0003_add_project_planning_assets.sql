@@ -89,26 +89,38 @@ drop policy if exists "Users can view their own project assets." on storage.obje
 create policy "Users can view their own project assets." on storage.objects
   for select using (
     bucket_id = 'project-assets'
-    and auth.uid()::text = (storage.foldername(name))[1]
+    and (
+      public.neta_current_jwt_role() = 'service_role'
+      or auth.uid()::text = (storage.foldername(name))[1]
+    )
   );
 
 drop policy if exists "Users can upload their own project assets." on storage.objects;
 create policy "Users can upload their own project assets." on storage.objects
   for insert with check (
     bucket_id = 'project-assets'
-    and auth.uid()::text = (storage.foldername(name))[1]
+    and (
+      public.neta_current_jwt_role() = 'service_role'
+      or auth.uid()::text = (storage.foldername(name))[1]
+    )
   );
 
 drop policy if exists "Users can update their own project assets." on storage.objects;
 create policy "Users can update their own project assets." on storage.objects
   for update using (
     bucket_id = 'project-assets'
-    and auth.uid()::text = (storage.foldername(name))[1]
+    and (
+      public.neta_current_jwt_role() = 'service_role'
+      or auth.uid()::text = (storage.foldername(name))[1]
+    )
   );
 
 drop policy if exists "Users can delete their own project assets." on storage.objects;
 create policy "Users can delete their own project assets." on storage.objects
   for delete using (
     bucket_id = 'project-assets'
-    and auth.uid()::text = (storage.foldername(name))[1]
+    and (
+      public.neta_current_jwt_role() = 'service_role'
+      or auth.uid()::text = (storage.foldername(name))[1]
+    )
   );

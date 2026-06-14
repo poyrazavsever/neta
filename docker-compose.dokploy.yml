@@ -96,6 +96,9 @@ services:
       SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:?Set SUPABASE_SERVICE_ROLE_KEY in Dokploy env}
       POSTGREST_URL: http://neta-rest:3000
       PGRST_JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in Dokploy env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in Dokploy env}
+      AUTH_JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in Dokploy env}
+      SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:?Set SUPABASE_SERVICE_ROLE_KEY in Dokploy env}
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in Dokploy env}@neta-db:5432/postgres
       FILE_SIZE_LIMIT: ${STORAGE_FILE_SIZE_LIMIT:-52428800}
       STORAGE_BACKEND: file
@@ -115,7 +118,7 @@ services:
       neta-storage:
         condition: service_started
     environment:
-      NETA_MIGRATION_RUNNER_VERSION: "2026-06-14.2"
+      NETA_MIGRATION_RUNNER_VERSION: "2026-06-14.3"
       DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in Dokploy env}@neta-db:5432/postgres
       NETA_POSTGREST_RELOAD_WAIT_SECONDS: ${NETA_POSTGREST_RELOAD_WAIT_SECONDS:-2}
     volumes:

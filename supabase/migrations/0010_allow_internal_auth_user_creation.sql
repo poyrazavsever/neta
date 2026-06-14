@@ -17,6 +17,23 @@ create index if not exists internal_auth_creations_email_idx
 revoke all on schema neta_internal from public;
 revoke all on all tables in schema neta_internal from public;
 
+create or replace function public.neta_current_jwt_role()
+returns text
+language sql
+stable
+as $$
+  select coalesce(
+    nullif(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role', ''),
+    nullif(current_setting('request.jwt.claim.role', true), ''),
+    ''
+  );
+$$;
+
+revoke all on function public.neta_current_jwt_role() from public;
+grant execute on function public.neta_current_jwt_role() to anon;
+grant execute on function public.neta_current_jwt_role() to authenticated;
+grant execute on function public.neta_current_jwt_role() to service_role;
+
 create or replace function public.request_internal_auth_creation(
   target_email text,
   target_reason text default 'internal'
@@ -27,7 +44,7 @@ security definer
 set search_path = public, neta_internal
 as $$
 begin
-  if coalesce(current_setting('request.jwt.claim.role', true), '') <> 'service_role' then
+  if public.neta_current_jwt_role() <> 'service_role' then
     raise exception 'Only service role can request internal auth creation.';
   end if;
 

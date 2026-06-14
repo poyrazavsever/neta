@@ -37,7 +37,8 @@ Do not overwrite already executed SQL without also creating a new ordered migrat
 8. `migrations/0008_add_project_progress_and_quota.sql`
 9. `migrations/0009_lock_registration_after_first_admin.sql`
 10. `migrations/0010_allow_internal_auth_user_creation.sql`
-11. Optional local/demo data: `seeds/0001_demo_freelancer_os_data.sql`
+11. `migrations/0011_fix_service_role_claims_and_storage_policies.sql`
+12. Optional local/demo data: `seeds/0001_demo_freelancer_os_data.sql`
 
 ## Apply Migrations
 

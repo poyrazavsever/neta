@@ -193,6 +193,23 @@ revoke all on function public.is_first_admin_setup_available() from public;
 grant execute on function public.is_first_admin_setup_available() to anon;
 grant execute on function public.is_first_admin_setup_available() to authenticated;
 
+create or replace function public.neta_current_jwt_role()
+returns text
+language sql
+stable
+as $$
+  select coalesce(
+    nullif(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role', ''),
+    nullif(current_setting('request.jwt.claim.role', true), ''),
+    ''
+  );
+$$;
+
+revoke all on function public.neta_current_jwt_role() from public;
+grant execute on function public.neta_current_jwt_role() to anon;
+grant execute on function public.neta_current_jwt_role() to authenticated;
+grant execute on function public.neta_current_jwt_role() to service_role;
+
 create schema if not exists neta_internal;
 
 create table if not exists neta_internal.internal_auth_creations (
@@ -219,7 +236,7 @@ security definer
 set search_path = public, neta_internal
 as $$
 begin
-  if coalesce(current_setting('request.jwt.claim.role', true), '') <> 'service_role' then
+  if public.neta_current_jwt_role() <> 'service_role' then
     raise exception 'Only service role can request internal auth creation.';
   end if;
 
@@ -285,14 +302,20 @@ on conflict (id) do nothing;
 drop policy if exists "Avatar images are publicly accessible." on storage.objects;
 create policy "Avatar images are publicly accessible."
   on storage.objects for select
-  using (bucket_id = 'avatars');
+  using (
+    bucket_id = 'avatars'
+    or public.neta_current_jwt_role() = 'service_role'
+  );
 
 drop policy if exists "Users can upload an avatar." on storage.objects;
 create policy "Users can upload an avatar."
   on storage.objects for insert
   with check (
     bucket_id = 'avatars'
-    and auth.uid()::text = (storage.foldername(name))[1]
+    and (
+      public.neta_current_jwt_role() = 'service_role'
+      or auth.uid()::text = (storage.foldername(name))[1]
+    )
   );
 
 drop policy if exists "Users can update their own avatar." on storage.objects;
@@ -300,7 +323,10 @@ create policy "Users can update their own avatar."
   on storage.objects for update
   using (
     bucket_id = 'avatars'
-    and auth.uid()::text = (storage.foldername(name))[1]
+    and (
+      public.neta_current_jwt_role() = 'service_role'
+      or auth.uid()::text = (storage.foldername(name))[1]
+    )
   );
 
 drop policy if exists "Users can delete their own avatar." on storage.objects;
@@ -308,5 +334,8 @@ create policy "Users can delete their own avatar."
   on storage.objects for delete
   using (
     bucket_id = 'avatars'
-    and auth.uid()::text = (storage.foldername(name))[1]
+    and (
+      public.neta_current_jwt_role() = 'service_role'
+      or auth.uid()::text = (storage.foldername(name))[1]
+    )
   );
