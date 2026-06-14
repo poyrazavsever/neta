@@ -60,7 +60,7 @@ services:
       GOTRUE_JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in Dokploy env}
       GOTRUE_JWT_EXP: ${JWT_EXPIRY:-3600}
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
-      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_DISABLE_SIGNUP: "true"
       GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
       GOTRUE_MAILER_AUTOCONFIRM: "true"
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL:-admin@neta.local}
@@ -115,7 +115,7 @@ services:
       neta-storage:
         condition: service_started
     environment:
-      NETA_MIGRATION_RUNNER_VERSION: "2026-06-14.1"
+      NETA_MIGRATION_RUNNER_VERSION: "2026-06-14.2"
       DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in Dokploy env}@neta-db:5432/postgres
       NETA_POSTGREST_RELOAD_WAIT_SECONDS: ${NETA_POSTGREST_RELOAD_WAIT_SECONDS:-2}
     volumes:

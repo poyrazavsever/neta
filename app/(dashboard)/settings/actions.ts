@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 
+import { createServiceRoleClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
 type ProfileUpdateData = {
@@ -30,8 +31,9 @@ export async function updateProfile(formData: FormData) {
   if (avatarFile && avatarFile.size > 0) {
     const fileExt = avatarFile.name.split('.').pop()
     const fileName = `${user.id}/${Math.random()}.${fileExt}`
+    const admin = createServiceRoleClient()
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await admin.storage
       .from('avatars')
       .upload(fileName, avatarFile, { upsert: true })
 
@@ -43,7 +45,7 @@ export async function updateProfile(formData: FormData) {
 
     const {
       data: { publicUrl },
-    } = supabase.storage.from('avatars').getPublicUrl(fileName)
+    } = admin.storage.from('avatars').getPublicUrl(fileName)
 
     avatarUrl = publicUrl
   }

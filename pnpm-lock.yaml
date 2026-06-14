@@ -71,6 +71,9 @@ importers:
       '@supabase/ssr':
         specifier: ^0.10.3
         version: 0.10.3(@supabase/supabase-js@2.105.3)
+      '@supabase/supabase-js':
+        specifier: ^2.105.3
+        version: 2.105.3
       '@tailwindcss/postcss':
         specifier: ^4.3.0
         version: 4.3.0

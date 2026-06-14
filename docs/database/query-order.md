@@ -13,6 +13,7 @@ This file is the canonical order of SQL files for database setup and migration.
 | 0007 | `supabase/migrations/0007_add_client_portal_tables.sql` | `docs/database/0007-client-portal-tables.md` | Pending execution |
 | 0008 | `supabase/migrations/0008_add_project_progress_and_quota.sql` | `docs/database/0008-project-progress-and-quota.md` | Pending execution |
 | 0009 | `supabase/migrations/0009_lock_registration_after_first_admin.sql` | `docs/database/0009-lock-registration-after-first-admin.md` | Pending execution |
+| 0010 | `supabase/migrations/0010_allow_internal_auth_user_creation.sql` | `docs/database/0010-internal-auth-user-creation.md` | Pending execution |
 | seed-0001 | `supabase/seeds/0001_demo_freelancer_os_data.sql` | `docs/database/seed-0001-demo-freelancer-os-data.md` | Optional demo seed, pending execution |
 
 ## How To Add The Next Query
@@ -37,4 +38,4 @@ Use the migration helper from the repository root:
 DATABASE_URL='postgresql://postgres:password@host:5432/postgres' sh ./scripts/apply-migrations.sh
 ```
 
-The helper applies missing queries from `0001` through `0009` in the order listed above and records completed migrations in `neta_internal.schema_migrations`. It uses local `psql` when available, otherwise it runs `psql` through Docker. After migrations, it sends `NOTIFY pgrst, 'reload schema'` so PostgREST can see new RPC functions without a manual restart.
+The helper applies missing queries from `0001` through `0010` in the order listed above and records completed migrations in `neta_internal.schema_migrations`. It uses local `psql` when available, otherwise it runs `psql` through Docker. After migrations, it sends `NOTIFY pgrst, 'reload schema'` so PostgREST can see new RPC functions without a manual restart.

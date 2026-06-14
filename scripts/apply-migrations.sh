@@ -93,6 +93,9 @@ existing_objects_cover_migration() {
     0009_first_admin_registration_lock)
       echo "no"
       ;;
+    0010_internal_auth_creation)
+      echo "no"
+      ;;
     *)
       echo "no"
       ;;
@@ -161,6 +164,7 @@ done <<'SQL_FILES'
 0007_client_portal|supabase/migrations/0007_add_client_portal_tables.sql
 0008_project_progress_quota|supabase/migrations/0008_add_project_progress_and_quota.sql
 0009_first_admin_registration_lock|supabase/migrations/0009_lock_registration_after_first_admin.sql
+0010_internal_auth_creation|supabase/migrations/0010_allow_internal_auth_user_creation.sql
 SQL_FILES
 
 reload_postgrest_schema_cache

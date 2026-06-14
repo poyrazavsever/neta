@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/admin";
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 
@@ -114,12 +115,10 @@ function sanitizeFileName(name: string) {
 }
 
 async function uploadCoverImage({
-  supabase,
   userId,
   projectId,
   formData,
 }: {
-  supabase: Awaited<ReturnType<typeof createClient>>;
   userId: string;
   projectId: string;
   formData: FormData;
@@ -132,7 +131,8 @@ async function uploadCoverImage({
 
   const fileName = `${Date.now()}-${sanitizeFileName(file.name) || "cover-image"}`;
   const path = `${userId}/projects/${projectId}/${fileName}`;
-  const { error } = await supabase.storage
+  const admin = createServiceRoleClient();
+  const { error } = await admin.storage
     .from(PROJECT_ASSETS_BUCKET)
     .upload(path, file, {
       cacheControl: "3600",
@@ -157,7 +157,6 @@ export async function createProjectRecord(formData: FormData) {
   }
 
   const coverImagePath = await uploadCoverImage({
-    supabase,
     userId,
     projectId,
     formData,
@@ -187,7 +186,6 @@ export async function updateProjectRecord(formData: FormData) {
   }
 
   const coverImagePath = await uploadCoverImage({
-    supabase,
     userId,
     projectId: id,
     formData,

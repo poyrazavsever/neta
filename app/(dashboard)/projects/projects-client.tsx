@@ -19,6 +19,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  toast,
 } from "poyraz-ui/molecules";
 import {
   CalendarDays,
@@ -398,6 +399,13 @@ function ProjectDialog({
     try {
       await action(formData);
       setOpen(false);
+      toast.success(mode === "create" ? "Proje eklendi." : "Proje güncellendi.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Proje kaydedilirken beklenmeyen bir hata oluştu.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -505,14 +513,6 @@ function CoverImageInput({ project }: { project?: ProjectListItem }) {
             </div>
           </div>
         )}
-
-        <div>
-
-            <div>
-              < ImageIcon className="h-6 w-6" />
-
-            </div>
-          </div>
 
         {previewUrl ? (
           <div className="absolute inset-x-0 bottom-0 bg-background/90 px-3 py-2 text-xs text-muted-foreground backdrop-blur">
@@ -788,8 +788,11 @@ function AIProjectRiskDialog({ projectId }: { projectId?: string }) {
         throw new Error(data.error || "Bilinmeyen bir hata oluştu.");
       }
       setResult(data.text);
-    } catch (err: any) {
-      setResult("Hata: " + err.message);
+    } catch (err) {
+      setResult(
+        "Hata: " +
+          (err instanceof Error ? err.message : "Bilinmeyen bir hata oluştu."),
+      );
     } finally {
       setLoading(false);
     }

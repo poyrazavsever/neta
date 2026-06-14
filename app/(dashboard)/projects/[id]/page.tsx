@@ -5,6 +5,7 @@ import {
   type ProjectFinanceItem,
   type ProjectPlanningSectionItem,
 } from "@/app/(dashboard)/projects/[id]/project-detail-client";
+import { createServiceRoleClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
@@ -105,7 +106,7 @@ export default async function ProjectDetailPage({
 
   const projectData = projectRow as unknown as ProjectRow;
   const coverImageUrl = projectData.cover_image_path
-    ? await createProjectImageUrl(supabase, projectData.cover_image_path)
+    ? await createProjectImageUrl(projectData.cover_image_path)
     : null;
 
   const project: ProjectDetail = {
@@ -165,11 +166,9 @@ export default async function ProjectDetailPage({
   );
 }
 
-async function createProjectImageUrl(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  path: string,
-) {
-  const { data } = await supabase.storage
+async function createProjectImageUrl(path: string) {
+  const admin = createServiceRoleClient();
+  const { data } = await admin.storage
     .from("project-assets")
     .createSignedUrl(path, 60 * 15);
 

@@ -4,6 +4,7 @@ import {
   type ProjectListItem,
 } from "@/app/(dashboard)/projects/projects-client";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/admin";
 
 type ProjectRow = {
   id: string;
@@ -59,7 +60,6 @@ export default async function ProjectsPage() {
   const taskStats = countTasksByProject((taskRows || []) as TaskRow[]);
   const clients = (clientRows || []) as ProjectClientOption[];
   const signedUrls = await createProjectImageUrls(
-    supabase,
     ((projectRows || []) as unknown as ProjectRow[])
       .map((project) => project.cover_image_path)
       .filter(Boolean) as string[],
@@ -93,15 +93,15 @@ export default async function ProjectsPage() {
 }
 
 async function createProjectImageUrls(
-  supabase: Awaited<ReturnType<typeof createClient>>,
   paths: string[],
 ) {
+  const admin = createServiceRoleClient();
   const urls = new Map<string, string>();
   const uniquePaths = Array.from(new Set(paths));
 
   await Promise.all(
     uniquePaths.map(async (path) => {
-      const { data } = await supabase.storage
+      const { data } = await admin.storage
         .from("project-assets")
         .createSignedUrl(path, 60 * 15);
 
