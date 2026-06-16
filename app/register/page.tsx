@@ -22,7 +22,7 @@ export default async function RegisterPage({
   if (!setupState.available) {
     redirect(
       `/login?error=true&message=${encodeURIComponent(
-        "Kayıt kapalı. Bu self-host kurulumunda ilk admin hesabı zaten oluşturulmuş.",
+        "Kayıt kapalı. Bu Neta kurulumunda ilk admin hesabı zaten oluşturulmuş.",
       )}`,
     );
   }
@@ -36,7 +36,7 @@ export default async function RegisterPage({
       {error && message && <ErrorToaster message={String(message)} />}
       <AuthPageShell
         title="İlk admin hesabını oluştur"
-        description="Bu self-host kurulumu için Neta çalışma alanının ilk yönetici hesabını oluştur."
+        description="Bu Neta çalışma alanının ilk yönetici hesabını oluştur."
         form={
           <form className="space-y-6">
             <div className="space-y-4">

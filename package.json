@@ -1,16 +1,12 @@
 {
-  "name": "mood-tracker-mvp",
+  "name": "neta",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "selfhost:env": "node scripts/generate-full-stack-env.mjs",
-    "selfhost:doctor": "sh scripts/selfhost-doctor.sh",
-    "selfhost:backup": "sh scripts/selfhost-backup.sh",
-    "selfhost:restore": "sh scripts/selfhost-restore.sh"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",

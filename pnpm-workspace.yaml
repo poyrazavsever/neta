@@ -1,7 +1,0 @@
-nodeLinker: hoisted
-allowBuilds:
-  msw: false
-  sharp: false
-  unrs-resolver: false
-minimumReleaseAgeExclude:
-  - poyraz-ui@2.1.0

@@ -34,7 +34,7 @@ export async function signup(formData: FormData) {
   if (!setupState.available) {
     redirect(
       `/login?error=true&message=${encodeURIComponent(
-        'Kayıt kapalı. Bu self-host kurulumunda ilk admin hesabı zaten oluşturulmuş.',
+        'Kayıt kapalı. Bu Neta kurulumunda ilk admin hesabı zaten oluşturulmuş.',
       )}`,
     )
   }

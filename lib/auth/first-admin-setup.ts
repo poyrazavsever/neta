@@ -5,6 +5,22 @@ type FirstAdminSetupState = {
   errorMessage?: string;
 };
 
+type FirstAdminSetupOptions = {
+  timeoutMs?: number;
+};
+
+const DEFAULT_SETUP_TIMEOUT_MS = 5_000;
+
+function createTimeoutSignal(timeoutMs: number) {
+  if (typeof AbortSignal !== "undefined" && "timeout" in AbortSignal) {
+    return AbortSignal.timeout(timeoutMs);
+  }
+
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), timeoutMs).unref?.();
+  return controller.signal;
+}
+
 function isMissingSetupFunctionError(error: {
   code?: string;
   message?: string;
@@ -15,9 +31,10 @@ function isMissingSetupFunctionError(error: {
   );
 }
 
-async function getSetupStateFromProfiles(): Promise<FirstAdminSetupState | null> {
-  const supabaseUrl =
-    process.env.SUPABASE_INTERNAL_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+async function getSetupStateFromProfiles(
+  timeoutMs: number,
+): Promise<FirstAdminSetupState | null> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !serviceRoleKey) {
@@ -31,6 +48,7 @@ async function getSetupStateFromProfiles(): Promise<FirstAdminSetupState | null>
   try {
     const response = await fetch(endpoint, {
       cache: "no-store",
+      signal: createTimeoutSignal(timeoutMs),
       headers: {
         apikey: serviceRoleKey,
         authorization: `Bearer ${serviceRoleKey}`,
@@ -53,9 +71,14 @@ async function getSetupStateFromProfiles(): Promise<FirstAdminSetupState | null>
   }
 }
 
-export async function getFirstAdminSetupState(): Promise<FirstAdminSetupState> {
+export async function getFirstAdminSetupState(
+  options: FirstAdminSetupOptions = {},
+): Promise<FirstAdminSetupState> {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_SETUP_TIMEOUT_MS;
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("is_first_admin_setup_available");
+  const { data, error } = await supabase
+    .rpc("is_first_admin_setup_available")
+    .abortSignal(createTimeoutSignal(timeoutMs));
 
   if (error) {
     console.error("First admin setup check failed", {
@@ -65,7 +88,7 @@ export async function getFirstAdminSetupState(): Promise<FirstAdminSetupState> {
       hint: error.hint,
     });
 
-    const fallbackState = await getSetupStateFromProfiles();
+    const fallbackState = await getSetupStateFromProfiles(timeoutMs);
 
     if (fallbackState) {
       if (isMissingSetupFunctionError(error)) {
