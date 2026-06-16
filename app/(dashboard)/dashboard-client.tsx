@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Badge, Button, Card, CardContent } from "poyraz-ui/atoms";
+import { Badge, Card, CardContent } from "poyraz-ui/atoms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "poyraz-ui/molecules";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Line, LineChart } from "recharts";
-import { CheckCircle2, Wallet, FolderKanban, Activity, CalendarDays, Plus, Users } from "lucide-react";
-import { QuickActionsSheet } from "@/components/dashboard/quick-actions-sheet";
+import { CheckCircle2, Wallet, FolderKanban, Activity, CalendarDays, Users } from "lucide-react";
 
 export type DashboardData = {
   tasks: { id: string; status: string; created_at: string; updated_at?: string; due_at?: string }[];
@@ -22,7 +21,6 @@ type DashboardClientProps = {
 
 export function DashboardClient({ data }: DashboardClientProps) {
   const [dateRange, setDateRange] = useState("this_month");
-  const [isQuickActionOpen, setIsQuickActionOpen] = useState(false);
 
   // Calculate real metrics from the `data` prop depending on `dateRange`
   const now = new Date();
