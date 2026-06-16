@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Badge, Card, CardContent } from "poyraz-ui/atoms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "poyraz-ui/molecules";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Line, LineChart } from "recharts";
-import { CheckCircle2, Wallet, FolderKanban, Activity, CalendarDays, Users } from "lucide-react";
+import { CheckCircle2, Wallet, FolderKanban, Activity, Users } from "lucide-react";
 
 export type DashboardData = {
   tasks: { id: string; status: string; created_at: string; updated_at?: string; due_at?: string }[];
