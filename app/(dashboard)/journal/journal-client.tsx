@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  toast,
 } from "poyraz-ui/molecules";
 import {
   Activity,
@@ -259,6 +260,13 @@ function DailyLogDialog({ mode, log }: { mode: "create" | "edit"; log?: DailyLog
     try {
       await action(formData);
       setOpen(false);
+      toast.success(mode === "create" ? "Günlük eklendi." : "Günlük güncellendi.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Günlük kaydedilirken beklenmeyen bir hata oluştu.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -272,22 +280,22 @@ function DailyLogDialog({ mode, log }: { mode: "create" | "edit"; log?: DailyLog
           {mode === "create" ? "Günlük ekle" : "Düzenle"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[min(640px,calc(100dvh-6rem))] overflow-hidden sm:max-w-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
-        <form action={handleSubmit} className="flex max-h-[min(600px,calc(100dvh-9rem))] flex-col">
+      <DialogContent className="flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] flex-col overflow-hidden p-0 sm:max-h-[min(680px,calc(100dvh-4rem))] sm:max-w-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
+        <form action={handleSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {log ? <input type="hidden" name="id" value={log.id} /> : null}
-          <DialogHeader className="shrink-0 pb-5">
+          <DialogHeader className="shrink-0 px-5 pb-4 pt-5 pr-12">
             <DialogTitle>{mode === "create" ? "Yeni günlük kayıt" : "Günlük kaydı düzenle"}</DialogTitle>
             <DialogDescription>
               Günün mood, enerji ve çalışma memnuniyeti skorlarını kaydet.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto pr-2">
+          <div className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto px-5 pb-5">
             <DailyLogFormFields log={log} />
           </div>
 
-          <DialogFooter className="shrink-0 border-t border-border pt-5">
-            <Button type="submit" disabled={isSubmitting} className="gap-2">
+          <DialogFooter className="shrink-0 border-t border-border bg-background p-5">
+            <Button type="submit" disabled={isSubmitting} className="w-full gap-2 sm:w-auto">
               {isSubmitting ? "Kaydediliyor" : mode === "create" ? "Kaydı ekle" : "Değişiklikleri kaydet"}
             </Button>
           </DialogFooter>

@@ -58,8 +58,8 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
   const projectIncomeData = Array.from(projectIncomeMap.values());
 
   // Task completion stats
-  const completedTasks = filteredTasks.filter(t => t.status === "completed").length;
-  const activeTasks = filteredTasks.filter(t => t.status !== "completed" && t.status !== "cancelled").length;
+  const completedTasks = filteredTasks.filter(t => t.status === "done").length;
+  const activeTasks = filteredTasks.filter(t => t.status !== "done" && t.status !== "cancelled").length;
   
   const taskStatusData = [
     { name: "Tamamlanan", value: completedTasks },

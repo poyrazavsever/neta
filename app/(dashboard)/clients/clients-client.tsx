@@ -25,6 +25,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  toast,
 } from "poyraz-ui/molecules";
 import {
   Archive,
@@ -133,8 +134,14 @@ export function ClientsClient({
 
     try {
       await updateClientPipelineStage(clientId, newStage as any);
+      toast.success("Müşteri aşaması güncellendi.");
     } catch (error) {
       setLocalClients(clients);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Müşteri aşaması güncellenemedi.",
+      );
     }
   }
 
@@ -440,6 +447,13 @@ function ClientDialog({
     try {
       await action(formData);
       setOpen(false);
+      toast.success(mode === "create" ? "Müşteri eklendi." : "Müşteri güncellendi.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Müşteri kaydedilirken beklenmeyen bir hata oluştu.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -458,10 +472,10 @@ function ClientDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
-        <form action={handleSubmit} className="space-y-5">
+      <DialogContent className="flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] flex-col overflow-hidden p-0 sm:max-h-[min(680px,calc(100dvh-4rem))] sm:max-w-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
+        <form action={handleSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {client ? <input type="hidden" name="id" value={client.id} /> : null}
-          <DialogHeader>
+          <DialogHeader className="shrink-0 px-5 pb-4 pt-5 pr-12">
             <DialogTitle>
               {mode === "create" ? "Yeni müşteri" : "Müşteriyi düzenle"}
             </DialogTitle>
@@ -470,10 +484,12 @@ function ClientDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <ClientFormFields client={client} />
+          <div className="tiny-scrollbar min-h-0 flex-1 overflow-y-auto px-5 pb-5">
+            <ClientFormFields client={client} />
+          </div>
 
-          <DialogFooter>
-            <Button type="submit" disabled={isSubmitting} className="gap-2">
+          <DialogFooter className="shrink-0 border-t border-border bg-background p-5">
+            <Button type="submit" disabled={isSubmitting} className="w-full gap-2 sm:w-auto">
               {mode === "create" ? <Plus className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
               {isSubmitting
                 ? "Kaydediliyor"

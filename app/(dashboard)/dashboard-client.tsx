@@ -50,7 +50,7 @@ export function DashboardClient({ data }: DashboardClientProps) {
 
   const activeProjectsCount = (data.projects || []).filter(p => p.status === "active").length;
   
-  const completedTasksCount = (data.tasks || []).filter(t => t.status === "completed" && filterByDate(t.updated_at || t.created_at)).length;
+  const completedTasksCount = (data.tasks || []).filter(t => t.status === "done" && filterByDate(t.updated_at || t.created_at)).length;
 
   const filteredLogs = (data.logs || []).filter(l => filterByDate(l.log_date));
   const avgMood = filteredLogs.length > 0 

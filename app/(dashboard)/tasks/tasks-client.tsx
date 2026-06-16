@@ -551,6 +551,13 @@ function TaskDialog({
     try {
       await action(formData);
       setOpen(false);
+      toast.success(mode === "create" ? "Görev eklendi." : "Görev güncellendi.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Görev kaydedilirken beklenmeyen bir hata oluştu.",
+      );
     } finally {
       setIsSubmitting(false);
     }
