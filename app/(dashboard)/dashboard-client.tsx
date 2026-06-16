@@ -118,11 +118,6 @@ export function DashboardClient({ data }: DashboardClientProps) {
             </SelectContent>
           </Select>
 
-          <Button onClick={() => setIsQuickActionOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Hızlı Ekle
-          </Button>
-          <QuickActionsSheet isOpen={isQuickActionOpen} onClose={() => setIsQuickActionOpen(false)} />
         </div>
       </div>
 
