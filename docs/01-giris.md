@@ -70,3 +70,20 @@ Kurulumdan sonra akış şu şekilde ilerler:
 6. İstenirse müşterilere portal hesabı oluşturulur.
 
 Bu dokümantasyonun amacı sadece nasıl kurulur demek değil. Aynı zamanda projeyi neden böyle kurguladığımı, hangi parçanın ne işe yaradığını ve özelleştirmek isteyen birinin nereden başlaması gerektiğini netleştirmek.
+
+## Canlı Demo
+
+Neta'yı kurmadan önce incelemek isterseniz demo ortamını açabilirsiniz:
+
+```txt
+https://demo.takeneta.com
+```
+
+Demo hesabı:
+
+```txt
+E-posta: test@takeneta.com
+Şifre: 123456
+```
+
+Bu demo ortamı projeyi hızlıca tanımak için var. Dashboard'u, müşteri ve proje ekranlarını, görevleri, finans alanını, AI asistan ekranını ve client portal akışını kurulum yapmadan gezebilirsiniz.

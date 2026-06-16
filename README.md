@@ -6,6 +6,21 @@ Neta is a freelancer operating system built with Next.js and Supabase. It manage
 
 This repository now ships only the web application. It does not bundle Supabase, PostgreSQL, Docker Compose, installers, migration runners, or backup scripts. Bring your own Supabase project and provide the required environment variables in the deploy platform.
 
+## Live Demo
+
+You can try the demo here:
+
+```txt
+https://demo.takeneta.com
+```
+
+Demo account:
+
+```txt
+Email: test@takeneta.com
+Password: 123456
+```
+
 ## Stack
 
 - Next.js App Router
