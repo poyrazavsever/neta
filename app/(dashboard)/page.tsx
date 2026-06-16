@@ -22,39 +22,39 @@ export default async function DashboardPage() {
   const todayStr = today.toISOString();
   const thirtyDaysAgoStr = thirtyDaysAgo.toISOString();
 
-  // 1. Fetch tasks
-  const { data: tasks } = await supabase
-    .from("tasks")
-    .select("*")
-    .or(`due_at.gte.${thirtyDaysAgoStr},created_at.gte.${thirtyDaysAgoStr}`)
-    .order("due_at", { ascending: true });
-
-  // 2. Fetch projects
-  const { data: projects } = await supabase
-    .from("projects")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  // 3. Fetch finances
-  const { data: finances } = await supabase
-    .from("finance_transactions")
-    .select("*")
-    .gte("transaction_date", thirtyDaysAgoStr)
-    .order("transaction_date", { ascending: true });
-
-  // 4. Fetch daily logs
-  const { data: logs } = await supabase
-    .from("daily_logs")
-    .select("*")
-    .gte("log_date", thirtyDaysAgoStr)
-    .order("log_date", { ascending: true });
-
-  // 5. Fetch recent clients
-  const { data: clients } = await supabase
-    .from("clients")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(5);
+  // Fetch all dashboard data in parallel with only needed columns
+  const [
+    { data: tasks },
+    { data: projects },
+    { data: finances },
+    { data: logs },
+    { data: clients },
+  ] = await Promise.all([
+    supabase
+      .from("tasks")
+      .select("id, status, created_at, updated_at, due_at")
+      .or(`due_at.gte.${thirtyDaysAgoStr},created_at.gte.${thirtyDaysAgoStr}`)
+      .order("due_at", { ascending: true }),
+    supabase
+      .from("projects")
+      .select("id, status, name, created_at")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("finance_transactions")
+      .select("id, type, amount, transaction_date")
+      .gte("transaction_date", thirtyDaysAgoStr)
+      .order("transaction_date", { ascending: true }),
+    supabase
+      .from("daily_logs")
+      .select("id, log_date, mood_score, energy_score")
+      .gte("log_date", thirtyDaysAgoStr)
+      .order("log_date", { ascending: true }),
+    supabase
+      .from("clients")
+      .select("id, name, company_name, created_at")
+      .order("created_at", { ascending: false })
+      .limit(5),
+  ]);
 
   const dashboardData = {
     tasks: tasks || [],

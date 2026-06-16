@@ -14,20 +14,19 @@ export default async function AnalyticsPage() {
     redirect("/login");
   }
 
-  // 1. Fetch tasks
-  const { data: tasks } = await supabase
-    .from("tasks")
-    .select("*");
-
-  // 2. Fetch projects
-  const { data: projects } = await supabase
-    .from("projects")
-    .select("*");
-
-  // 3. Fetch finances
-  const { data: finances } = await supabase
-    .from("finance_transactions")
-    .select("*");
+  // Fetch all analytics data in parallel with only needed columns
+  const [{ data: tasks }, { data: projects }, { data: finances }] =
+    await Promise.all([
+      supabase
+        .from("tasks")
+        .select("id, status, created_at, due_at"),
+      supabase
+        .from("projects")
+        .select("id, name"),
+      supabase
+        .from("finance_transactions")
+        .select("id, type, amount, transaction_date, project_id"),
+    ]);
 
   const analyticsData = {
     tasks: tasks || [],
