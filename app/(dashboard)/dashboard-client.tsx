@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { PendingLink } from "@/components/ui/pending-link";
 import { Badge, Card, CardContent } from "poyraz-ui/atoms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "poyraz-ui/molecules";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Line, LineChart } from "recharts";
@@ -269,7 +269,7 @@ export function DashboardClient({ data }: DashboardClientProps) {
             </div>
             <div className="space-y-4">
               {(data.projects || []).slice(0, 5).map((project) => (
-                <Link key={project.id} href={`/projects/${project.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 -mx-2 rounded-md transition-colors">
+                <PendingLink key={project.id} href={`/projects/${project.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 -mx-2 rounded-md transition-colors" showSpinner>
                   <div className={`h-2 w-2 rounded-full ${project.status === 'completed' ? 'bg-emerald-500' : project.status === 'active' ? 'bg-blue-500' : 'bg-amber-500'}`} />
                   <div className="flex-1 flex justify-between items-center">
                     <div>
@@ -282,7 +282,7 @@ export function DashboardClient({ data }: DashboardClientProps) {
                       {project.status === 'completed' ? 'Tamamlandı' : project.status === 'active' ? 'Aktif' : 'Beklemede'}
                     </Badge>
                   </div>
-                </Link>
+                </PendingLink>
               ))}
               {data.projects.length === 0 && (
                 <div className="text-sm text-muted-foreground py-4 text-center border border-dashed rounded-sm border-border bg-muted/20">Henüz proje yok.</div>
@@ -300,7 +300,7 @@ export function DashboardClient({ data }: DashboardClientProps) {
             </div>
             <div className="space-y-4">
               {(data.clients || []).length > 0 ? (data.clients || []).map((client) => (
-                <Link key={client.id} href={`/clients/${client.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 -mx-2 rounded-md transition-colors">
+                <PendingLink key={client.id} href={`/clients/${client.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 -mx-2 rounded-md transition-colors" showSpinner>
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-xs">
                     {client.name.charAt(0).toUpperCase()}
                   </div>
@@ -311,7 +311,7 @@ export function DashboardClient({ data }: DashboardClientProps) {
                   <div className="text-xs text-muted-foreground">
                     {new Date(client.created_at).toLocaleDateString("tr-TR", { month: "short", day: "numeric" })}
                   </div>
-                </Link>
+                </PendingLink>
               )) : (
                 <div className="text-sm text-muted-foreground py-4 text-center border border-dashed rounded-sm border-border bg-muted/20">Henüz müşteri yok.</div>
               )}

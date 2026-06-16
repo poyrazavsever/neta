@@ -6,6 +6,7 @@ import {
   updateClientRecord,
   updateClientPipelineStage,
 } from "@/app/(dashboard)/clients/actions";
+import { PendingLink } from "@/components/ui/pending-link";
 import { Badge, Button, Card, CardContent, Input, Label, Textarea } from "poyraz-ui/atoms";
 import {
   Dialog,
@@ -325,9 +326,9 @@ function DraggableClientCard({
       <Card className="hover:border-primary/50 transition-colors">
         <CardContent className="p-3">
           <div className="flex justify-between items-start mb-2">
-            <Link href={`/clients/${client.id}`} className="font-medium text-foreground hover:underline" onPointerDown={(e) => e.stopPropagation()}>
+            <PendingLink href={`/clients/${client.id}`} className="font-medium text-foreground hover:underline inline-flex items-center gap-1.5" onPointerDown={(e) => e.stopPropagation()} showSpinner>
               {client.name}
-            </Link>
+            </PendingLink>
             <div onPointerDown={(e) => e.stopPropagation()}>
               <ClientDialog mode="edit" client={client} trigger={<Button variant="ghost" className="h-6 w-6 p-0"><Pencil className="h-3 w-3" /></Button>} />
             </div>
@@ -360,7 +361,7 @@ function ClientRow({ client }: { client: ClientListItem }) {
             {getInitials(client.name)}
           </div>
           <div className="min-w-0">
-            <Link href={`/clients/${client.id}`} className="truncate font-medium text-foreground hover:underline block">{client.name}</Link>
+            <PendingLink href={`/clients/${client.id}`} className="truncate font-medium text-foreground hover:underline flex items-center gap-1.5" showSpinner>{client.name}</PendingLink>
             <div className="truncate text-sm text-muted-foreground">
               {client.company_name || "Firma bilgisi yok"}
             </div>
@@ -409,11 +410,11 @@ function ClientRow({ client }: { client: ClientListItem }) {
       </div>
 
       <div className="flex justify-end gap-2">
-        <Link href={`/clients/${client.id}`}>
+        <PendingLink href={`/clients/${client.id}`} className="inline-flex" showSpinner>
           <Button variant="ghost" className="h-9 w-9 p-0">
             <ArrowRight className="h-4 w-4" />
           </Button>
-        </Link>
+        </PendingLink>
         <ClientDialog mode="edit" client={client} trigger={<Button variant="outline" className="h-9 min-w-20 gap-2 px-3"><Pencil className="h-4 w-4" /> Düzenle</Button>} />
       </div>
     </div>

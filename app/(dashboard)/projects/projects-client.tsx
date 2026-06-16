@@ -5,6 +5,8 @@ import {
   createProjectRecord,
   updateProjectRecord,
 } from "@/app/(dashboard)/projects/actions";
+import { PendingLink } from "@/components/ui/pending-link";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { Badge, Button, Card, CardContent, Input, Label, Textarea } from "poyraz-ui/atoms";
 import {
   Dialog,
@@ -36,8 +38,7 @@ import {
   Brain,
   Loader2,
 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ChangeEvent } from "react";
 
 export type ProjectClientOption = {
@@ -222,9 +223,21 @@ function ProjectCard({
   clients: ProjectClientOption[];
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const [isNavigating, setIsNavigating] = useState(false);
+  const detailHref = `/projects/${project.id}`;
+
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname]);
 
   function goToProjectDetail() {
-    router.push(`/projects/${project.id}`);
+    setIsNavigating(true);
+    router.push(detailHref);
+  }
+
+  function prefetchProjectDetail() {
+    router.prefetch(detailHref);
   }
 
   return (
@@ -232,8 +245,15 @@ function ProjectCard({
       role="link"
       tabIndex={0}
       aria-label={`${project.name} detayına git`}
-      className="cursor-pointer transition-colors hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      aria-busy={isNavigating}
+      className={
+        isNavigating
+          ? "relative cursor-progress opacity-80 transition-colors ring-2 ring-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          : "relative cursor-pointer transition-colors hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      }
       onClick={goToProjectDetail}
+      onMouseEnter={prefetchProjectDetail}
+      onFocus={prefetchProjectDetail}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
@@ -242,6 +262,11 @@ function ProjectCard({
       }}
     >
       <CardContent className="flex h-full flex-col gap-5 p-5">
+        {isNavigating ? (
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-sm bg-background/70 backdrop-blur-[1px]">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          </div>
+        ) : null}
         <ProjectCover project={project} />
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -353,24 +378,23 @@ function ProjectActions({
           title="Detaya git"
           aria-label="Detaya git"
         >
-          <Link href={`/projects/${project.id}`}>
+          <PendingLink href={`/projects/${project.id}`} className="flex h-full w-full items-center justify-center" showSpinner>
             <Eye className="h-4 w-4" />
-          </Link>
+          </PendingLink>
         </Button>
       ) : null}
       <ProjectDialog mode="edit" project={project} clients={clients} iconOnly />
       {project.status !== "completed" ? (
         <form action={completeProjectRecord}>
           <input type="hidden" name="id" value={project.id} />
-          <Button
-            type="submit"
+          <PendingSubmitButton
             variant="outline"
             className="h-9 w-9 p-0"
             title="Tamamla"
             aria-label="Tamamla"
+            idleIcon={<CheckCircle2 className="h-4 w-4" />}
           >
-            <CheckCircle2 className="h-4 w-4" />
-          </Button>
+          </PendingSubmitButton>
         </form>
       ) : null}
     </div>

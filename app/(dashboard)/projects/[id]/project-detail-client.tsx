@@ -7,10 +7,11 @@ import {
   updateProjectPlanningSectionRecord,
 } from "@/app/(dashboard)/projects/actions";
 import {
-  completeTaskRecord,
   createTaskRecord,
   updateTaskStatusRecord,
 } from "@/app/(dashboard)/tasks/actions";
+import { PendingLink } from "@/components/ui/pending-link";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { Badge, Button, Card, CardContent, Input, Label, Textarea } from "poyraz-ui/atoms";
 import {
   Dialog,
@@ -25,6 +26,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  toast,
 } from "poyraz-ui/molecules";
 import {
   ArrowLeft,
@@ -35,6 +37,7 @@ import {
   FolderKanban,
   KanbanSquare,
   LayoutList,
+  Loader2,
   Palette,
   Pencil,
   Plus,
@@ -43,8 +46,7 @@ import {
   Trash2,
   Wallet,
 } from "lucide-react";
-import Link from "next/link";
-import { useState, useTransition, type DragEvent } from "react";
+import { useEffect, useState, useTransition, type DragEvent } from "react";
 
 export type ProjectDetail = {
   id: string;
@@ -197,10 +199,10 @@ export function ProjectDetailClient({
       <div className="flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-3">
           <Button asChild variant="ghost" className="h-8 gap-2 px-0 text-muted-foreground">
-            <Link href="/projects">
+            <PendingLink href="/projects" className="flex items-center gap-2" showSpinner>
               <ArrowLeft className="h-4 w-4" />
               Projelere dön
-            </Link>
+            </PendingLink>
           </Button>
           <div>
             <div className="flex flex-wrap items-center gap-2">
@@ -223,10 +225,14 @@ export function ProjectDetailClient({
           {project.status !== "completed" ? (
             <form action={completeProjectRecord}>
               <input type="hidden" name="id" value={project.id} />
-              <Button type="submit" variant="outline" className="gap-2">
-                <CheckCircle2 className="h-4 w-4" />
+              <PendingSubmitButton
+                variant="outline"
+                className="gap-2"
+                idleIcon={<CheckCircle2 className="h-4 w-4" />}
+                pendingChildren="Tamamlanıyor"
+              >
                 Tamamla
-              </Button>
+              </PendingSubmitButton>
             </form>
           ) : null}
         </div>
@@ -450,9 +456,12 @@ function PlanningSectionCard({ section }: { section: ProjectPlanningSectionItem 
             <form action={deleteProjectPlanningSectionRecord}>
               <input type="hidden" name="id" value={section.id} />
               <input type="hidden" name="project_id" value={section.project_id} />
-              <Button type="submit" variant="outline" className="h-9 px-3 text-rose-600">
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <PendingSubmitButton
+                variant="outline"
+                className="h-9 px-3 text-rose-600"
+                idleIcon={<Trash2 className="h-4 w-4" />}
+                aria-label="Sil"
+              />
             </form>
           </div>
         </div>
@@ -586,19 +595,48 @@ function TaskPanel({
 }) {
   const [view, setView] = useState<"list" | "kanban">("list");
   const [localTasks, setLocalTasks] = useState(tasks);
+  const [pendingTaskIds, setPendingTaskIds] = useState<Set<string>>(new Set());
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
 
   function handleTaskStatusChange(taskId: string, status: ProjectDetailTaskItem["status"]) {
     const previousTasks = localTasks;
 
+    setPendingTask(taskId, true);
     setLocalTasks((currentTasks) =>
       currentTasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
     );
 
     startTransition(() => {
-      void updateTaskStatusRecord(taskId, status, projectId).catch(() => {
-        setLocalTasks(previousTasks);
-      });
+      void updateTaskStatusRecord(taskId, status, projectId)
+        .catch((error) => {
+          setLocalTasks(previousTasks);
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "Görev durumu güncellenemedi.",
+          );
+        })
+        .finally(() => {
+          setPendingTask(taskId, false);
+        });
+    });
+  }
+
+  function setPendingTask(taskId: string, pending: boolean) {
+    setPendingTaskIds((current) => {
+      const next = new Set(current);
+
+      if (pending) {
+        next.add(taskId);
+      } else {
+        next.delete(taskId);
+      }
+
+      return next;
     });
   }
 
@@ -682,14 +720,21 @@ function TaskPanel({
                   </div>
                   <div className="flex justify-start lg:justify-end">
                     {task.status !== "done" ? (
-                      <form action={completeTaskRecord}>
-                        <input type="hidden" name="id" value={task.id} />
-                        <input type="hidden" name="project_id" value={projectId} />
-                        <Button type="submit" variant="outline" className="h-9 gap-2 px-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={pendingTaskIds.has(task.id)}
+                        aria-busy={pendingTaskIds.has(task.id)}
+                        className="h-9 gap-2 px-3"
+                        onClick={() => handleTaskStatusChange(task.id, "done")}
+                      >
+                        {pendingTaskIds.has(task.id) ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
                           <CheckCircle2 className="h-4 w-4" />
-                          Tamamla
-                        </Button>
-                      </form>
+                        )}
+                        {pendingTaskIds.has(task.id) ? "Tamamlanıyor" : "Tamamla"}
+                      </Button>
                     ) : null}
                   </div>
                 </div>
@@ -700,8 +745,8 @@ function TaskPanel({
 
         {localTasks.length > 0 && view === "kanban" ? (
           <ProjectTaskKanban
-            projectId={projectId}
             tasks={localTasks}
+            pendingTaskIds={pendingTaskIds}
             onTaskStatusChange={handleTaskStatusChange}
           />
         ) : null}
@@ -715,12 +760,12 @@ function TaskPanel({
 }
 
 function ProjectTaskKanban({
-  projectId,
   tasks,
+  pendingTaskIds,
   onTaskStatusChange,
 }: {
-  projectId: string;
   tasks: ProjectDetailTaskItem[];
+  pendingTaskIds: Set<string>;
   onTaskStatusChange: (taskId: string, status: ProjectDetailTaskItem["status"]) => void;
 }) {
   const columns = ["todo", "in_progress", "done"] as const;
@@ -784,19 +829,22 @@ function ProjectTaskKanban({
                     <div className="flex items-center justify-between gap-2">
                       <Badge className={priorityClasses[task.priority]}>{task.priority}</Badge>
                       {task.status !== "done" ? (
-                        <form action={completeTaskRecord}>
-                          <input type="hidden" name="id" value={task.id} />
-                          <input type="hidden" name="project_id" value={projectId} />
-                          <Button
-                            type="submit"
-                            variant="outline"
-                            className="h-8 w-8 p-0"
-                            title="Tamamla"
-                            aria-label="Tamamla"
-                          >
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={pendingTaskIds.has(task.id)}
+                          aria-busy={pendingTaskIds.has(task.id)}
+                          className="h-8 w-8 p-0"
+                          title="Tamamla"
+                          aria-label="Tamamla"
+                          onClick={() => onTaskStatusChange(task.id, "done")}
+                        >
+                          {pendingTaskIds.has(task.id) ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
                             <CheckCircle2 className="h-4 w-4" />
-                          </Button>
-                        </form>
+                          )}
+                        </Button>
                       ) : null}
                     </div>
                   </CardContent>

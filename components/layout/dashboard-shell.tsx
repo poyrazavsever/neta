@@ -24,6 +24,7 @@ import {
   SidebarUserProfile,
 } from "poyraz-ui/organisms";
 import { sidebarData } from "@/config/sidebar";
+import { PendingLink } from "@/components/ui/pending-link";
 import { cn } from "@/lib/utils";
 import { ChevronUp, LogOut, Menu, Settings } from "lucide-react";
 import Image from "next/image";
@@ -158,13 +159,14 @@ function AppSidebar({
                       icon={Icon ? <Icon className="h-4 w-4" /> : undefined}
                       className={cn(isActive && "font-semibold")}
                     >
-                      <Link
+                      <PendingLink
                         href={item.href || "#"}
                         onClick={onNavigate}
-                        className="block w-full"
+                        className="flex w-full items-center justify-between gap-2"
+                        showSpinner
                       >
                         {item.title}
-                      </Link>
+                      </PendingLink>
                     </SidebarMenuItem>
                   );
                 })}
@@ -214,10 +216,10 @@ function AppSidebar({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/settings" onClick={onNavigate} className="gap-2">
+              <PendingLink href="/settings" onClick={onNavigate} className="gap-2" showSpinner>
                 <Settings className="h-4 w-4" />
                 Ayarlar
-              </Link>
+              </PendingLink>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <form action={signOut}>

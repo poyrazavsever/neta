@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  completeTaskRecord,
   createTaskRecord,
   deleteTaskRecord,
   updateTaskStatusRecord,
@@ -21,12 +20,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  toast,
 } from "poyraz-ui/molecules";
 import {
-  CalendarDays,
   CheckCircle2,
   KanbanSquare,
   LayoutList,
+  Loader2,
   Pencil,
   Plus,
   Trash2,
@@ -86,6 +86,7 @@ export function TasksClient({ tasks, clients, projects }: TasksClientProps) {
   const [query, setQuery] = useState("");
   const [projectFilter, setProjectFilter] = useState("__all");
   const [view, setView] = useState<"list" | "kanban">("list");
+  const [pendingTaskIds, setPendingTaskIds] = useState<Set<string>>(new Set());
   const [, startTransition] = useTransition();
 
   useEffect(() => {
@@ -95,14 +96,65 @@ export function TasksClient({ tasks, clients, projects }: TasksClientProps) {
   function handleTaskStatusChange(taskId: string, status: TaskListItem["status"]) {
     const previousTasks = localTasks;
 
+    setPendingTask(taskId, true);
     setLocalTasks((currentTasks) =>
       currentTasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
     );
 
     startTransition(() => {
-      void updateTaskStatusRecord(taskId, status).catch(() => {
-        setLocalTasks(previousTasks);
-      });
+      void updateTaskStatusRecord(taskId, status)
+        .catch((error) => {
+          setLocalTasks(previousTasks);
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "Görev durumu güncellenemedi.",
+          );
+        })
+        .finally(() => {
+          setPendingTask(taskId, false);
+        });
+    });
+  }
+
+  function handleTaskDelete(taskId: string) {
+    const previousTasks = localTasks;
+    const task = localTasks.find((item) => item.id === taskId);
+    const formData = new FormData();
+    formData.set("id", taskId);
+
+    if (task?.project_id) {
+      formData.set("project_id", task.project_id);
+    }
+
+    setPendingTask(taskId, true);
+    setLocalTasks((currentTasks) => currentTasks.filter((item) => item.id !== taskId));
+
+    startTransition(() => {
+      void deleteTaskRecord(formData)
+        .catch((error) => {
+          setLocalTasks(previousTasks);
+          toast.error(
+            error instanceof Error ? error.message : "Görev silinemedi.",
+          );
+        })
+        .finally(() => {
+          setPendingTask(taskId, false);
+        });
+    });
+  }
+
+  function setPendingTask(taskId: string, pending: boolean) {
+    setPendingTaskIds((current) => {
+      const next = new Set(current);
+
+      if (pending) {
+        next.add(taskId);
+      } else {
+        next.delete(taskId);
+      }
+
+      return next;
     });
   }
 
@@ -208,12 +260,21 @@ export function TasksClient({ tasks, clients, projects }: TasksClientProps) {
 
           {filteredTasks.length > 0 ? (
             view === "list" ? (
-              <TaskList tasks={filteredTasks} clients={clients} projects={projects} />
+              <TaskList
+                tasks={filteredTasks}
+                clients={clients}
+                projects={projects}
+                pendingTaskIds={pendingTaskIds}
+                onTaskDelete={handleTaskDelete}
+                onTaskStatusChange={handleTaskStatusChange}
+              />
             ) : (
               <TaskKanban
                 tasks={filteredTasks}
                 clients={clients}
                 projects={projects}
+                pendingTaskIds={pendingTaskIds}
+                onTaskDelete={handleTaskDelete}
                 onTaskStatusChange={handleTaskStatusChange}
               />
             )
@@ -230,10 +291,16 @@ function TaskList({
   tasks,
   clients,
   projects,
+  pendingTaskIds,
+  onTaskDelete,
+  onTaskStatusChange,
 }: {
   tasks: TaskListItem[];
   clients: TaskRelationOption[];
   projects: TaskRelationOption[];
+  pendingTaskIds: Set<string>;
+  onTaskDelete: (taskId: string) => void;
+  onTaskStatusChange: (taskId: string, status: TaskListItem["status"]) => void;
 }) {
   return (
     <div className="overflow-x-auto rounded-sm border border-border">
@@ -247,7 +314,15 @@ function TaskList({
         </div>
         <div className="divide-y divide-border">
         {tasks.map((task) => (
-          <TaskRow key={task.id} task={task} clients={clients} projects={projects} />
+          <TaskRow
+            key={task.id}
+            task={task}
+            clients={clients}
+            projects={projects}
+            isPending={pendingTaskIds.has(task.id)}
+            onTaskDelete={onTaskDelete}
+            onTaskStatusChange={onTaskStatusChange}
+          />
         ))}
         </div>
       </div>
@@ -259,10 +334,16 @@ function TaskRow({
   task,
   clients,
   projects,
+  isPending,
+  onTaskDelete,
+  onTaskStatusChange,
 }: {
   task: TaskListItem;
   clients: TaskRelationOption[];
   projects: TaskRelationOption[];
+  isPending: boolean;
+  onTaskDelete: (taskId: string) => void;
+  onTaskStatusChange: (taskId: string, status: TaskListItem["status"]) => void;
 }) {
   return (
     <div className="grid gap-4 px-4 py-4 grid-cols-[1.5fr_1fr_1fr_0.8fr_1fr] items-center">
@@ -286,7 +367,14 @@ function TaskRow({
       <div className={isOverdue(task) ? "text-sm font-medium text-rose-600" : "text-sm text-muted-foreground"}>
         {task.due_at ? formatDateTime(task.due_at) : "Yok"}
       </div>
-      <TaskActions task={task} clients={clients} projects={projects} />
+      <TaskActions
+        task={task}
+        clients={clients}
+        projects={projects}
+        isPending={isPending}
+        onTaskDelete={onTaskDelete}
+        onTaskStatusChange={onTaskStatusChange}
+      />
     </div>
   );
 }
@@ -295,11 +383,15 @@ function TaskKanban({
   tasks,
   clients,
   projects,
+  pendingTaskIds,
+  onTaskDelete,
   onTaskStatusChange,
 }: {
   tasks: TaskListItem[];
   clients: TaskRelationOption[];
   projects: TaskRelationOption[];
+  pendingTaskIds: Set<string>;
+  onTaskDelete: (taskId: string) => void;
   onTaskStatusChange: (taskId: string, status: TaskListItem["status"]) => void;
 }) {
   const columns = ["todo", "in_progress", "done"] as const;
@@ -362,7 +454,15 @@ function TaskKanban({
                       <Badge className={priorityClasses[task.priority]}>
                         {priorityLabels[task.priority]}
                       </Badge>
-                      <TaskActions task={task} clients={clients} projects={projects} compact />
+                      <TaskActions
+                        task={task}
+                        clients={clients}
+                        projects={projects}
+                        compact
+                        isPending={pendingTaskIds.has(task.id)}
+                        onTaskDelete={onTaskDelete}
+                        onTaskStatusChange={onTaskStatusChange}
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -380,30 +480,52 @@ function TaskActions({
   clients,
   projects,
   compact = false,
+  isPending,
+  onTaskDelete,
+  onTaskStatusChange,
 }: {
   task: TaskListItem;
   clients: TaskRelationOption[];
   projects: TaskRelationOption[];
   compact?: boolean;
+  isPending: boolean;
+  onTaskDelete: (taskId: string) => void;
+  onTaskStatusChange: (taskId: string, status: TaskListItem["status"]) => void;
 }) {
   return (
     <div className={compact ? "flex justify-end gap-1" : "flex justify-start gap-2 lg:justify-end"}>
       <TaskDialog mode="edit" task={task} clients={clients} projects={projects} />
       {task.status !== "done" ? (
-        <form action={completeTaskRecord}>
-          <input type="hidden" name="id" value={task.id} />
-          <Button type="submit" variant="outline" className="h-9 min-w-24 gap-2 px-3">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isPending}
+          aria-busy={isPending}
+          className="h-9 min-w-24 gap-2 px-3"
+          onClick={() => onTaskStatusChange(task.id, "done")}
+        >
+          {isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
             <CheckCircle2 className="h-4 w-4" />
-            {!compact ? "Tamamla" : null}
-          </Button>
-        </form>
-      ) : null}
-      <form action={deleteTaskRecord}>
-        <input type="hidden" name="id" value={task.id} />
-        <Button type="submit" variant="outline" className="h-9 gap-2 px-3 text-rose-600">
-          <Trash2 className="h-4 w-4" />
+          )}
+          {!compact ? (isPending ? "Tamamlanıyor" : "Tamamla") : null}
         </Button>
-      </form>
+      ) : null}
+      <Button
+        type="button"
+        variant="outline"
+        disabled={isPending}
+        aria-busy={isPending}
+        className="h-9 gap-2 px-3 text-rose-600"
+        onClick={() => onTaskDelete(task.id)}
+      >
+        {isPending ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Trash2 className="h-4 w-4" />
+        )}
+      </Button>
     </div>
   );
 }
