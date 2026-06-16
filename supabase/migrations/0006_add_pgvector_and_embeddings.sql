@@ -16,9 +16,13 @@ create table if not exists public.document_embeddings (
 -- Enable RLS
 alter table public.document_embeddings enable row level security;
 
+drop policy if exists "Users can view their own embeddings" on public.document_embeddings;
 create policy "Users can view their own embeddings" on public.document_embeddings for select using (auth.uid() = user_id);
+drop policy if exists "Users can insert their own embeddings" on public.document_embeddings;
 create policy "Users can insert their own embeddings" on public.document_embeddings for insert with check (auth.uid() = user_id);
+drop policy if exists "Users can update their own embeddings" on public.document_embeddings;
 create policy "Users can update their own embeddings" on public.document_embeddings for update using (auth.uid() = user_id);
+drop policy if exists "Users can delete their own embeddings" on public.document_embeddings;
 create policy "Users can delete their own embeddings" on public.document_embeddings for delete using (auth.uid() = user_id);
 
 -- Create a function to similarity search for embeddings

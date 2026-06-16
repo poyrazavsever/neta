@@ -22,6 +22,49 @@ Kurulumda genel yaklaşım şu:
 
 Repo içinde `supabase/` ve `docs/database/` klasörleri tutulmaya devam eder. Bunları deployment sırasında otomatik çalıştıran bir script yoktur. Bu dosyalar benim SQL kayıtlarım, migration notlarım ve schema geçmişim olarak durur.
 
+## Tek Seferlik Kurulum SQL'i
+
+Yeni bir Supabase projesini Neta için hazırlamanın en kolay yolu `supabase/setup.sql` dosyasını çalıştırmak. Bu dosya `supabase/schema.sql` ve `supabase/migrations/0002..0011` arasındaki migration dosyalarının tek dosyada birleştirilmiş hâlidir.
+
+Demo seed verisi bu dosyaya dahil değildir. Production kurulumda örnek veri istemediğim için seed ayrı tutulur.
+
+### Supabase SQL Editor ile
+
+Supabase panelinde şu bölümü açın:
+
+```txt
+SQL Editor -> New query
+```
+
+Sonra `supabase/setup.sql` dosyasının tamamını kopyalayıp tek seferde çalıştırın.
+
+Bu işlem şunları kurar:
+
+- Tablolar.
+- Foreign key ve check constraint'leri.
+- Index'ler.
+- Trigger ve function'lar.
+- RLS policy'leri.
+- Storage bucket kayıtları ve storage policy'leri.
+
+### Terminalden Tek Komut ile
+
+Supabase connection string'iniz varsa aynı kurulumu tek `psql` komutuyla da çalıştırabilirsiniz:
+
+```bash
+psql "postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres" -v ON_ERROR_STOP=1 -f supabase/setup.sql
+```
+
+Supabase hosted projelerde connection string'i şuradan alabilirsiniz:
+
+```txt
+Project Settings -> Database -> Connection string
+```
+
+Şifre, host ve port bilgilerini kendi projenize göre değiştirmelisiniz.
+
+Bu komut başarılı bittikten sonra Supabase tarafı Neta uygulamasına hazır hâle gelir.
+
 ## Gerekli Tablolar
 
 Neta şu public tabloları bekler:
@@ -104,7 +147,21 @@ Bu yüzden `SUPABASE_SERVICE_ROLE_KEY` zorunludur. Bu key asla browser'a gönder
 
 ## SQL Dosyaları Nasıl Kullanılmalı?
 
-Bu repodaki SQL dosyalarını otomatik migration sistemi gibi düşünmüyorum. Bunlar benim migration geçmişimi ve Supabase tarafında beklenen yapıyı belgeleyen kaynaklar.
+Yeni kurulum için en pratik dosya:
+
+```txt
+supabase/setup.sql
+```
+
+Bu dosya tek seferde çalıştırılacak kurulum dosyasıdır.
+
+Parçalı dosyalar ise migration geçmişini ve geliştirme sürecini belgelemek için korunur:
+
+```txt
+supabase/schema.sql
+supabase/migrations/
+docs/database/
+```
 
 Yeni bir kurulum yaparken en güvenilir kaynak, çalışan Supabase projesinden aldığınız güncel SQL çıktısıdır. Supabase panelindeki "copy as SQL" çıktısı bu yüzden önemlidir.
 

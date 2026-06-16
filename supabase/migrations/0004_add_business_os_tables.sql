@@ -70,25 +70,41 @@ alter table public.invoices enable row level security;
 alter table public.subscriptions enable row level security;
 
 -- Proposals RLS
+drop policy if exists "Users can view their own proposals" on public.proposals;
 create policy "Users can view their own proposals" on public.proposals for select using (auth.uid() = user_id);
+drop policy if exists "Users can insert their own proposals" on public.proposals;
 create policy "Users can insert their own proposals" on public.proposals for insert with check (auth.uid() = user_id);
+drop policy if exists "Users can update their own proposals" on public.proposals;
 create policy "Users can update their own proposals" on public.proposals for update using (auth.uid() = user_id);
+drop policy if exists "Users can delete their own proposals" on public.proposals;
 create policy "Users can delete their own proposals" on public.proposals for delete using (auth.uid() = user_id);
 
 -- Contracts RLS
+drop policy if exists "Users can view their own contracts" on public.contracts;
 create policy "Users can view their own contracts" on public.contracts for select using (auth.uid() = user_id);
+drop policy if exists "Users can insert their own contracts" on public.contracts;
 create policy "Users can insert their own contracts" on public.contracts for insert with check (auth.uid() = user_id);
+drop policy if exists "Users can update their own contracts" on public.contracts;
 create policy "Users can update their own contracts" on public.contracts for update using (auth.uid() = user_id);
+drop policy if exists "Users can delete their own contracts" on public.contracts;
 create policy "Users can delete their own contracts" on public.contracts for delete using (auth.uid() = user_id);
 
 -- Invoices RLS
+drop policy if exists "Users can view their own invoices" on public.invoices;
 create policy "Users can view their own invoices" on public.invoices for select using (auth.uid() = user_id);
+drop policy if exists "Users can insert their own invoices" on public.invoices;
 create policy "Users can insert their own invoices" on public.invoices for insert with check (auth.uid() = user_id);
+drop policy if exists "Users can update their own invoices" on public.invoices;
 create policy "Users can update their own invoices" on public.invoices for update using (auth.uid() = user_id);
+drop policy if exists "Users can delete their own invoices" on public.invoices;
 create policy "Users can delete their own invoices" on public.invoices for delete using (auth.uid() = user_id);
 
 -- Subscriptions RLS
+drop policy if exists "Users can view their own subscriptions" on public.subscriptions;
 create policy "Users can view their own subscriptions" on public.subscriptions for select using (auth.uid() = user_id);
+drop policy if exists "Users can insert their own subscriptions" on public.subscriptions;
 create policy "Users can insert their own subscriptions" on public.subscriptions for insert with check (auth.uid() = user_id);
+drop policy if exists "Users can update their own subscriptions" on public.subscriptions;
 create policy "Users can update their own subscriptions" on public.subscriptions for update using (auth.uid() = user_id);
+drop policy if exists "Users can delete their own subscriptions" on public.subscriptions;
 create policy "Users can delete their own subscriptions" on public.subscriptions for delete using (auth.uid() = user_id);

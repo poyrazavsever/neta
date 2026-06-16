@@ -20,6 +20,14 @@ Başlamadan önce şunlar hazır olmalı:
 - Supabase schema ve storage yapısı.
 - Ortam değişkenleri.
 
+Supabase tarafı hazır değilse önce `supabase/setup.sql` dosyasını çalıştırın. Terminalden tek komutla kurmak için:
+
+```bash
+psql "postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres" -v ON_ERROR_STOP=1 -f supabase/setup.sql
+```
+
+SQL Editor kullanıyorsanız `supabase/setup.sql` içeriğini komple yapıştırıp çalıştırabilirsiniz.
+
 ## Dokploy'da Uygulama Oluşturma
 
 Dokploy içinde yeni bir uygulama oluştururken GitHub reposunu seçin. Uygulamayı Node.js/Next.js app olarak yapılandırın.

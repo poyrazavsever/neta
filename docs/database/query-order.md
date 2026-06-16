@@ -33,10 +33,10 @@ They must also be documented and registered in this file, but they should only b
 
 ## Applying The Ordered SQL
 
-Use the migration helper from the repository root:
+For a fresh Supabase project, use the one-shot setup file from the repository root:
 
 ```bash
-DATABASE_URL='postgresql://postgres:password@host:5432/postgres' sh ./scripts/apply-migrations.sh
+psql "postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres" -v ON_ERROR_STOP=1 -f supabase/setup.sql
 ```
 
-The helper applies missing queries from `0001` through `0011` in the order listed above and records completed migrations in `neta_internal.schema_migrations`. It uses local `psql` when available, otherwise it runs `psql` through Docker. After migrations, it sends `NOTIFY pgrst, 'reload schema'` so PostgREST can see new RPC functions without a manual restart.
+The setup file applies `0001` through `0011` in the order listed above. It does not include optional seed data. If you are changing the schema later, keep adding ordered files under `supabase/migrations/` and update this table.

@@ -19,6 +19,12 @@ Deploy'dan önce hazır olması gerekenler:
 - Supabase tabloları, policy'leri, function'ları ve storage bucket'ları.
 - Environment variable değerleri.
 
+Supabase tarafını yeni kuruyorsanız önce `supabase/setup.sql` dosyasını Supabase SQL Editor'da tek seferde çalıştırın. Terminal kullanıyorsanız aynı işlem şu komutla yapılabilir:
+
+```bash
+psql "postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres" -v ON_ERROR_STOP=1 -f supabase/setup.sql
+```
+
 Gerekli env değerleri:
 
 ```env

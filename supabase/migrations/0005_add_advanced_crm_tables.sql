@@ -24,7 +24,11 @@ create table if not exists public.client_activities (
 alter table public.client_activities enable row level security;
 
 -- Client Activities RLS
+drop policy if exists "Users can view their own client activities" on public.client_activities;
 create policy "Users can view their own client activities" on public.client_activities for select using (auth.uid() = user_id);
+drop policy if exists "Users can insert their own client activities" on public.client_activities;
 create policy "Users can insert their own client activities" on public.client_activities for insert with check (auth.uid() = user_id);
+drop policy if exists "Users can update their own client activities" on public.client_activities;
 create policy "Users can update their own client activities" on public.client_activities for update using (auth.uid() = user_id);
+drop policy if exists "Users can delete their own client activities" on public.client_activities;
 create policy "Users can delete their own client activities" on public.client_activities for delete using (auth.uid() = user_id);

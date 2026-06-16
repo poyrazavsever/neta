@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS public.project_revisions (
 );
 
 -- Trigger to set updated_at
+DROP TRIGGER IF EXISTS set_project_revisions_updated_at ON public.project_revisions;
 CREATE TRIGGER set_project_revisions_updated_at
 BEFORE UPDATE ON public.project_revisions
 FOR EACH ROW
@@ -35,18 +36,21 @@ ALTER TABLE public.project_revisions ENABLE ROW LEVEL SECURITY;
 
 -- PROFILES
 -- Clients can read their own profile
+DROP POLICY IF EXISTS "Clients can view own profile" ON public.profiles;
 CREATE POLICY "Clients can view own profile"
 ON public.profiles FOR SELECT
 USING (auth.uid() = id);
 
 -- CLIENTS
 -- Clients can read their own client record
+DROP POLICY IF EXISTS "Clients can view own client record" ON public.clients;
 CREATE POLICY "Clients can view own client record"
 ON public.clients FOR SELECT
 USING (client_auth_id = auth.uid());
 
 -- PROJECTS
 -- Clients can view projects where client_id matches their client record
+DROP POLICY IF EXISTS "Clients can view own projects" ON public.projects;
 CREATE POLICY "Clients can view own projects"
 ON public.projects FOR SELECT
 USING (
@@ -57,6 +61,7 @@ USING (
 
 -- TASKS
 -- Clients can view tasks linked to their projects IF is_public_to_client is true
+DROP POLICY IF EXISTS "Clients can view public tasks of their projects" ON public.tasks;
 CREATE POLICY "Clients can view public tasks of their projects"
 ON public.tasks FOR SELECT
 USING (
@@ -70,6 +75,7 @@ USING (
 
 -- PROJECT PLANNING SECTIONS (Milestones, Roadmap, etc.)
 -- Clients can view planning sections of their projects
+DROP POLICY IF EXISTS "Clients can view planning sections of their projects" ON public.project_planning_sections;
 CREATE POLICY "Clients can view planning sections of their projects"
 ON public.project_planning_sections FOR SELECT
 USING (
@@ -82,6 +88,7 @@ USING (
 
 -- PROJECT REVISIONS
 -- Freelancers can manage all revisions for their projects
+DROP POLICY IF EXISTS "Freelancers can manage revisions" ON public.project_revisions;
 CREATE POLICY "Freelancers can manage revisions"
 ON public.project_revisions FOR ALL
 USING (
@@ -91,6 +98,7 @@ USING (
 );
 
 -- Clients can insert revisions for their projects
+DROP POLICY IF EXISTS "Clients can insert revisions" ON public.project_revisions;
 CREATE POLICY "Clients can insert revisions"
 ON public.project_revisions FOR INSERT
 WITH CHECK (
@@ -101,6 +109,7 @@ WITH CHECK (
 );
 
 -- Clients can view their own revisions
+DROP POLICY IF EXISTS "Clients can view own revisions" ON public.project_revisions;
 CREATE POLICY "Clients can view own revisions"
 ON public.project_revisions FOR SELECT
 USING (

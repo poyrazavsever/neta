@@ -22,6 +22,14 @@ Coolify deploy için hazır olması gerekenler:
 
 Supabase tarafında tablo, policy, function ve storage bucket'ları hazır olmalıdır.
 
+Yeni bir Supabase projesi hazırlıyorsanız `supabase/setup.sql` dosyasını tek seferde çalıştırabilirsiniz:
+
+```bash
+psql "postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres" -v ON_ERROR_STOP=1 -f supabase/setup.sql
+```
+
+Supabase panelinden ilerlemek isterseniz aynı dosyanın tamamını SQL Editor'a yapıştırıp çalıştırmanız yeterli.
+
 ## Uygulama Oluşturma
 
 Coolify içinde yeni bir application oluştururken:

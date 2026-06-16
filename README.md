@@ -26,6 +26,14 @@ This repository now ships only the web application. It does not bundle Supabase,
 
 See `docs/04-supabase-kurulumu.md` for the expected Supabase-side resources.
 
+For a fresh Supabase project, run the one-shot setup SQL:
+
+```bash
+psql "postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres" -v ON_ERROR_STOP=1 -f supabase/setup.sql
+```
+
+You can also paste the full contents of `supabase/setup.sql` into Supabase SQL Editor and run it once.
+
 ## Environment Variables
 
 Copy `.env.example` to `.env.local` for local development, or add the same values in Vercel, Coolify, Dokploy, or your hosting provider.
