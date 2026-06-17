@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "poyraz-ui/atoms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "poyraz-ui/molecules";
 import {
@@ -10,9 +10,12 @@ import {
 import { BarChart3, Filter } from "lucide-react";
 
 export type AnalyticsData = {
-  tasks: { id: string; status: string; created_at: string; due_at?: string }[];
-  projects: { id: string; name: string }[];
-  finances: { id: string; type: string; amount: number; transaction_date: string; project_id?: string }[];
+  metrics: {
+    projectIncomeData: { name: string; value: number }[];
+    completedTasks: number;
+    activeTasks: number;
+  };
+  range: string;
 };
 
 type AnalyticsClientProps = {
@@ -22,44 +25,17 @@ type AnalyticsClientProps = {
 const COLORS = ["hsl(var(--primary))", "hsl(var(--destructive))", "#eab308", "#3b82f6", "#8b5cf6"];
 
 export function AnalyticsClient({ data }: AnalyticsClientProps) {
-  const [dateRange, setDateRange] = useState("this_month");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   
-  const now = new Date();
-  
-  const filterByDate = (dateStr: string | null) => {
-    if (!dateStr) return false;
-    const date = new Date(dateStr);
-    if (dateRange === "this_week") {
-      const firstDay = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)));
-      return date >= firstDay;
-    }
-    if (dateRange === "this_month") {
-      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-    }
-    if (dateRange === "this_year") {
-      return date.getFullYear() === now.getFullYear();
-    }
-    return true;
+  const handleRangeChange = (newRange: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("range", newRange);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
-  const filteredFinances = data.finances.filter(f => filterByDate(f.transaction_date));
-  const filteredTasks = data.tasks.filter(t => filterByDate(t.created_at || t.due_at || null));
-
-  // Project-based income
-  const projectIncomeMap = new Map();
-  filteredFinances.filter(f => f.type === "income" && f.project_id).forEach(f => {
-    const project = data.projects.find(p => p.id === f.project_id);
-    const name = project ? project.name : "Bilinmeyen";
-    if (!projectIncomeMap.has(name)) {
-      projectIncomeMap.set(name, { name, value: 0 });
-    }
-    projectIncomeMap.get(name).value += Number(f.amount);
-  });
-  const projectIncomeData = Array.from(projectIncomeMap.values());
-
-  // Task completion stats
-  const completedTasks = filteredTasks.filter(t => t.status === "done").length;
-  const activeTasks = filteredTasks.filter(t => t.status !== "done" && t.status !== "cancelled").length;
+  const { projectIncomeData, completedTasks, activeTasks } = data.metrics;
   
   const taskStatusData = [
     { name: "Tamamlanan", value: completedTasks },
@@ -85,7 +61,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <Select value={dateRange} onValueChange={setDateRange}>
+          <Select value={data.range} onValueChange={handleRangeChange}>
             <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="Tarih aralığı" />
             </SelectTrigger>

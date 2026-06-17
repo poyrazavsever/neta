@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PendingLink } from "@/components/ui/pending-link";
 import { Badge, Card, CardContent } from "poyraz-ui/atoms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "poyraz-ui/molecules";
@@ -8,11 +8,17 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { CheckCircle2, Wallet, FolderKanban, Activity, Users } from "lucide-react";
 
 export type DashboardData = {
-  tasks: { id: string; status: string; created_at: string; updated_at?: string; due_at?: string }[];
+  metrics: {
+    netProfit: number;
+    activeProjectsCount: number;
+    completedTasksCount: number;
+    avgMood: string;
+    financeTrend: { date: string; income: number; expense: number }[];
+    moodTrend: { date: string; mood: number; energy: number }[];
+  };
   projects: { id: string; status: string; name: string; created_at: string }[];
-  finances: { id: string; type: string; amount: number; transaction_date: string }[];
-  logs: { id: string; log_date: string; mood_score: number; energy_score: number }[];
   clients: { id: string; name: string; company_name: string; created_at: string }[];
+  range: string;
 };
 
 type DashboardClientProps = {
@@ -20,62 +26,29 @@ type DashboardClientProps = {
 };
 
 export function DashboardClient({ data }: DashboardClientProps) {
-  const [dateRange, setDateRange] = useState("this_month");
-
-  // Calculate real metrics from the `data` prop depending on `dateRange`
-  const now = new Date();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   
-  // Helper to filter by date
-  const filterByDate = (dateStr: string | null) => {
-    if (!dateStr) return false;
-    const date = new Date(dateStr);
-    if (dateRange === "today") {
-      return date.toDateString() === now.toDateString();
-    }
-    if (dateRange === "this_week") {
-      const firstDay = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))); // Monday
-      return date >= firstDay;
-    }
-    if (dateRange === "this_month") {
-      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-    }
-    return true;
+  const handleRangeChange = (newRange: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("range", newRange);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
-  // KPIs
-  const filteredFinances = (data.finances || []).filter(f => filterByDate(f.transaction_date));
-  const income = filteredFinances.filter(f => f.type === "income").reduce((acc, curr) => acc + Number(curr.amount), 0);
-  const expense = filteredFinances.filter(f => f.type === "expense").reduce((acc, curr) => acc + Number(curr.amount), 0);
-  const netProfit = income - expense;
+  const { netProfit, activeProjectsCount, completedTasksCount, avgMood, financeTrend, moodTrend } = data.metrics;
 
-  const activeProjectsCount = (data.projects || []).filter(p => p.status === "active").length;
-  
-  const completedTasksCount = (data.tasks || []).filter(t => t.status === "done" && filterByDate(t.updated_at || t.created_at)).length;
+  // Format dates for Recharts using local timezone
+  const incomeTrendData = (financeTrend || []).map(f => ({
+    name: new Date(f.date).toLocaleDateString("tr-TR", { month: "short", day: "numeric" }),
+    income: f.income,
+    expense: f.expense
+  }));
 
-  const filteredLogs = (data.logs || []).filter(l => filterByDate(l.log_date));
-  const avgMood = filteredLogs.length > 0 
-    ? (filteredLogs.reduce((acc, curr) => acc + curr.mood_score, 0) / filteredLogs.length).toFixed(1) 
-    : "0.0";
-
-  // Recharts Data Prep
-  // Group finances by date
-  const financeMap = new Map();
-  filteredFinances.forEach(f => {
-    const d = new Date(f.transaction_date).toLocaleDateString("tr-TR", { month: "short", day: "numeric" });
-    if (!financeMap.has(d)) {
-      financeMap.set(d, { name: d, income: 0, expense: 0 });
-    }
-    const entry = financeMap.get(d);
-    if (f.type === "income") entry.income += Number(f.amount);
-    if (f.type === "expense") entry.expense += Number(f.amount);
-  });
-  const incomeTrendData = Array.from(financeMap.values());
-
-  // Group logs by date
-  const moodTrendData = filteredLogs.map(l => ({
-    date: new Date(l.log_date).toLocaleDateString("tr-TR", { month: "short", day: "numeric" }),
-    mood: l.mood_score,
-    energy: l.energy_score,
+  const moodTrendData = (moodTrend || []).map(l => ({
+    date: new Date(l.date).toLocaleDateString("tr-TR", { month: "short", day: "numeric" }),
+    mood: l.mood,
+    energy: l.energy,
   }));
 
   // Format currency
@@ -107,7 +80,7 @@ export function DashboardClient({ data }: DashboardClientProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <Select value={dateRange} onValueChange={setDateRange}>
+          <Select value={data.range} onValueChange={handleRangeChange}>
             <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="Tarih aralığı" />
             </SelectTrigger>

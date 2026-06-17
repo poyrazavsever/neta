@@ -24,7 +24,7 @@ Repo içinde `supabase/` ve `docs/database/` klasörleri tutulmaya devam eder. B
 
 ## Tek Seferlik Kurulum SQL'i
 
-Yeni bir Supabase projesini Neta için hazırlamanın en kolay yolu `supabase/setup.sql` dosyasını çalıştırmak. Bu dosya `supabase/schema.sql` ve `supabase/migrations/0002..0011` arasındaki migration dosyalarının tek dosyada birleştirilmiş hâlidir.
+Yeni bir Supabase projesini Neta için hazırlamanın en kolay yolu `supabase/setup.sql` dosyasını çalıştırmak. Bu dosya `supabase/schema.sql` ve `supabase/migrations/0002..0012` arasındaki migration dosyalarının tek dosyada birleştirilmiş hâlidir.
 
 Demo seed verisi bu dosyaya dahil değildir. Production kurulumda örnek veri istemediğim için seed ayrı tutulur.
 
@@ -98,6 +98,8 @@ Uygulama şu function/RPC yapılarına ihtiyaç duyar:
 - `is_first_admin_setup_available`
 - `request_internal_auth_creation`
 - `match_documents`
+- `get_dashboard_metrics` — Dashboard KPI ve grafik verilerini sunucu tarafında hesaplar
+- `get_analytics_metrics` — Analiz sayfası proje gelir dağılımı ve görev istatistiklerini hesaplar
 - Yeni auth user için profile oluşturan trigger/function
 - Proje ilerlemesini görev durumuna göre güncelleyen trigger/function
 

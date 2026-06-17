@@ -6,7 +6,11 @@ export const metadata = {
   title: "Dashboard - Neta",
 };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -14,41 +18,48 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Get current date and date 30 days ago
-  const today = new Date();
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const range = typeof searchParams.range === "string" ? searchParams.range : "this_month";
   
-  const todayStr = today.toISOString();
-  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString();
+  const now = new Date();
+  let startDate = new Date();
+  let endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59); // default to end of month
+  
+  if (range === "today") {
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+  } else if (range === "this_week") {
+    // Reset `now` because setDate mutates
+    const tempNow = new Date();
+    const firstDay = new Date(tempNow.setDate(tempNow.getDate() - tempNow.getDay() + (tempNow.getDay() === 0 ? -6 : 1)));
+    firstDay.setHours(0, 0, 0, 0);
+    startDate = firstDay;
+    endDate = new Date(firstDay.getTime());
+    endDate.setDate(endDate.getDate() + 6);
+    endDate.setHours(23, 59, 59, 999);
+  } else if (range === "this_month") {
+    startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+  } else if (range === "this_year") {
+    startDate = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
+    endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+  }
 
-  // Fetch all dashboard data in parallel with only needed columns
+  // Fetch metrics using RPC
+  const { data: metricsData } = await supabase.rpc('get_dashboard_metrics', {
+    p_start_date: startDate.toISOString(),
+    p_end_date: endDate.toISOString()
+  });
+
+  // Fetch limited recent data
   const [
-    { data: tasks },
     { data: projects },
-    { data: finances },
-    { data: logs },
     { data: clients },
   ] = await Promise.all([
     supabase
-      .from("tasks")
-      .select("id, status, created_at, updated_at, due_at")
-      .or(`due_at.gte.${thirtyDaysAgoStr},created_at.gte.${thirtyDaysAgoStr}`)
-      .order("due_at", { ascending: true }),
-    supabase
       .from("projects")
       .select("id, status, name, created_at")
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("finance_transactions")
-      .select("id, type, amount, transaction_date")
-      .gte("transaction_date", thirtyDaysAgoStr)
-      .order("transaction_date", { ascending: true }),
-    supabase
-      .from("daily_logs")
-      .select("id, log_date, mood_score, energy_score")
-      .gte("log_date", thirtyDaysAgoStr)
-      .order("log_date", { ascending: true }),
+      .order("created_at", { ascending: false })
+      .limit(5),
     supabase
       .from("clients")
       .select("id, name, company_name, created_at")
@@ -57,11 +68,17 @@ export default async function DashboardPage() {
   ]);
 
   const dashboardData = {
-    tasks: tasks || [],
+    metrics: metricsData || {
+      netProfit: 0,
+      activeProjectsCount: 0,
+      completedTasksCount: 0,
+      avgMood: "0.0",
+      financeTrend: [],
+      moodTrend: []
+    },
     projects: projects || [],
-    finances: finances || [],
-    logs: logs || [],
     clients: clients || [],
+    range
   };
 
   return <DashboardClient data={dashboardData} />;
