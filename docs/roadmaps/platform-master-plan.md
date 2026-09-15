@@ -1,8 +1,8 @@
 ---
 title: Neta Platform Master Planı
 status: active
-current_phase: M0-complete
-last_updated: 2026-09-02
+current_phase: MOB-7-code-security-acceptance-open
+last_updated: 2026-09-15
 owners:
   - platform
   - backend-api
@@ -11,6 +11,8 @@ owners:
 ---
 
 # Neta platform master planı
+
+> 2026-09-15: MOB-4/5 owner parity ve MOB-6/7 pairing/portal transport'u kodda yer alır. Signed iki-instance native, pairing restore/revoke ve client tenant negatif kabulü mağaza yayını için açıktır.
 
 ## 1. Ürün kararı
 
@@ -25,8 +27,9 @@ Neta üç ürün yüzeyinden oluşur:
 
 Self-host eden kişinin mobil uygulamayı fork etmesi, bundle ID değiştirmesi veya
 ayrı mağaza build'i alması temel kullanım akışının parçası olmayacaktır. Mobil
-uygulama ilk bağlantıda instance domain'ini elle alır veya domain ile tek
-kullanımlık pairing secret'ını taşıyan bir QR kod okur. Hesaplar ilk ürün
+uygulama ilk bağlantıda instance domain'ini elle alır veya yalnız origin
+taşıyan secret-free bir QR kod okur. Gelecekteki device pairing QR'ı ayrı,
+tek kullanımlık secret'lı bir güvenlik akışıdır. Hesaplar ilk ürün
 sürümünde merkezi Neta hesabında değil, bağlanılan self-hosted instance'ta
 yaşar.
 
@@ -65,8 +68,9 @@ belge üst seviye doğruluk kaynağıdır.
 - Web ile React Native arasında görsel component paylaşımı.
 
 Yalnız kısa bir kodun domain bilinmeden çalışması merkezi ve güvenilir bir
-resolver gerektirir. Bu servis ilk fazda kurulmayacaktır. İlk pairing sözleşmesi
-QR içinde `origin + secret`, manuel akışta ise `domain + code` kullanır.
+resolver gerektirir. Bu servis ilk fazda kurulmayacaktır. İlk runtime connect
+sözleşmesi QR içinde yalnız `origin` kullanır. Pairing uygulandığında
+`origin + secret` ayrı bir payload ve lifecycle kullanacaktır.
 
 ## 3. Monorepo hedefi
 
@@ -264,7 +268,7 @@ Teslimler:
   iki web build'i ve mobil release gate'i geçer.
 - Docker release boundary yeni app path'lerini doğrular.
 
-### P0 — Ürün ve contract freeze
+### P0 — Ürün ve contract freeze ✅ (2026-09-03)
 
 Amaç: Eski build-time fork modeli ile evrensel app hedefi arasındaki çelişkiyi
 kod yazmaya başlamadan kapatmak.
@@ -287,7 +291,7 @@ Kabul:
 - Açık karar kalmaz: disabled user `401/403` politikası, currency summary ve
   project assets pagination şekli kayda alınır.
 
-### P1 — Monorepo contract ve CI omurgası
+### P1 — Monorepo contract ve CI omurgası ✅ (2026-09-03)
 
 Amaç: Backend ile mobilin aynı wire sözleşmesini derleme ve test aşamasında
 paylaşması.
@@ -308,7 +312,7 @@ Kabul:
 - App veya package altında ikinci lockfile/workspace oluşamaz.
 - API fixture snapshot'larında secret ve internal field taraması vardır.
 
-### P2 — Bootstrap doğruluğu ve manuel instance bağlantısı
+### P2 — Bootstrap doğruluğu ve manuel instance bağlantısı ← aktif
 
 Amaç: Mağazadan gelen generic binary'nin domain ile güvenli biçimde
 bağlanabilmesi.
@@ -646,14 +650,12 @@ Bir faz ancak aşağıdakilerin tümü sağlandığında tamamdır:
 
 ## 15. Bir sonraki uygulanacak iş
 
-Monorepo baseline kontrolleri yeşil olduktan sonra doğrudan P0 ile başlanmalıdır:
+P0/P1 ve P2'nin backend contract doğruluğu tamamlandı. Sıradaki iş P2'nin evrensel mobil bağlantı dilimidir:
 
-1. Evrensel mobil app ADR'ını kabul etmek.
-2. Eski build-time origin ve pairing yasağı testlerini yeni hedefe göre
-   değiştirmek.
-3. `api-contracts` bootstrap fixture'larını backend ve mobile için ortaklaştırmak.
-4. `/me`, preferences ve catalog uyumsuzluklarını ilk küçük vertical slice olarak
-   kapatmak.
+1. Production build-time origin zorunluluğunu runtime connect state machine'ine taşımak.
+2. Domain girişi, discovery onayı, login ve instance unutma akışını eklemek.
+3. Aynı binary ile iki HTTPS instance için credential/cache izolasyonunu E2E kanıtlamak.
+4. Değişen `instanceId`, TLS downgrade, cross-origin link ve eski client version negatif akışlarını tamamlamak.
 
 Bu sıra, büyük resource API yatırımından önce mobilin gerçekten herhangi bir
 self-hosted instance'a güvenli biçimde bağlanabildiğini kanıtlar.

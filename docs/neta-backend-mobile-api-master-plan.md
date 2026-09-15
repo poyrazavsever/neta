@@ -1,9 +1,9 @@
 ---
 title: Neta Backend Mobil API Ana Uygulama Planı
 description: Neta web/backend ile React Native mobil istemci arasındaki API boşluklarını kapatmak için doğrulanmış, fazlı ve test kapılı uygulama planı.
-status: planned
-current_phase: phase-0
-last_updated: 2026-08-02
+status: active
+current_phase: owner-parity-pairing-portal-code
+last_updated: 2026-09-15
 owners:
   - backend-api
   - mobile
@@ -16,6 +16,8 @@ related_documents:
 ---
 
 # Neta Backend Mobil API Ana Uygulama Planı
+
+> 2026-09-15 kod durumu: Owner read/mutation/parity, pairing ve client portal v1 transport'u mevcuttur. Signed cihaz, iki canlı HTTPS instance, restore/revoke ve cross-client negatif E2E kabulü açık kalır; `mobile-v1` store hazır oluşu planlanandır.
 
 ## 1. Amaç
 
@@ -236,75 +238,75 @@ yazılmaz.
 
 ## 6. Faz planı
 
-### Faz 0 — Contract freeze ve karar kaydı
+### Faz 0 — Contract freeze ve karar kaydı ✅ (2026-09-03)
 
 Amaç: Backend ve mobilin aynı endpoint, alan ve capability anlamına baktığını
 kanıtlamak.
 
-- [ ] Mobil `api-contracts` tipleri backend planına sabit fixture olarak aktarılacak.
-- [ ] Her mobil API çağrısı method/path/parser tablosuna dönüştürülecek.
-- [ ] Project asset kanonik şekli `PaginatedResponse<FileAsset>` olarak kaydedilecek.
-- [ ] `mobile-v1` semantiği yazılı olarak dondurulacak.
-- [ ] Granular capability isimleri ve her birinin zorunlu endpoint listesi
+- [x] Mobil `api-contracts` tipleri backend planına sabit fixture olarak aktarıldı.
+- [x] Her mobil API çağrısı method/path/parser tablosuna dönüştürüldü.
+- [x] Project asset kanonik şekli `PaginatedResponse<FileAsset>` olarak kaydedildi.
+- [x] `mobile-v1` semantiği ADR-011 ile donduruldu.
+- [x] Granular capability isimleri ve her birinin zorunlu endpoint listesi
   belirlenecek.
-- [ ] Disabled session politikası `401` veya `403` olarak tekleştirilecek.
-- [ ] Finance summary multi-currency politikası seçilecek.
-- [ ] Version politikası `updatedAt ISO string` olarak onaylanacak.
-- [ ] Validation için HTTP `400` politikası korunacak veya tüm API için `422`
+- [x] Disabled session politikası `401`, geçerli yanlış rol politikası `403` olarak tekleştirildi.
+- [x] Finance summary multi-currency politikası currency-grouped olarak seçildi.
+- [x] Version politikası opaque `updatedAt` ISO string olarak onaylandı.
+- [x] Validation için HTTP `400`, invariant ihlali için `422`
   kararı alınacak; route bazında karıştırılmayacak.
-- [ ] Mobil `features/files/api.ts` takip işi mobil repository planına eklenecek.
+- [x] Mobil `features/files/api.ts` paginated contract'a geçirildi.
 
 Çıkış kriteri:
 
-- [ ] Endpoint matrisi ile mobil çağrı dosyaları arasında açıklanamayan fark yok.
-- [ ] Açık kararların tümü ADR veya bu plan içinde sonuçlandırılmış.
+- [x] Endpoint matrisi ile mobil çağrı dosyaları arasında açıklanamayan fark yok.
+- [x] Açık kararların tümü ADR-011…ADR-020 içinde sonuçlandırıldı.
 
-### Faz 1 — Protokol doğruluğu ve v1 çekirdeği
+### Faz 1 — Protokol doğruluğu ve v1 çekirdeği ✅ (2026-09-03)
 
 Amaç: Yalan capability ilanını kaldırmak ve tüm v1 hatalarını JSON yapmak.
 
-- [ ] Hazır olmayan `files.local`, `freelancer.core`, `portal.client` ve
+- [x] Hazır olmayan broad capability'ler granular `planned` kayıtlara dönüştürüldü; eski `files.local`, `freelancer.core`, `portal.client` ve
   `ai.assistant` capability'leri `planned` yapılacak.
-- [ ] `mobile-v1` Faz 0 kararına göre ya bootstrap capability olarak açıkça
+- [x] `mobile-v1` Faz 0 kararına göre
   tutulacak ya da minimum yüzey tamamlanana kadar `planned` yapılacak.
-- [ ] `capabilities` yalnız `available` ID'lerini taşımaya devam edecek.
-- [ ] `capabilityDetails` planned kayıtları taşıyabilecek.
-- [ ] `app/api/v1/[...path]/route.ts` JSON `NOT_FOUND` fallback eklenecek.
-- [ ] Unsupported method yanıtlarının JSON `405` politikası test edilecek.
-- [ ] Ortak auth/role helper'ları eklenecek.
-- [ ] JSON body parse hatası `VALIDATION_ERROR` olarak normalize edilecek.
-- [ ] Error response'larda v1 header ve no-store garantilenecek.
-- [ ] Capabilities için route manifest tabanlı release testi eklenecek.
+- [x] `capabilities` yalnız `available` ID'lerini taşıyor.
+- [x] `capabilityDetails` planned kayıtları taşıyor.
+- [x] `app/api/v1/[...path]/route.ts` JSON `NOT_FOUND` fallback eklendi.
+- [x] Unsupported method yanıtlarının JSON `405` politikası test edildi.
+- [x] Ortak auth/role helper'ları eklendi.
+- [x] JSON body parse hatası `VALIDATION_ERROR` olarak normalize edildi.
+- [x] Error response'larda v1 header ve no-store garantilendi.
+- [x] Capability route requirement matrisi ve release boundary testi eklendi.
 
 Çıkış kriteri:
 
-- [ ] `/api/v1/does-not-exist` HTML değil JSON 404 döndürüyor.
-- [ ] Discovery/meta bulunmayan hiçbir resource grubunu available ilan etmiyor.
-- [ ] Public endpoint'ler session/cookie üretmiyor.
+- [x] `/api/v1/does-not-exist` HTML değil JSON 404 döndürüyor.
+- [x] Discovery/meta bulunmayan hiçbir resource grubunu available ilan etmiyor.
+- [x] Public endpoint'ler session/cookie üretmiyor.
 
-### Faz 2 — Me, preferences ve runtime catalog uyumu
+### Faz 2 — Me, preferences ve runtime catalog uyumu ✅ (2026-09-03)
 
 Amaç: Login sonrası kullanıcı, tema ve dil state'ini mobil contract'a uydurmak.
 
-- [ ] Tek bir `presentMeProfile` presenter'ı yazılacak.
-- [ ] Profil `id`, `email`, `name`, `role`, `clientId`, `disabled` ve
+- [x] Tek bir `presentMeProfile` presenter'ı yazıldı.
+- [x] Profil `id`, `email`, `name`, `role`, `clientId`, `disabled` ve
   `preferences` alanlarını taşıyacak.
-- [ ] Preferences public DTO'su `locale`, `colorMode`, `timezone` taşıyacak.
-- [ ] Storage'daki `language` alanı yalnız service içinde API `locale` alanına
+- [x] Preferences public DTO'su `locale`, `colorMode`, `timezone` taşıyor.
+- [x] Storage'daki `language` alanı presenter sınırında API `locale` alanına
   çevrilecek.
-- [ ] `PATCH /me/preferences` `locale` kabul edecek; geçiş için `language` alias'ı
+- [x] `PATCH /me/preferences` `locale` kabul ediyor; geçiş için `language` alias'ı
   opsiyonel tutulabilecek.
-- [ ] Aktif locale ve geçerli IANA timezone doğrulanacak.
-- [ ] Preferences mutation response'u `GET /me` ile aynı tam profil olacak.
-- [ ] Catalog response'u `version` taşıyacak; geçiş boyunca `catalogVersion` da
+- [x] Aktif locale ve geçerli IANA timezone doğrulanıyor.
+- [x] Preferences mutation response'u `GET /me` ile aynı tam profil.
+- [x] Catalog response'u `version` taşıyor; geçiş boyunca `catalogVersion` da
   korunabilecek.
-- [ ] `/me` ve preferences için owner/client fixture'ları eklenecek.
+- [x] `/me` ve preferences için owner/client fixture'ları eklendi.
 
 Çıkış kriteri:
 
-- [ ] Mobil `normalizeMeProfile` hem GET hem PATCH yanıtını kabul ediyor.
-- [ ] Runtime catalog `isTranslationCatalog` guard'ını geçiyor.
-- [ ] Locale değişikliği tekrar GET edildiğinde kalıcı ve doğru görünüyor.
+- [x] Mobil `normalizeMeProfile` hem GET hem PATCH yanıtını kabul ediyor.
+- [x] Runtime catalog `isNetaRuntimeCatalog` guard'ını geçiyor.
+- [x] Locale değişikliği tekrar GET edildiğinde kalıcı ve doğru görünüyor.
 
 ### Faz 3 — Ortak pagination, concurrency ve idempotency altyapısı
 

@@ -2,7 +2,7 @@
 title: Neta Çok Dilli Sistem ve Yerelleştirme Ana Planı
 description: Self-host edilen Neta instance'larında yönetilebilir arayüz dilleri, çok dilli içerik formları, müşteri portalı dili ve mobil API uyumu için faz bazlı uygulama planı.
 status: completed
-current_phase: "completed"
+current_phase: completed
 last_updated: 2026-07-19
 ---
 

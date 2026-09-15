@@ -1,0 +1,57 @@
+{
+  "description": "Neta bilgi kasası yönlendirmesi, karar bağlamı ve senkronizasyon kontrolü.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/neta-vault.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Neta bilgi haritası ve kararları yükleniyor",
+            "additionalContextLimit": 5000
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/neta-vault.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Alt ajan için Neta karar bağlamı yükleniyor",
+            "additionalContextLimit": 5000
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/neta-vault.mjs\"",
+            "timeout": 10,
+            "statusMessage": "İlgili Neta bilgi notları seçiliyor",
+            "additionalContextLimit": 2500
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/neta-vault.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Bilgi kasası senkronizasyonu denetleniyor"
+          }
+        ]
+      }
+    ]
+  }
+}

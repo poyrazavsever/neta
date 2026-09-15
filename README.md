@@ -231,6 +231,18 @@ pnpm build
 
 Güncel teknik yayın durumu, doğrulama kanıtları, kalıntı güvenlik riskleri ve gerçek production cutover sınırı: [2026-07-18 release-readiness raporu](docs/self-hosted-redesign/release-readiness-2026-07-18.md).
 
+## Yaşayan bilgi kasası
+
+Repository kökü Obsidian vault olarak açılabilir. Kod ve `docs/` canonical kaynak olmaya devam eder. Her çalışma önce bütün notları özetleyen üretilmiş [genel bilgi haritasından](bilgi/harita.md) geçer; insan tarafından kürate edilen [bilgi kasası indeksi](bilgi/00-sistem/indeks.md) konu navigasyonunu sağlar. Büyük bir mimari görevden önce [mevcut durum](bilgi/00-sistem/mevcut-durum.md), [değişmez kurallar](bilgi/00-sistem/degismez-kurallar.md) ve [kasa bakım sözleşmesi](bilgi/00-sistem/kasa-semasi.md) okunmalıdır.
+
+```bash
+pnpm vault:map          # genel haritayı yeniden üret
+pnpm vault:check        # link, metadata, kaynak, orphan ve ADR sağlığı
+pnpm vault:hooks:test   # prompt routing hooklarını doğrula
+```
+
+Codex repository hookları ilk kullanımda `/hooks` ekranından incelenip güvenilir olarak işaretlenmelidir. Ayrıntılar [agent bağlamı ve hooklar](bilgi/00-sistem/agent-baglam-ve-hooklar.md) sayfasındadır.
+
 ## Lisans
 
 Bu proje kişisel self-hosting amacıyla geliştirilen proprietary bir projedir.

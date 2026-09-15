@@ -1,7 +1,7 @@
 ---
 title: Neta Mobile Product Redesign Master Plan
 description: Fork başına tek Neta instance'ına bağlanan, profesyonel native mobil deneyim için ürün, UI, navigasyon, API ve kalite planı.
-status: completed
+status: superseded
 current_phase: "completed"
 last_updated: 2026-07-29
 supersedes:
@@ -12,6 +12,8 @@ source_of_truth:
 ---
 
 # Neta Mobile Product Redesign Master Plan
+
+> **Tarihsel belge:** Build-time tek-instance ürün kararı `docs/roadmaps/platform-master-plan.md` tarafından supersede edilmiştir. Güncel uygulama sırası `bilgi/09-yol-haritasi/mobil-uygulama-plani.md` dosyasındadır.
 
 > Repository sınırı: `/Users/poyrazavsever/Yazılım/neta` web projesi bu plan
 > için read-only product/backend source-of-truth olarak incelenir. Plan içinde

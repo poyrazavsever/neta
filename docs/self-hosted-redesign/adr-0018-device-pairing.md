@@ -1,6 +1,6 @@
 ---
 title: ADR-0018 — Mobil Device Pairing ve Token Lifecycle
-status: accepted-design-not-implemented
+status: implementation-pending-security-acceptance
 date: 2026-07-17
 ---
 
@@ -10,17 +10,17 @@ date: 2026-07-17
 
 React Native istemcisi kullanıcı tarafından girilen self-hosted Neta URL'sine bağlanacak. Web session cookie'sini kopyalamak, uzun ömürlü API key vermek veya owner şifresini cihazda sürekli saklamak güvenli bir pairing modeli değildir.
 
-Faz 9 yalnızca discovery ve API v1 temelini yayınlar. Pairing/token endpoint'leri bu ADR uygulanmadan açılmaz.
+Faz 9 yalnızca discovery ve API v1 temelini yayınlamıştı. 2026-09-15 çalışma ağacında pairing schema/route ve mobil transport kodu eklendi; bu tasarımın güvenlik kabulü ayrı doğrulanmalıdır.
 
 ## Karar
 
 İlk device pairing sürümü owner cihazları için tek kullanımlık, kısa ömürlü bir pairing challenge ve DB-backed opaque token modeli kullanacaktır.
 
-Planlanan endpoint'ler:
+Kodda kullanılan endpoint'ler:
 
 ```text
-POST   /api/v1/pairing-codes
-POST   /api/v1/device-sessions/exchange
+POST   /api/v1/pairing/challenges
+POST   /api/v1/pairing/exchange
 POST   /api/v1/device-sessions/refresh
 GET    /api/v1/device-sessions
 DELETE /api/v1/device-sessions/:id
@@ -116,7 +116,7 @@ Kurallar:
 
 Eski DB backup'ı revoke edilmiş token kayıtlarını yeniden aktif hale getirebilir. Pairing implementasyonunun release blocker'ı:
 
-1. `instance_settings` içinde bir device token epoch tutulur.
+1. `device_security_state` içinde bir device token epoch tutulur.
 2. Bütün token digest doğrulamaları bu epoch'a bağlanır.
 3. `db:restore` başarılı atomik swap sonrasında epoch'u yeni random değerle rotate eder.
 4. Böylece restore tüm eski device tokenları otomatik geçersiz kılar.
@@ -145,7 +145,7 @@ Audit event'leri:
 
 Audit metadata raw token, pairing secret, tam IP geçmişi veya gereksiz device fingerprint içermez. Device name kullanıcı tarafından değiştirilebilir ve output-encode edilir.
 
-## Uygulama öncesi zorunlu testler
+## Güvenlik kabulü için zorunlu testler
 
 - Pairing raw secret'ın DB/log'da bulunmaması
 - Expired, consumed, locked ve brute-force challenge negatifleri
@@ -160,4 +160,4 @@ Audit metadata raw token, pairing secret, tam IP geçmişi veya gereksiz device 
 
 ## Sonuç
 
-Faz 9'da capability `auth.device-pairing` değeri `planned` kalır. Bu ADR'ın schema, service, rate-limit, restore epoch ve negatif test maddeleri tamamlanmadan `pairing-codes` veya `device-sessions` route'u oluşturulmaz.
+Kodda `auth.device-pairing.v1` capability'si `available`, pairing/device-session route'ları, DB digest/token epoch ve mobil bearer refresh transport'u mevcuttur. Bu durum signed gerçek cihazda double exchange, reuse/revoke, restore ve tenant negatif kabulünün yerine geçmez. Tasarım ile kodun kalan farkları ve yukarıdaki güvenlik testleri mağaza yayını öncesinde kapatılmalıdır.
