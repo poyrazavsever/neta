@@ -1,0 +1,22 @@
+{
+  "user": {
+    "id": "owner-user",
+    "email": "owner@example.com",
+    "name": "Örnek Owner",
+    "role": "freelancer",
+    "clientId": null,
+    "disabled": false,
+    "imageUrl": null
+  },
+  "session": { "expiresAt": "2026-10-03T09:00:00.000Z" },
+  "preferences": { "colorMode": "dark", "locale": "en", "timezone": "Europe/Berlin" },
+  "localization": {
+    "userPreferenceLocale": "en",
+    "clientDefaultLocale": null,
+    "resolvedLocale": "en",
+    "requestedLocale": "en",
+    "instanceDefaultLocale": "tr",
+    "source": "query",
+    "fallbackChain": ["en", "tr"]
+  }
+}

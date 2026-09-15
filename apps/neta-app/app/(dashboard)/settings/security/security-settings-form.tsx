@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useTransition } from "react";
-import { KeyRound, Save, ShieldCheck } from "lucide-react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { KeyRound, Link2, Save, ShieldCheck, Smartphone, Trash2 } from "lucide-react";
+import type { DeviceSessionInfo, PairingChallenge } from "@neta/api-contracts";
 import { Button, Card, CardContent, Input, Label } from "poyraz-ui/atoms";
 import { Alert, AlertDescription, AlertTitle, toast } from "poyraz-ui/molecules";
 import { useTranslations } from "@/components/i18n/i18n-provider";
@@ -11,6 +12,35 @@ export function SecuritySettingsForm() {
   const t = useTranslations();
   const formRef = useRef<HTMLFormElement>(null);
   const [pending, startTransition] = useTransition();
+  const [pairing, setPairing] = useState<PairingChallenge | null>(null);
+  const [devices, setDevices] = useState<DeviceSessionInfo[]>([]);
+  const [pairingPassword, setPairingPassword] = useState("");
+
+  async function loadDevices() {
+    const response = await fetch("/api/v1/device-sessions", { headers: { Accept: "application/json" } });
+    const payload = await response.json() as { data?: DeviceSessionInfo[] };
+    if (response.ok && Array.isArray(payload.data)) setDevices(payload.data);
+  }
+
+  useEffect(() => { void loadDevices(); }, []);
+
+  async function createPairing() {
+    const response = await fetch("/api/v1/pairing/challenges", {
+      body: JSON.stringify({ currentPassword: pairingPassword }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
+    const payload = await response.json() as { data?: PairingChallenge; error?: { message?: string } };
+    if (!response.ok || !payload.data) return toast.error(payload.error?.message ?? "Pairing kodu oluşturulamadı.");
+    setPairing(payload.data);
+    setPairingPassword("");
+  }
+
+  async function revokeDevice(id: string) {
+    const response = await fetch(`/api/v1/device-sessions/${encodeURIComponent(id)}`, { method: "DELETE" });
+    if (!response.ok) return toast.error("Cihaz oturumu kapatılamadı.");
+    setDevices((current) => current.filter((item) => item.id !== id));
+  }
 
   function submit(formData: FormData) {
     startTransition(async () => {
@@ -25,7 +55,7 @@ export function SecuritySettingsForm() {
   }
 
   return (
-    <Card>
+    <div className="space-y-6"><Card>
       <CardContent className="space-y-8 p-6 sm:p-8">
         <div className="space-y-1.5">
           <h2 className="text-xl font-semibold text-foreground">
@@ -109,5 +139,26 @@ export function SecuritySettingsForm() {
         </form>
       </CardContent>
     </Card>
+      <Card>
+        <CardContent className="space-y-6 p-6 sm:p-8">
+          <div className="space-y-1.5">
+            <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground"><Smartphone className="h-5 w-5" /> Mobil cihazlar</h2>
+            <p className="text-sm text-muted-foreground">Owner şifresini telefona girmeden, beş dakika geçerli tek kullanımlık kodla bağlan.</p>
+          </div>
+          <div className="flex max-w-2xl gap-3">
+            <Input aria-label="Pairing için mevcut şifre" autoComplete="current-password" onChange={(event) => setPairingPassword(event.target.value)} placeholder="Mevcut şifre" type="password" value={pairingPassword} />
+            <Button disabled={!pairingPassword} onClick={() => void createPairing()} type="button"><Link2 className="mr-2 h-4 w-4" />Kod üret</Button>
+          </div>
+          {pairing ? <Alert><AlertTitle>Tek kullanımlık kod: <span className="font-mono tracking-widest">{pairing.manualCode}</span></AlertTitle><AlertDescription>Kod {new Date(pairing.expiresAt).toLocaleTimeString()} saatine kadar geçerli. QR payload: <span className="break-all font-mono text-xs">{pairing.qrPayload}</span></AlertDescription></Alert> : null}
+          <div className="space-y-2">
+            {devices.map((device) => <div className="flex items-center justify-between rounded-xl border border-border p-3" key={device.id}>
+              <div><p className="font-medium">{device.deviceLabel}</p><p className="text-xs text-muted-foreground">{device.platform} · Son kullanım {new Date(device.lastActiveAt).toLocaleString()}</p></div>
+              {!device.revokedAt ? <Button aria-label="Cihazı kaldır" onClick={() => void revokeDevice(device.id)} size="sm" type="button" variant="ghost"><Trash2 className="h-4 w-4" /></Button> : <span className="text-xs text-muted-foreground">İptal edildi</span>}
+            </div>)}
+            {devices.length === 0 ? <p className="text-sm text-muted-foreground">Bağlı mobil cihaz yok.</p> : null}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

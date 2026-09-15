@@ -22,6 +22,7 @@ export type FileUploadInput = {
   bytes: Uint8Array;
   projectId?: string;
   portalVisible?: boolean;
+  metadataSanitized?: boolean;
 };
 
 export type StoredFile = typeof files.$inferSelect;
@@ -69,6 +70,7 @@ export class FileService {
           mimeType: upload.mimeType,
           byteSize: upload.byteSize,
           sha256: upload.sha256,
+          metadataSanitized: input.metadataSanitized ?? false,
         }).returning().get();
 
         if (input.kind === "avatar") {
@@ -91,6 +93,10 @@ export class FileService {
     const metadata = this.repository.get(id) ?? this.throwNotFound();
     this.assertCanRead(actor, metadata);
     return { metadata, bytes: this.readStoredBytes(metadata) };
+  }
+
+  list(actor: DomainActor): StoredFile[] {
+    return this.repository.listOwned(requireOwnerScope(actor));
   }
 
   readPublicBranding(id: string): { metadata: StoredFile; bytes: Buffer } {

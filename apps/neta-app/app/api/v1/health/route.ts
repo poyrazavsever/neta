@@ -1,4 +1,4 @@
-import { apiV1Error, apiV1Success } from "@/server/api/v1/responses";
+import { apiV1Error, apiV1MethodNotAllowed, apiV1Success } from "@/server/api/v1/responses";
 import { checkReadiness } from "@/server/db/health";
 import { DomainError } from "@/server/domain/errors";
 
@@ -25,3 +25,8 @@ export function GET() {
     checkedAt,
   });
 }
+
+export function POST() { return apiV1MethodNotAllowed(["GET"]); }
+export function PUT() { return apiV1MethodNotAllowed(["GET"]); }
+export function PATCH() { return apiV1MethodNotAllowed(["GET"]); }
+export function DELETE() { return apiV1MethodNotAllowed(["GET"]); }

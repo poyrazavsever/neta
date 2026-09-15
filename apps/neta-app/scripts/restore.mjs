@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import Database from "better-sqlite3";
 import { ensureDataLayout, getDataConfig } from "./lib/data-dir.mjs";
 
 const args = parseArgs(process.argv.slice(2));
@@ -63,6 +64,7 @@ try {
 
   fs.renameSync(stagedDatabasePath, config.databasePath);
   stagedDatabaseInstalled = true;
+  rotateDeviceTokenEpoch(config.databasePath);
   fs.renameSync(stagedUploadsDir, config.uploadsDir);
   stagedUploadsInstalled = true;
 } catch (error) {
@@ -88,6 +90,21 @@ fs.rmSync(rollbackDatabasePath, { force: true });
 fs.rmSync(rollbackUploadsDir, { recursive: true, force: true });
 
 console.log(`Backup restored from ${backupDir} to ${config.dataDir}`);
+
+function rotateDeviceTokenEpoch(databasePath) {
+  const sqlite = new Database(databasePath);
+  try {
+    sqlite.transaction(() => {
+      sqlite.exec("CREATE TABLE IF NOT EXISTS device_security_state (key text PRIMARY KEY NOT NULL DEFAULT 'default', token_epoch text NOT NULL, updated_at integer NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)))");
+      const epoch = crypto.randomBytes(32).toString("base64url");
+      sqlite.prepare("INSERT INTO device_security_state (key, token_epoch, updated_at) VALUES ('default', ?, ?) ON CONFLICT(key) DO UPDATE SET token_epoch = excluded.token_epoch, updated_at = excluded.updated_at").run(epoch, Date.now());
+      const table = sqlite.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'device_sessions'").get();
+      if (table) sqlite.prepare("UPDATE device_sessions SET status = 'revoked', revoked_at = ? WHERE status = 'active'").run(Date.now());
+    })();
+  } finally {
+    sqlite.close();
+  }
+}
 
 function parseArgs(values) {
   const parsed = { force: false };

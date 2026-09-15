@@ -1,0 +1,14 @@
+{
+  "locale": "tr",
+  "requestedLocale": "tr",
+  "defaultLocale": "tr",
+  "source": "query",
+  "fallbackChain": ["tr"],
+  "version": 7,
+  "catalogVersion": 7,
+  "namespaces": ["common", "portal"],
+  "messages": {
+    "common.actions.save": "Kaydet",
+    "portal.dashboard.title": "Müşteri portalı"
+  }
+}

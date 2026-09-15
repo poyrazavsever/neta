@@ -15,6 +15,7 @@
     "start": "node .next/standalone/apps/neta-app/server.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "mobile:contract:test": "node --test server/api/v1/presenters.test.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.mjs",
     "db:backup": "node scripts/backup.mjs",
@@ -56,6 +57,7 @@
     "@ai-sdk/groq": "^3.0.39",
     "@ai-sdk/openai": "^3.0.68",
     "@ai-sdk/react": "^3.0.199",
+    "@neta/api-contracts": "workspace:*",
     "@tailwindcss/postcss": "^4.3.0",
     "ai": "^6.0.197",
     "better-auth": "^1.6.23",
@@ -72,6 +74,7 @@
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.81.0",
     "recharts": "^3.8.1",
+    "sharp": "^0.35.4",
     "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^4.4.3"

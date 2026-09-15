@@ -1,158 +1,46 @@
+import {
+  NETA_API_BASE_PATH as SHARED_NETA_API_BASE_PATH,
+  NETA_API_VERSION as SHARED_NETA_API_VERSION,
+  NETA_CAPABILITIES as SHARED_NETA_CAPABILITIES,
+  NETA_CAPABILITY_DETAILS as SHARED_NETA_CAPABILITY_DETAILS,
+  NETA_DISCOVERY_VERSION as SHARED_NETA_DISCOVERY_VERSION,
+  NETA_PROTOCOL as SHARED_NETA_PROTOCOL,
+  isNetaDiscoveryDocument,
+  isNetaInstanceMetadata,
+  type NetaCapability as SharedNetaCapability,
+  type NetaCapabilityAccess as SharedNetaCapabilityAccess,
+  type NetaCapabilityStatus as SharedNetaCapabilityStatus,
+  type NetaDiscoveryDocument as SharedNetaDiscoveryDocument,
+  type NetaInstanceMetadata as SharedNetaInstanceMetadata,
+  type NetaLocalizedResponse as SharedNetaLocalizedResponse,
+  type NetaTranslationMutationShape as SharedNetaTranslationMutationShape,
+} from "@neta/api-contracts";
 import type { PublicBranding } from "../../branding/service";
 import type { InstanceIdentity } from "../../instance/service";
 import type { getPublicLocalizationMetadata } from "../../i18n/runtime";
 import { buildLocalizationContract } from "./localization";
 
-export const NETA_PROTOCOL = "neta" as const;
-export const NETA_DISCOVERY_VERSION = 1 as const;
-export const NETA_API_VERSION = "1" as const;
-export const NETA_API_BASE_PATH = "/api/v1" as const;
+export const NETA_PROTOCOL = SHARED_NETA_PROTOCOL;
+export const NETA_DISCOVERY_VERSION = SHARED_NETA_DISCOVERY_VERSION;
+export const NETA_API_VERSION = SHARED_NETA_API_VERSION;
+export const NETA_API_BASE_PATH = SHARED_NETA_API_BASE_PATH;
 
-export type CapabilityStatus = "available" | "planned";
-export type CapabilityAccess = "public" | "session" | "freelancer" | "client";
+export type CapabilityStatus = SharedNetaCapabilityStatus;
+export type CapabilityAccess = SharedNetaCapabilityAccess;
 
-export type NetaCapability = {
-  id: string;
-  version: number;
-  status: CapabilityStatus;
-  access: CapabilityAccess;
-};
+export type NetaCapability = SharedNetaCapability;
 
-export type NetaLocalizedResponse<TResource> = {
-  resource: TResource;
-  localized: TResource;
-  locale: string;
-  fallbackChain: string[];
-};
+export type NetaLocalizedResponse<TResource> = SharedNetaLocalizedResponse<TResource>;
 
-export type NetaTranslationMutationShape = Record<
-  string,
-  Record<string, string | null>
->;
+export type NetaTranslationMutationShape = SharedNetaTranslationMutationShape;
 
-export const NETA_CAPABILITY_DETAILS = [
-  { id: "mobile-v1", version: 1, status: "available", access: "public" },
-  { id: "instance.discovery", version: 1, status: "available", access: "public" },
-  { id: "instance.branding", version: 1, status: "available", access: "public" },
-  { id: "instance.localization", version: 1, status: "available", access: "public" },
-  { id: "auth.better-auth-cookie", version: 1, status: "available", access: "session" },
-  { id: "files.local", version: 1, status: "available", access: "session" },
-  { id: "freelancer.core", version: 1, status: "available", access: "freelancer" },
-  { id: "portal.client", version: 1, status: "available", access: "client" },
-  { id: "ai.assistant", version: 1, status: "available", access: "freelancer" },
-  { id: "auth.device-pairing", version: 1, status: "planned", access: "freelancer" },
-] as const satisfies readonly NetaCapability[];
+export const NETA_CAPABILITY_DETAILS = SHARED_NETA_CAPABILITY_DETAILS;
 
-export const NETA_CAPABILITIES = NETA_CAPABILITY_DETAILS
-  .filter((capability) => capability.status === "available")
-  .map((capability) => capability.id);
+export const NETA_CAPABILITIES = SHARED_NETA_CAPABILITIES;
 
-export type NetaDiscoveryDocument = {
-  protocol: typeof NETA_PROTOCOL;
-  discoveryVersion: typeof NETA_DISCOVERY_VERSION;
-  instanceId: string;
-  applicationName: string;
-  workspaceName: string;
-  api: {
-    version: typeof NETA_API_VERSION;
-    baseUrl: string;
-    metaUrl: string;
-    healthUrl: string;
-    catalogUrl: string;
-  };
-  security: {
-    httpsRequired: true;
-    insecureLoopbackAllowed: true;
-  };
-  localization: {
-    defaultLocale: string;
-    supportedLocales: Array<{
-      code: string;
-      name: string;
-      nativeName: string;
-      status: string;
-      textDirection: string;
-    }>;
-    catalogVersion: number;
-  };
-  capabilities: readonly string[];
-  capabilityDetails: readonly NetaCapability[];
-};
+export type NetaDiscoveryDocument = SharedNetaDiscoveryDocument;
 
-export type NetaInstanceMetadata = {
-  protocol: {
-    name: typeof NETA_PROTOCOL;
-    discoveryVersion: typeof NETA_DISCOVERY_VERSION;
-    apiVersion: typeof NETA_API_VERSION;
-  };
-  server: {
-    version: string;
-  };
-  instance: {
-    id: string;
-    createdAt: string;
-    applicationName: string;
-    workspaceName: string;
-    metaTitle: string;
-    shortName: string;
-    organizationName: string | null;
-  };
-  branding: {
-    primaryColor: string;
-    accentColor: string;
-    defaultColorMode: PublicBranding["defaultColorMode"];
-    radiusScale: PublicBranding["radiusScale"];
-    lightLogoUrl: string | null;
-    darkLogoUrl: string | null;
-    iconUrl: string | null;
-    faviconUrl: string | null;
-  };
-  localization: ReturnType<typeof buildLocalizationContract>;
-  contracts: {
-    localizedResponse: {
-      resource: "original database record";
-      localized: "locale-resolved record";
-      locale: "resolved locale code";
-      fallbackChain: "ordered locale fallback chain";
-    };
-    ownerMutationTranslations: {
-      field: "translations";
-      shape: "Record<locale, Record<field, string | null>>";
-      unsupportedLocaleCode: "UNSUPPORTED_LOCALE";
-    };
-    portalRevision: {
-      sourceLocale: "locale code of the client-authored revision message";
-      descriptionPolicy: "user-authored text is stored and returned without machine translation";
-    };
-    preferenceMutation: {
-      endpoint: "PATCH /api/v1/me/preferences";
-      body: "{ language?: activeLocale, colorMode?: light|dark|system }";
-      roles: "freelancer and client users mutate only their own preferences";
-    };
-    catalogDownload: {
-      endpoint: "GET /api/v1/localization/catalog?locale=tr&namespaces=common,portal";
-      versionField: "catalogVersion";
-    };
-  };
-  client: {
-    minimumSupportedVersion: string | null;
-    platforms: readonly ["ios", "android"];
-  };
-  authentication: {
-    sessionMethod: "better-auth-cookie";
-    devicePairing: "planned";
-  };
-  capabilities: readonly string[];
-  capabilityDetails: readonly NetaCapability[];
-  links: {
-    discovery: string;
-    apiBase: string;
-    health: string;
-    me: string;
-    preferences: string;
-    catalog: string;
-  };
-};
+export type NetaInstanceMetadata = SharedNetaInstanceMetadata;
 
 type ContractInput = {
   appUrl: string;
@@ -167,7 +55,7 @@ export function buildDiscoveryDocument(
   input: ContractInput,
 ): NetaDiscoveryDocument {
   const apiBaseUrl = absoluteUrl(input.appUrl, NETA_API_BASE_PATH);
-  return {
+  const output: NetaDiscoveryDocument = {
     protocol: NETA_PROTOCOL,
     discoveryVersion: NETA_DISCOVERY_VERSION,
     instanceId: input.identity.instanceId,
@@ -198,12 +86,16 @@ export function buildDiscoveryDocument(
     capabilities: NETA_CAPABILITIES,
     capabilityDetails: NETA_CAPABILITY_DETAILS,
   };
+  if (!isNetaDiscoveryDocument(output)) {
+    throw new Error("Discovery presenter produced an invalid API contract.");
+  }
+  return output;
 }
 
 export function buildInstanceMetadata(
   input: ContractInput,
 ): NetaInstanceMetadata {
-  return {
+  const output: NetaInstanceMetadata = {
     protocol: {
       name: NETA_PROTOCOL,
       discoveryVersion: NETA_DISCOVERY_VERSION,
@@ -250,12 +142,14 @@ export function buildInstanceMetadata(
       },
       preferenceMutation: {
         endpoint: "PATCH /api/v1/me/preferences",
-        body: "{ language?: activeLocale, colorMode?: light|dark|system }",
+        canonicalFields: ["locale", "colorMode", "timezone"],
+        legacyInputAlias: "language -> locale",
         roles: "freelancer and client users mutate only their own preferences",
       },
       catalogDownload: {
         endpoint: "GET /api/v1/localization/catalog?locale=tr&namespaces=common,portal",
-        versionField: "catalogVersion",
+        versionField: "version",
+        legacyVersionField: "catalogVersion",
       },
     },
     client: {
@@ -264,7 +158,7 @@ export function buildInstanceMetadata(
     },
     authentication: {
       sessionMethod: "better-auth-cookie",
-      devicePairing: "planned",
+      devicePairing: "available",
     },
     capabilities: NETA_CAPABILITIES,
     capabilityDetails: NETA_CAPABILITY_DETAILS,
@@ -277,6 +171,10 @@ export function buildInstanceMetadata(
       catalog: absoluteUrl(input.appUrl, `${NETA_API_BASE_PATH}/localization/catalog`),
     },
   };
+  if (!isNetaInstanceMetadata(output)) {
+    throw new Error("Metadata presenter produced an invalid API contract.");
+  }
+  return output;
 }
 
 function absoluteOptionalUrl(baseUrl: string, value: string | null): string | null {

@@ -4,6 +4,7 @@ export type DomainErrorCode =
   | "UNAUTHENTICATED"
   | "FORBIDDEN"
   | "NOT_FOUND"
+  | "METHOD_NOT_ALLOWED"
   | "CONFLICT"
   | "INVARIANT_VIOLATION"
   | "UPSTREAM_ERROR"
@@ -16,6 +17,7 @@ const statusByCode: Record<DomainErrorCode, number> = {
   UNAUTHENTICATED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
+  METHOD_NOT_ALLOWED: 405,
   CONFLICT: 409,
   INVARIANT_VIOLATION: 422,
   UPSTREAM_ERROR: 502,

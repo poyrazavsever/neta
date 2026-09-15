@@ -1,0 +1,22 @@
+{
+  "user": {
+    "id": "client-user",
+    "email": "client@example.com",
+    "name": "Örnek Müşteri",
+    "role": "client",
+    "clientId": "client-record",
+    "disabled": false,
+    "imageUrl": "https://neta.example.com/api/files/client-avatar"
+  },
+  "session": { "expiresAt": "2026-10-03T09:00:00.000Z" },
+  "preferences": { "colorMode": "dark", "locale": "en", "timezone": "Europe/London" },
+  "localization": {
+    "userPreferenceLocale": "en",
+    "clientDefaultLocale": "tr",
+    "resolvedLocale": "en",
+    "requestedLocale": null,
+    "instanceDefaultLocale": "tr",
+    "source": "preference",
+    "fallbackChain": ["en", "tr"]
+  }
+}

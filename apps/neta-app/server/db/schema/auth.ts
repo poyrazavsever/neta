@@ -157,3 +157,60 @@ export const authAuditEvents = sqliteTable(
     index("auth_audit_events_auth_user_id_idx").on(table.authUserId),
   ],
 );
+
+export const deviceSecurityState = sqliteTable("device_security_state", {
+  key: text("key").primaryKey().default("default"),
+  tokenEpoch: text("token_epoch").notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).default(nowMs).notNull(),
+});
+
+export const pairingChallenges = sqliteTable(
+  "pairing_challenges",
+  {
+    id: text("id").primaryKey(),
+    ownerUserId: text("owner_user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+    secretDigest: text("secret_digest").notNull(),
+    manualCodeDigest: text("manual_code_digest").notNull(),
+    status: text("status").$type<"pending" | "consumed" | "locked" | "revoked">().default("pending").notNull(),
+    attemptCount: integer("attempt_count").default(0).notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    consumedAt: integer("consumed_at", { mode: "timestamp_ms" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).default(nowMs).notNull(),
+  },
+  (table) => [
+    uniqueIndex("pairing_challenges_secret_digest_unique").on(table.secretDigest),
+    uniqueIndex("pairing_challenges_manual_code_digest_unique").on(table.manualCodeDigest),
+    index("pairing_challenges_owner_status_idx").on(table.ownerUserId, table.status),
+  ],
+);
+
+export const deviceSessions = sqliteTable(
+  "device_sessions",
+  {
+    id: text("id").primaryKey(),
+    familyId: text("family_id").notNull(),
+    ownerUserId: text("owner_user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+    installIdDigest: text("install_id_digest").notNull(),
+    deviceName: text("device_name").notNull(),
+    platform: text("platform").$type<"ios" | "android" | "unknown">().notNull(),
+    appVersion: text("app_version").notNull(),
+    osMajor: text("os_major"),
+    scopes: text("scopes", { mode: "json" }).$type<string[]>().notNull(),
+    tokenEpoch: text("token_epoch").notNull(),
+    accessDigest: text("access_digest").notNull(),
+    accessExpiresAt: integer("access_expires_at", { mode: "timestamp_ms" }).notNull(),
+    refreshDigest: text("refresh_digest").notNull(),
+    previousRefreshDigest: text("previous_refresh_digest"),
+    refreshExpiresAt: integer("refresh_expires_at", { mode: "timestamp_ms" }).notNull(),
+    status: text("status").$type<"active" | "revoked" | "compromised">().default("active").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).default(nowMs).notNull(),
+    lastUsedAt: integer("last_used_at", { mode: "timestamp_ms" }).default(nowMs).notNull(),
+    revokedAt: integer("revoked_at", { mode: "timestamp_ms" }),
+  },
+  (table) => [
+    uniqueIndex("device_sessions_access_digest_unique").on(table.accessDigest),
+    uniqueIndex("device_sessions_refresh_digest_unique").on(table.refreshDigest),
+    index("device_sessions_owner_status_idx").on(table.ownerUserId, table.status),
+    index("device_sessions_family_idx").on(table.familyId),
+  ],
+);

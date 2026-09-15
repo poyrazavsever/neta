@@ -1,0 +1,10 @@
+{
+  "items": [
+    { "id": "item-1" },
+    { "id": "item-2" }
+  ],
+  "pageInfo": {
+    "hasNextPage": true,
+    "nextCursor": "opaque-v1-cursor"
+  }
+}

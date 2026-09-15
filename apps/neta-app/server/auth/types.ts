@@ -23,4 +23,10 @@ export type AuthAuditEventType =
   | "invitation_accept_failed"
   | "client_access_disabled"
   | "client_access_enabled"
-  | "client_locale_updated";
+  | "client_locale_updated"
+  | "pairing_created"
+  | "pairing_failed"
+  | "pairing_consumed"
+  | "device_session_refreshed"
+  | "device_session_revoked"
+  | "device_token_reuse_detected";

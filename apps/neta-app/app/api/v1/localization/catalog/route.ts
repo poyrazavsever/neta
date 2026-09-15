@@ -1,5 +1,10 @@
-import { apiV1Error, apiV1Success } from "@/server/api/v1/responses";
+import {
+  apiV1Error,
+  apiV1MethodNotAllowed,
+  apiV1Success,
+} from "@/server/api/v1/responses";
 import { negotiateLocale } from "@/server/api/v1/localization";
+import { presentRuntimeCatalog } from "@/server/api/v1/presenters";
 import { getCatalogVersion, getResolvedCatalog } from "@/server/i18n/catalog";
 import { getPublicLocalizationMetadata } from "@/server/i18n/runtime";
 import { I18N_NAMESPACES, type I18nNamespace } from "@/lib/i18n";
@@ -21,16 +26,18 @@ export function GET(request: Request) {
     const namespaces = parseNamespaces(url.searchParams.get("namespaces"));
     const catalog = getResolvedCatalog(resolved.locale, namespaces, metadata.catalogVersion);
 
-    return apiV1Success({
+    const version = getCatalogVersion();
+    return apiV1Success(presentRuntimeCatalog({
       locale: catalog.locale,
       requestedLocale: resolved.requestedLocale,
       defaultLocale: resolved.defaultLocale,
       source: resolved.source,
       fallbackChain: catalog.fallbackChain,
-      catalogVersion: getCatalogVersion(),
+      version,
+      catalogVersion: version,
       namespaces: catalog.namespaces,
       messages: catalog.messages,
-    }, {
+    }), {
       headers: {
         "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
       },
@@ -39,6 +46,11 @@ export function GET(request: Request) {
     return apiV1Error(error);
   }
 }
+
+export function POST() { return apiV1MethodNotAllowed(["GET"]); }
+export function PUT() { return apiV1MethodNotAllowed(["GET"]); }
+export function PATCH() { return apiV1MethodNotAllowed(["GET"]); }
+export function DELETE() { return apiV1MethodNotAllowed(["GET"]); }
 
 function parseNamespaces(value: string | null): I18nNamespace[] {
   if (!value) return [...I18N_NAMESPACES];

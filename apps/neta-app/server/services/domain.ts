@@ -197,6 +197,13 @@ export class DomainService {
     return projectId ? rows.filter((task) => task.projectId === projectId) : rows;
   }
 
+  getTask(actor: DomainActor, taskId: string) {
+    if (actor.role === "client") {
+      return this.listTasks(actor).find((task) => task.id === taskId) ?? this.throwNotFound("İş");
+    }
+    return this.repositories.tasks.get(requireOwnerScope(actor), taskId) ?? this.throwNotFound("İş");
+  }
+
   createTask(actor: DomainActor, input: unknown) {
     const scope = requireOwnerScope(actor);
     const translations = this.getContentTranslations(input);
@@ -256,6 +263,10 @@ export class DomainService {
     return this.repositories.calendar.list(requireOwnerScope(actor));
   }
 
+  getCalendarEvent(actor: DomainActor, eventId: string) {
+    return this.repositories.calendar.get(requireOwnerScope(actor), eventId) ?? this.throwNotFound("Takvim kaydı");
+  }
+
   updateCalendarEvent(actor: DomainActor, eventId: string, input: unknown) {
     const scope = requireOwnerScope(actor);
     const current = this.repositories.calendar.get(scope, eventId) ?? this.throwNotFound("Takvim kaydı");
@@ -297,6 +308,10 @@ export class DomainService {
 
   listFinanceTransactions(actor: DomainActor) {
     return this.repositories.finance.list(requireOwnerScope(actor));
+  }
+
+  getFinanceTransaction(actor: DomainActor, transactionId: string) {
+    return this.repositories.finance.get(requireOwnerScope(actor), transactionId) ?? this.throwNotFound("Finans kaydı");
   }
 
   updateFinanceTransaction(actor: DomainActor, transactionId: string, input: unknown) {
@@ -342,6 +357,10 @@ export class DomainService {
 
   listJournalEntries(actor: DomainActor) {
     return this.repositories.journal.list(requireOwnerScope(actor));
+  }
+
+  getJournalEntry(actor: DomainActor, entryId: string) {
+    return this.repositories.journal.get(requireOwnerScope(actor), entryId) ?? this.throwNotFound("Günlük kaydı");
   }
 
   updateJournalEntry(actor: DomainActor, entryId: string, input: unknown) {

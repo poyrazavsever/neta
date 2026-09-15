@@ -5,6 +5,21 @@ import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import Database from "better-sqlite3";
+import {
+  isCalendarEvent,
+  isCalendarEventDetail,
+  isClientDetail,
+  isClientListItem,
+  isOwnerDashboardOverview,
+  isPaginatedResponse,
+  isPlanningSection,
+  isProjectDetail,
+  isProjectListItem,
+  isProjectRevision,
+  isPortalInvitationResult,
+  isTaskDetail,
+  isTaskListItem,
+} from "@neta/api-contracts";
 
 const PNG_BYTES = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]);
 
@@ -104,22 +119,22 @@ try {
   assert.deepEqual(publicMeta.payload.data.client.platforms, ["ios", "android"]);
   assert.equal(
     publicMeta.payload.data.capabilities.includes("mobile-v1"),
-    true,
-    "Public metadata must advertise the base mobile client contract",
+    false,
+    "Public metadata must not advertise mobile-v1 before its required routes ship",
   );
   assert.equal(
     discovery.capabilities.includes("mobile-v1"),
-    true,
-    "Discovery must advertise the base mobile client contract",
+    false,
+    "Discovery must not advertise mobile-v1 before its required routes ship",
   );
   assert.deepEqual(
     publicMeta.payload.data.capabilityDetails.find(
-      (capability) => capability.id === "auth.device-pairing",
+      (capability) => capability.id === "auth.device-pairing.v1",
     ),
     {
-      id: "auth.device-pairing",
+      id: "auth.device-pairing.v1",
       version: 1,
-      status: "planned",
+      status: "available",
       access: "freelancer",
     },
   );
@@ -195,6 +210,50 @@ try {
       },
     );
     assert.equal(ownerMe.payload.data.preferences.colorMode, "system");
+    assert.equal(ownerMe.payload.data.preferences.locale, "tr");
+    assert.equal(ownerMe.payload.data.preferences.timezone, "Europe/Istanbul");
+    assert.equal(ownerMe.payload.data.user.name.startsWith("Owner"), true);
+    assert.equal(ownerMe.payload.data.user.disabled, false);
+
+    const updatedPreferences = await jsonRequest("/api/v1/me/preferences", {
+      method: "PATCH",
+      cookie: ownerCookie,
+      body: { colorMode: "dark", locale: "en", timezone: "Europe/Berlin" },
+    });
+    assert.equal(updatedPreferences.response.status, 200);
+    assert.deepEqual(updatedPreferences.payload.data.preferences, {
+      colorMode: "dark",
+      locale: "en",
+      timezone: "Europe/Berlin",
+    });
+    assert.equal(updatedPreferences.payload.data.user.id, ownerUserId);
+    const reloadedPreferences = await jsonRequest("/api/v1/me", { cookie: ownerCookie });
+    assert.deepEqual(reloadedPreferences.payload.data.preferences, updatedPreferences.payload.data.preferences);
+
+    const invalidPreferences = await jsonRequest("/api/v1/me/preferences", {
+      method: "PATCH",
+      cookie: ownerCookie,
+      body: { locale: "en", unexpected: true },
+    });
+    assert.equal(invalidPreferences.response.status, 400);
+    assert.equal(invalidPreferences.payload.error.code, "VALIDATION_ERROR");
+
+    const unsupportedPreferenceMethod = await jsonRequest("/api/v1/me/preferences", {
+      cookie: ownerCookie,
+    });
+    assert.equal(unsupportedPreferenceMethod.response.status, 405);
+    assert.equal(unsupportedPreferenceMethod.payload.error.code, "METHOD_NOT_ALLOWED");
+    assert.equal(unsupportedPreferenceMethod.response.headers.get("allow"), "PATCH");
+
+    const unknownV1Route = await jsonRequest("/api/v1/does-not-exist", { cookie: ownerCookie });
+    assert.equal(unknownV1Route.response.status, 404);
+    assert.equal(unknownV1Route.payload.error.code, "NOT_FOUND");
+
+    await jsonRequest("/api/v1/me/preferences", {
+      method: "PATCH",
+      cookie: ownerCookie,
+      body: { colorMode: "system", locale: "tr", timezone: "Europe/Istanbul" },
+    });
     assert.doesNotMatch(
       JSON.stringify(ownerMe.payload),
       /token|password/i,
@@ -226,6 +285,11 @@ try {
     db.prepare(
       "insert into project_planning_sections (id, owner_user_id, project_id, category, title, content, metadata, sort_order) values (?, ?, ?, ?, ?, ?, ?, ?)",
     ).run("planning-portal", ownerUserId, "project-alpha", "overview", "Portal Plan", "Visible planning content", "{}", 0);
+    const calendarStart = new Date();
+    const calendarEnd = new Date(calendarStart.getTime() + 3_600_000);
+    db.prepare(
+      "insert into calendar_events (id, owner_user_id, client_id, project_id, title, type, starts_at, ends_at) values (?, ?, ?, ?, ?, ?, ?, ?)",
+    ).run("calendar-mobile", ownerUserId, "client-alpha", "project-alpha", "Mobile Meeting", "meeting", calendarStart.getTime(), calendarEnd.getTime());
     db.prepare(
       "insert into finance_transactions (id, owner_user_id, type, amount_minor, currency, transaction_date, payment_status) values (?, ?, ?, ?, ?, ?, ?)",
     ).run(
@@ -268,6 +332,119 @@ try {
       ownerCookie = cookieHeader(signedIn.response);
     }
     assert.ok(ownerCookie, "Owner session cookie must be issued");
+
+    const ownerPassword = ownerEmail.startsWith("owner-one")
+      ? "OwnerOne-Password-123"
+      : "OwnerTwo-Password-123";
+    const pairing = await jsonRequest("/api/v1/pairing/challenges", {
+      method: "POST", cookie: ownerCookie, body: { currentPassword: ownerPassword },
+    });
+    assert.equal(pairing.response.status, 201, JSON.stringify(pairing.payload));
+    const pairingUrl = new URL(pairing.payload.data.qrPayload);
+    const pairingSecret = pairingUrl.searchParams.get("secret");
+    assert.ok(pairingSecret);
+    const exchangeBody = {
+      secret: pairingSecret, installId: "phase1-smoke-install", deviceName: "Smoke iPhone",
+      platform: "ios", appVersion: "0.1.0", osMajor: "18",
+    };
+    const paired = await jsonRequest("/api/v1/pairing/exchange", { method: "POST", body: exchangeBody });
+    assert.equal(paired.response.status, 201, JSON.stringify(paired.payload));
+    const doubleExchange = await jsonRequest("/api/v1/pairing/exchange", { method: "POST", body: exchangeBody });
+    assert.equal(doubleExchange.response.status, 401, "Pairing challenge must be one-use");
+    const pairedMe = await jsonRequest("/api/v1/me", { headers: { authorization: `Bearer ${paired.payload.data.accessToken}` } });
+    assert.equal(pairedMe.response.status, 200);
+    assert.equal(pairedMe.payload.data.user.role, "freelancer");
+    const rotated = await jsonRequest("/api/v1/device-sessions/refresh", {
+      method: "POST", body: { refreshToken: paired.payload.data.refreshToken },
+    });
+    assert.equal(rotated.response.status, 200);
+    const reuse = await jsonRequest("/api/v1/device-sessions/refresh", {
+      method: "POST", body: { refreshToken: paired.payload.data.refreshToken },
+    });
+    assert.equal(reuse.response.status, 401, "Refresh reuse must compromise the token family");
+    const compromisedMe = await jsonRequest("/api/v1/me", { headers: { authorization: `Bearer ${rotated.payload.data.accessToken}` } });
+    assert.equal(compromisedMe.response.status, 401);
+    const serializedDb = fs.readFileSync(databasePath);
+    assert.equal(serializedDb.includes(Buffer.from(pairingSecret)), false, "Raw pairing secret must not be stored");
+    assert.equal(serializedDb.includes(Buffer.from(paired.payload.data.refreshToken)), false, "Raw refresh token must not be stored");
+
+    const dashboardV1 = await jsonRequest("/api/v1/dashboard/overview?range=this_month", { cookie: ownerCookie });
+    assert.equal(dashboardV1.response.status, 200);
+    assert.equal(dashboardV1.payload.data.dashboard.range, "this_month");
+    assert.equal(isOwnerDashboardOverview(dashboardV1.payload.data), true);
+    const anonymousOwnerV1 = await jsonRequest("/api/v1/clients");
+    assert.equal(anonymousOwnerV1.response.status, 401);
+    assert.equal(anonymousOwnerV1.payload.error.code, "UNAUTHENTICATED");
+    const clientsV1 = await jsonRequest("/api/v1/clients?limit=1", { cookie: ownerCookie });
+    assert.equal(clientsV1.response.status, 200);
+    assert.equal(clientsV1.payload.data.items.length, 1);
+    assert.equal(clientsV1.payload.data.pageInfo.hasNextPage, true);
+    assert.equal(typeof clientsV1.payload.data.pageInfo.nextCursor, "string");
+    assert.equal(isPaginatedResponse(clientsV1.payload.data, isClientListItem), true);
+    const clientsNextV1 = await jsonRequest(`/api/v1/clients?limit=1&cursor=${encodeURIComponent(clientsV1.payload.data.pageInfo.nextCursor)}`, { cookie: ownerCookie });
+    assert.equal(clientsNextV1.response.status, 200);
+    assert.notEqual(clientsNextV1.payload.data.items[0].id, clientsV1.payload.data.items[0].id);
+    const clientV1 = await jsonRequest("/api/v1/clients/client-alpha", { cookie: ownerCookie });
+    assert.equal(clientV1.response.status, 200);
+    assert.equal(clientV1.payload.data.displayName, "Alpha Client");
+    assert.equal(isClientDetail(clientV1.payload.data), true);
+    const projectsV1 = await jsonRequest("/api/v1/projects?status=active", { cookie: ownerCookie });
+    assert.equal(projectsV1.response.status, 200);
+    assert.ok(projectsV1.payload.data.items.every((item) => item.status === "active"));
+    assert.equal(isPaginatedResponse(projectsV1.payload.data, isProjectListItem), true);
+    const projectV1 = await jsonRequest("/api/v1/projects/project-alpha", { cookie: ownerCookie });
+    assert.equal(projectV1.response.status, 200);
+    assert.equal(projectV1.payload.data.revisionAllowance, 2);
+    assert.equal(isProjectDetail(projectV1.payload.data), true);
+    const planningV1 = await jsonRequest("/api/v1/projects/project-alpha/planning-sections", { cookie: ownerCookie });
+    assert.equal(planningV1.response.status, 200);
+    assert.equal(planningV1.payload.data.items[0].title, "Portal Plan");
+    assert.equal(isPaginatedResponse(planningV1.payload.data, isPlanningSection), true);
+    const revisionsV1 = await jsonRequest("/api/v1/projects/project-alpha/revisions", { cookie: ownerCookie });
+    assert.equal(revisionsV1.response.status, 200);
+    assert.equal(isPaginatedResponse(revisionsV1.payload.data, isProjectRevision), true);
+    const tasksV1 = await jsonRequest("/api/v1/tasks?projectId=project-alpha", { cookie: ownerCookie });
+    assert.equal(tasksV1.response.status, 200);
+    assert.equal(tasksV1.payload.data.items.length, 2);
+    assert.equal(isPaginatedResponse(tasksV1.payload.data, isTaskListItem), true);
+    const taskV1 = await jsonRequest("/api/v1/tasks/task-portal-public", { cookie: ownerCookie });
+    assert.equal(taskV1.response.status, 200);
+    assert.equal(taskV1.payload.data.title, "Portal Public Task");
+    assert.equal(isTaskDetail(taskV1.payload.data), true);
+    const calendarV1 = await jsonRequest(`/api/v1/calendar/events?from=${encodeURIComponent(new Date(calendarStart.getTime() - 1_000).toISOString())}&to=${encodeURIComponent(new Date(calendarEnd.getTime() + 1_000).toISOString())}&timezone=Europe%2FIstanbul`, { cookie: ownerCookie });
+    assert.equal(calendarV1.response.status, 200);
+    assert.equal(calendarV1.payload.data.items[0].id, "calendar-mobile");
+    assert.ok(calendarV1.payload.data.items.every(isCalendarEvent));
+    const calendarDateRangeV1 = await jsonRequest(`/api/v1/calendar/events?from=${calendarStart.toISOString().slice(0, 10)}&to=${new Date(calendarStart.getTime() + 86_400_000).toISOString().slice(0, 10)}&timezone=Europe%2FIstanbul`, { cookie: ownerCookie });
+    assert.equal(calendarDateRangeV1.response.status, 200);
+    const calendarDetailV1 = await jsonRequest("/api/v1/calendar/events/calendar-mobile", { cookie: ownerCookie });
+    assert.equal(calendarDetailV1.response.status, 200);
+    assert.equal(isCalendarEventDetail(calendarDetailV1.payload.data), true);
+    const foreignIdV1 = await jsonRequest("/api/v1/tasks/not-owned-or-missing", { cookie: ownerCookie });
+    assert.equal(foreignIdV1.response.status, 404);
+    const invalidQueryV1 = await jsonRequest("/api/v1/clients?unexpected=true", { cookie: ownerCookie });
+    assert.equal(invalidQueryV1.response.status, 400);
+    const readOnlyV1 = await jsonRequest("/api/v1/clients", { method: "PUT", cookie: ownerCookie, body: {} });
+    assert.equal(readOnlyV1.response.status, 405);
+
+    const createClientBody = { email: "retry-client@example.com", pipelineStatus: "lead", status: "active", translations: { [discovery.localization.defaultLocale]: { name: "Retry Client" } } };
+    const createClientHeaders = { "idempotency-key": "client-create-smoke-0001" };
+    const createdClient = await jsonRequest("/api/v1/clients", { method: "POST", cookie: ownerCookie, body: createClientBody, headers: createClientHeaders });
+    const replayedClient = await jsonRequest("/api/v1/clients", { method: "POST", cookie: ownerCookie, body: createClientBody, headers: createClientHeaders });
+    assert.equal(createdClient.response.status, 201, JSON.stringify(createdClient.payload));
+    assert.equal(replayedClient.payload.data.id, createdClient.payload.data.id, "Retry must replay the first mutation result");
+    assert.equal(db.prepare("select count(*) as value from clients where email = ?").get(createClientBody.email).value, 1, "Retry must not duplicate side effects");
+    const reusedKey = await jsonRequest("/api/v1/clients", { method: "POST", cookie: ownerCookie, body: { ...createClientBody, email: "different@example.com" }, headers: createClientHeaders });
+    assert.equal(reusedKey.response.status, 409, "An idempotency key cannot be reused with a different payload");
+    const updatedClient = await jsonRequest(`/api/v1/clients/${createdClient.payload.data.id}`, { method: "PATCH", cookie: ownerCookie, body: { ...createClientBody, phone: "+905551112233", version: createdClient.payload.data.updatedAt } });
+    assert.equal(updatedClient.response.status, 200);
+    const staleClient = await jsonRequest(`/api/v1/clients/${createdClient.payload.data.id}`, { method: "PATCH", cookie: ownerCookie, body: { ...createClientBody, phone: "+905559998877", version: createdClient.payload.data.updatedAt } });
+    assert.equal(staleClient.response.status, 409, "A stale version must not overwrite the current record");
+
+    const invitationV1 = await jsonRequest("/api/v1/clients/client-alpha/portal-invitations", { method: "POST", cookie: ownerCookie, body: { defaultLocale: "tr", email: "mobile-invite@example.com" }, headers: { "idempotency-key": "portal-invite-smoke-0001" } });
+    assert.equal(invitationV1.response.status, 201);
+    assert.equal(isPortalInvitationResult(invitationV1.payload.data), true);
+    assert.equal(db.prepare("select count(*) as value from api_idempotency_records where response_json like '%/invite/%'").get().value, 0, "Idempotency storage must not contain raw invitation URLs");
 
     for (const pathname of [
       "/",
@@ -571,6 +748,9 @@ try {
     });
     assert.equal(clientSignIn.response.ok, true, JSON.stringify(clientSignIn.payload));
     const clientCookie = cookieHeader(clientSignIn.response);
+    const ownerRouteAsClient = await jsonRequest("/api/v1/clients", { cookie: clientCookie });
+    assert.equal(ownerRouteAsClient.response.status, 403);
+    assert.equal(ownerRouteAsClient.payload.error.code, "FORBIDDEN");
     const clientMe = await jsonRequest("/api/v1/me", { cookie: clientCookie });
     assert.equal(clientMe.response.status, 200);
     assert.deepEqual(
@@ -580,6 +760,33 @@ try {
       },
       { role: "client", clientId: "client-alpha" },
     );
+    const portalDashboardV1 = await jsonRequest("/api/v1/portal/dashboard", { cookie: clientCookie });
+    assert.equal(portalDashboardV1.response.status, 200, JSON.stringify(portalDashboardV1.payload));
+    assert.equal(portalDashboardV1.payload.data.projects.every((project) => project.id !== "project-foreign"), true);
+    const portalProjectsV1 = await jsonRequest("/api/v1/portal/projects", { cookie: clientCookie });
+    assert.deepEqual(portalProjectsV1.payload.data.items.map((project) => project.id), ["project-alpha"]);
+    const portalProjectV1 = await jsonRequest("/api/v1/portal/projects/project-alpha", { cookie: clientCookie });
+    assert.equal(portalProjectV1.response.status, 200);
+    assert.deepEqual(portalProjectV1.payload.data.publicTasks.map((task) => task.id), ["task-portal-public"]);
+    assert.equal(portalProjectV1.payload.data.assets.some((asset) => asset.id === portalAssetFileId), true);
+    const portalForeignV1 = await jsonRequest("/api/v1/portal/projects/project-foreign", { cookie: clientCookie });
+    assert.equal(portalForeignV1.response.status, 404, "Portal API must hide another client's project existence");
+    const portalTasksV1 = await jsonRequest("/api/v1/portal/tasks?projectId=project-alpha", { cookie: clientCookie });
+    assert.deepEqual(portalTasksV1.payload.data.items.map((task) => task.id), ["task-portal-public"]);
+    const portalRevisionsV1 = await jsonRequest("/api/v1/portal/revisions", { cookie: clientCookie });
+    assert.deepEqual(portalRevisionsV1.payload.data.items.map((revision) => revision.id), ["revision-portal"]);
+    const portalRevisionV1 = await jsonRequest("/api/v1/portal/projects/project-alpha/revisions", {
+      method: "POST", cookie: clientCookie,
+      body: { description: "Mobil revizyon isteği", sourceLocale: "tr" },
+      headers: { "idempotency-key": "portal-revision-mobile-0001" },
+    });
+    assert.equal(portalRevisionV1.response.status, 201);
+    const portalQuotaConflict = await jsonRequest("/api/v1/portal/projects/project-alpha/revisions", {
+      method: "POST", cookie: clientCookie,
+      body: { description: "Kota dışı istek", sourceLocale: "tr" },
+      headers: { "idempotency-key": "portal-revision-mobile-0002" },
+    });
+    assert.equal(portalQuotaConflict.response.status, 409);
 
     for (const [pathname, body] of [
       ["/api/finance-analysis", undefined],
@@ -813,8 +1020,8 @@ async function uploadFile(kind, { cookie, fileName, projectId, portalVisible } =
   return { response, payload: text ? JSON.parse(text) : null };
 }
 
-async function jsonRequest(pathname, { method, body, cookie } = {}) {
-  const headers = { origin: baseUrl };
+async function jsonRequest(pathname, { method, body, cookie, headers: extraHeaders } = {}) {
+  const headers = { origin: baseUrl, ...extraHeaders };
   if (body !== undefined) headers["content-type"] = "application/json";
   if (cookie) headers.cookie = cookie;
 

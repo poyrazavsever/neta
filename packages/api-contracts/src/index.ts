@@ -1,3 +1,245 @@
+export const NETA_PROTOCOL = 'neta' as const;
+export const NETA_DISCOVERY_VERSION = 1 as const;
+export const NETA_API_VERSION = '1' as const;
+export const NETA_API_BASE_PATH = '/api/v1' as const;
+export const NETA_API_VERSION_HEADER = 'X-Neta-API-Version' as const;
+
+export type NetaCapabilityStatus = 'available' | 'planned';
+export type NetaCapabilityAccess = 'public' | 'session' | 'freelancer' | 'client';
+
+export const NETA_CAPABILITY_DETAILS = [
+  { id: 'mobile-v1', version: 1, status: 'planned', access: 'public' },
+  { id: 'instance.discovery', version: 1, status: 'available', access: 'public' },
+  { id: 'instance.branding', version: 1, status: 'available', access: 'public' },
+  { id: 'instance.localization', version: 1, status: 'available', access: 'public' },
+  { id: 'auth.better-auth-cookie', version: 1, status: 'available', access: 'session' },
+  { id: 'auth.device-pairing.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'freelancer.dashboard.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'freelancer.clients.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'freelancer.projects.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'freelancer.tasks.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'freelancer.calendar.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'freelancer.core-mutations.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'freelancer.finance.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'freelancer.journal.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'freelancer.settings.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'instance.locales.admin.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'files.v1', version: 1, status: 'available', access: 'freelancer' },
+  { id: 'portal.client.v1', version: 1, status: 'available', access: 'client' },
+  { id: 'ai.assistant.v1', version: 1, status: 'planned', access: 'freelancer' },
+] as const satisfies readonly {
+  id: string;
+  version: number;
+  status: NetaCapabilityStatus;
+  access: NetaCapabilityAccess;
+}[];
+
+export type NetaCapabilityId = (typeof NETA_CAPABILITY_DETAILS)[number]['id'];
+export type NetaCapability = {
+  id: string;
+  version: number;
+  status: NetaCapabilityStatus;
+  access: NetaCapabilityAccess;
+};
+
+export const NETA_CAPABILITIES = NETA_CAPABILITY_DETAILS
+  .filter((capability) => capability.status === 'available')
+  .map((capability) => capability.id);
+
+export const NETA_MOBILE_V1_REQUIRED_CAPABILITIES = [
+  'instance.discovery',
+  'instance.branding',
+  'instance.localization',
+  'auth.better-auth-cookie',
+  'freelancer.dashboard.v1',
+  'freelancer.clients.v1',
+  'freelancer.projects.v1',
+  'freelancer.tasks.v1',
+  'freelancer.calendar.v1',
+  'freelancer.core-mutations.v1',
+  'freelancer.finance.v1',
+  'freelancer.journal.v1',
+  'freelancer.settings.v1',
+  'instance.locales.admin.v1',
+  'files.v1',
+] as const satisfies readonly NetaCapabilityId[];
+
+export const NETA_CAPABILITY_ROUTE_REQUIREMENTS = {
+  'instance.discovery': ['GET /.well-known/neta', 'GET /api/v1/health', 'GET /api/v1/meta'],
+  'instance.branding': ['GET /api/v1/meta'],
+  'instance.localization': ['GET /api/v1/meta', 'GET /api/v1/localization/catalog'],
+  'auth.better-auth-cookie': [
+    'POST /api/auth/sign-in/email',
+    'POST /api/auth/sign-out',
+    'GET /api/v1/me',
+    'PATCH /api/v1/me/preferences',
+  ],
+  'auth.device-pairing.v1': [
+    'POST /api/v1/pairing/challenges',
+    'POST /api/v1/pairing/exchange',
+    'POST /api/v1/device-sessions/refresh',
+    'GET /api/v1/device-sessions',
+    'DELETE /api/v1/device-sessions/:id',
+  ],
+  'freelancer.dashboard.v1': ['GET /api/v1/dashboard/overview'],
+  'freelancer.clients.v1': ['GET /api/v1/clients', 'GET /api/v1/clients/:id'],
+  'freelancer.projects.v1': ['GET /api/v1/projects', 'GET /api/v1/projects/:id', 'GET /api/v1/projects/:id/planning-sections', 'GET /api/v1/projects/:id/revisions'],
+  'freelancer.tasks.v1': ['GET /api/v1/tasks', 'GET /api/v1/tasks/:id'],
+  'freelancer.calendar.v1': ['GET /api/v1/calendar/events', 'GET /api/v1/calendar/events/:id'],
+  'freelancer.core-mutations.v1': ['POST /api/v1/clients', 'PATCH /api/v1/clients/:id', 'GET /api/v1/clients/:id/activities', 'POST /api/v1/clients/:id/activities', 'POST /api/v1/clients/:id/portal-invitations', 'POST /api/v1/projects', 'PATCH /api/v1/projects/:id', 'POST /api/v1/tasks', 'PATCH /api/v1/tasks/:id', 'POST /api/v1/tasks/:id/complete', 'DELETE /api/v1/tasks/:id', 'POST /api/v1/calendar/events', 'PATCH /api/v1/calendar/events/:id', 'DELETE /api/v1/calendar/events/:id'],
+  'freelancer.finance.v1': ['GET /api/v1/finance/summary', 'GET /api/v1/finance/transactions', 'POST /api/v1/finance/transactions', 'PATCH /api/v1/finance/transactions/:id', 'DELETE /api/v1/finance/transactions/:id'],
+  'freelancer.journal.v1': ['GET /api/v1/journal/entries', 'PUT /api/v1/journal/entries/:date', 'PATCH /api/v1/journal/entries/:id', 'DELETE /api/v1/journal/entries/:id'],
+  'freelancer.settings.v1': ['PATCH /api/v1/me/profile', 'POST /api/v1/me/password', 'GET /api/v1/me/sessions', 'DELETE /api/v1/me/sessions/:id', 'DELETE /api/v1/me/sessions', 'GET /api/v1/settings/general', 'PATCH /api/v1/settings/general', 'GET /api/v1/settings/appearance', 'PATCH /api/v1/settings/appearance', 'GET /api/v1/settings/ai', 'PATCH /api/v1/settings/ai'],
+  'instance.locales.admin.v1': ['GET /api/v1/settings/locales', 'POST /api/v1/settings/locales', 'PATCH /api/v1/settings/locales/:code', 'GET /api/v1/settings/locales/:code/translations', 'PUT /api/v1/settings/locales/:code/translations', 'POST /api/v1/settings/locales/import', 'GET /api/v1/settings/locales/export'],
+  'files.v1': ['POST /api/v1/files', 'GET /api/v1/projects/:id/assets', 'DELETE /api/v1/projects/:id/assets/:assetId', 'POST /api/v1/settings/appearance/assets', 'DELETE /api/v1/settings/appearance/assets/:kind'],
+  'portal.client.v1': [
+    'GET /api/v1/portal/dashboard', 'GET /api/v1/portal/projects',
+    'GET /api/v1/portal/projects/:id', 'GET /api/v1/portal/tasks',
+    'GET /api/v1/portal/revisions', 'POST /api/v1/portal/projects/:id/revisions',
+    'GET /api/v1/portal/profile', 'PATCH /api/v1/portal/profile',
+  ],
+  'ai.assistant.v1': ['GET /api/v1/chat/sessions', 'POST /api/v1/chat/sessions'],
+} as const satisfies Partial<Record<NetaCapabilityId, readonly string[]>>;
+
+export type NetaColorMode = 'light' | 'dark' | 'system';
+export type NetaSessionRole = 'freelancer' | 'client';
+
+export type NetaBootstrapLocale = {
+  code: string;
+  name: string;
+  nativeName: string;
+  status: string;
+  textDirection: string;
+};
+
+export type NetaLocalizedResponse<TResource> = {
+  resource: TResource;
+  localized: TResource;
+  locale: string;
+  fallbackChain: string[];
+};
+
+export type NetaTranslationMutationShape = Record<string, Record<string, string | null>>;
+
+export type NetaDiscoveryDocument = {
+  protocol: typeof NETA_PROTOCOL;
+  discoveryVersion: typeof NETA_DISCOVERY_VERSION;
+  instanceId: string;
+  applicationName: string;
+  workspaceName: string;
+  api: {
+    version: typeof NETA_API_VERSION;
+    baseUrl: string;
+    metaUrl: string;
+    healthUrl: string;
+    catalogUrl: string;
+  };
+  security: {
+    httpsRequired: true;
+    insecureLoopbackAllowed: true;
+  };
+  localization: {
+    defaultLocale: string;
+    supportedLocales: NetaBootstrapLocale[];
+    catalogVersion: number;
+  };
+  capabilities: readonly string[];
+  capabilityDetails: readonly NetaCapability[];
+};
+
+export type NetaInstanceMetadata = {
+  protocol: {
+    name: typeof NETA_PROTOCOL;
+    discoveryVersion: typeof NETA_DISCOVERY_VERSION;
+    apiVersion: typeof NETA_API_VERSION;
+  };
+  server: { version: string };
+  instance: {
+    id: string;
+    createdAt: string;
+    applicationName: string;
+    workspaceName: string;
+    metaTitle: string;
+    shortName: string;
+    organizationName: string | null;
+  };
+  branding: {
+    primaryColor: string;
+    accentColor: string;
+    defaultColorMode: NetaColorMode;
+    radiusScale: 'compact' | 'default' | 'soft';
+    lightLogoUrl: string | null;
+    darkLogoUrl: string | null;
+    iconUrl: string | null;
+    faviconUrl: string | null;
+  };
+  localization: {
+    defaultLocale: string;
+    supportedLocales: NetaBootstrapLocale[];
+    catalogVersion: number;
+    [key: string]: unknown;
+  };
+  contracts: Record<string, unknown>;
+  client: {
+    minimumSupportedVersion: string | null;
+    platforms: readonly ['ios', 'android'];
+  };
+  authentication: {
+    sessionMethod: 'better-auth-cookie';
+    devicePairing: 'available';
+  };
+  capabilities: readonly string[];
+  capabilityDetails: readonly NetaCapability[];
+  links: {
+    discovery: string;
+    apiBase: string;
+    health: string;
+    me: string;
+    preferences: string;
+    catalog: string;
+  };
+};
+
+export type NetaMePreferences = {
+  colorMode: NetaColorMode;
+  locale: string;
+  timezone: string;
+};
+
+export type NetaMeProfile = {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    role: NetaSessionRole;
+    clientId: string | null;
+    disabled: false;
+    imageUrl: string | null;
+  };
+  session: { expiresAt: string };
+  preferences: NetaMePreferences;
+  localization: {
+    userPreferenceLocale: string;
+    clientDefaultLocale: string | null;
+    resolvedLocale: string;
+    requestedLocale: string | null;
+    instanceDefaultLocale: string;
+    source: 'query' | 'accept-language' | 'preference' | 'portal' | 'instance';
+    fallbackChain: string[];
+  };
+};
+
+export type NetaMePreferencesMutation = Partial<NetaMePreferences>;
+
+export type NetaRuntimeCatalog = TranslationCatalog & {
+  requestedLocale: string | null;
+  defaultLocale: string;
+  source: 'query' | 'accept-language' | 'preference' | 'portal' | 'instance';
+  fallbackChain: string[];
+  catalogVersion: number;
+  namespaces: string[];
+};
+
 export type ApiEnvelope<T> = ApiSuccess<T> | ApiFailure;
 
 export type ApiSuccess<T> = {
@@ -48,6 +290,9 @@ export type MoneyAmount = {
   amountMinor: number;
   currency: string;
 };
+
+/** Opaque optimistic-concurrency value; v1 presenters currently derive it from updatedAt. */
+export type ResourceVersion = string;
 
 export type DeleteResult = {
   deleted: boolean;
@@ -144,6 +389,12 @@ export type ClientMutationPayload = {
 export type PortalInvitationPayload = {
   defaultLocale: string;
   email: string;
+};
+
+export type PortalInvitationResult = {
+  client: ClientDetail;
+  expiresAt: string;
+  invitationUrl: string;
 };
 
 export type ProjectType = 'client_project' | 'side_project';
@@ -308,6 +559,16 @@ export type FinanceSummary = {
   totals: FinanceSummaryTotals;
 };
 
+export type MultiCurrencyFinanceSummary = {
+  generatedAt: string;
+  month: string;
+  taxDisclaimer: string | null;
+  currencies: Array<{
+    currency: string;
+    totals: FinanceSummaryTotals;
+  }>;
+};
+
 export type LocalizedFinanceText = {
   category: string;
   description?: string | null;
@@ -447,6 +708,32 @@ export type AuthSessionInfo = {
 export type DeviceSessionInfo = AuthSessionInfo & {
   platform: 'android' | 'ios' | 'unknown';
   revokedAt: string | null;
+};
+
+export type PairingChallenge = {
+  challengeId: string;
+  expiresAt: string;
+  manualCode: string;
+  qrPayload: string;
+};
+
+export type PairingExchangePayload = {
+  appVersion: string;
+  code?: string;
+  deviceName: string;
+  installId: string;
+  osMajor?: string;
+  platform: 'android' | 'ios';
+  secret?: string;
+};
+
+export type DeviceTokenPair = {
+  accessExpiresAt: string;
+  accessToken: string;
+  deviceSessionId?: string;
+  refreshExpiresAt: string;
+  refreshToken: string;
+  tokenType: 'Bearer';
 };
 
 export type GeneralSettings = {
@@ -679,6 +966,89 @@ export type ResourceName =
   | 'settings'
   | 'tasks';
 
+export function isNetaCapabilityId(value: unknown): value is NetaCapabilityId {
+  return typeof value === 'string' && NETA_CAPABILITY_DETAILS.some((capability) => capability.id === value);
+}
+
+export function isNetaCapability(value: unknown): value is NetaCapability {
+  if (!isRecord(value) || !isNonEmptyString(value.id) || !isNonNegativeInteger(value.version)) return false;
+  if (value.version < 1 || (value.status !== 'available' && value.status !== 'planned') ||
+    (value.access !== 'public' && value.access !== 'session' && value.access !== 'freelancer' && value.access !== 'client')) return false;
+  const expected = NETA_CAPABILITY_DETAILS.find((capability) => capability.id === value.id);
+  return expected === undefined || (value.version === expected.version && value.access === expected.access);
+}
+
+export function isNetaDiscoveryDocument(value: unknown): value is NetaDiscoveryDocument {
+  if (!isRecord(value) || !isRecord(value.api) || !isRecord(value.security) || !isRecord(value.localization)) return false;
+  return value.protocol === NETA_PROTOCOL && value.discoveryVersion === NETA_DISCOVERY_VERSION &&
+    isNonEmptyString(value.instanceId) && isNonEmptyString(value.applicationName) && isNonEmptyString(value.workspaceName) &&
+    value.api.version === NETA_API_VERSION && isAbsoluteHttpUrl(value.api.baseUrl) && isAbsoluteHttpUrl(value.api.metaUrl) &&
+    isAbsoluteHttpUrl(value.api.healthUrl) && isAbsoluteHttpUrl(value.api.catalogUrl) &&
+    value.security.httpsRequired === true && value.security.insecureLoopbackAllowed === true &&
+    isNonEmptyString(value.localization.defaultLocale) && isNonNegativeInteger(value.localization.catalogVersion) &&
+    Array.isArray(value.localization.supportedLocales) && value.localization.supportedLocales.every(isNetaBootstrapLocale) &&
+    hasConsistentCapabilities(value.capabilities, value.capabilityDetails);
+}
+
+export function isNetaInstanceMetadata(value: unknown): value is NetaInstanceMetadata {
+  if (!isRecord(value) || !isRecord(value.protocol) || !isRecord(value.server) || !isRecord(value.instance) ||
+    !isRecord(value.branding) || !isRecord(value.localization) || !isRecord(value.client) || !isRecord(value.authentication) ||
+    !isRecord(value.links) || !isRecord(value.contracts)) return false;
+  const branding = value.branding;
+  const links = value.links;
+  const urls = ['discovery', 'apiBase', 'health', 'me', 'preferences', 'catalog'] as const;
+  return value.protocol.name === NETA_PROTOCOL && value.protocol.discoveryVersion === NETA_DISCOVERY_VERSION &&
+    value.protocol.apiVersion === NETA_API_VERSION && isNonEmptyString(value.server.version) &&
+    isNonEmptyString(value.instance.id) && isIsoInstant(value.instance.createdAt) &&
+    isNonEmptyString(value.instance.applicationName) && isNonEmptyString(value.instance.workspaceName) &&
+    isNonEmptyString(value.instance.metaTitle) && isNonEmptyString(value.instance.shortName) && isNullableString(value.instance.organizationName) &&
+    isNonEmptyString(value.branding.primaryColor) && isNonEmptyString(value.branding.accentColor) &&
+    isColorMode(value.branding.defaultColorMode) &&
+    (value.branding.radiusScale === 'compact' || value.branding.radiusScale === 'default' || value.branding.radiusScale === 'soft') &&
+    (['lightLogoUrl', 'darkLogoUrl', 'iconUrl', 'faviconUrl'] as const)
+      .every((key) => isNullableAbsoluteHttpUrl(branding[key])) &&
+    isNonEmptyString(value.localization.defaultLocale) && isNonNegativeInteger(value.localization.catalogVersion) &&
+    Array.isArray(value.localization.supportedLocales) && value.localization.supportedLocales.every(isNetaBootstrapLocale) &&
+    isNullableString(value.client.minimumSupportedVersion) && Array.isArray(value.client.platforms) &&
+    value.client.platforms.length === 2 && value.client.platforms[0] === 'ios' && value.client.platforms[1] === 'android' &&
+    value.authentication.sessionMethod === 'better-auth-cookie' && value.authentication.devicePairing === 'available' &&
+    hasConsistentCapabilities(value.capabilities, value.capabilityDetails) &&
+    urls.every((key) => isAbsoluteHttpUrl(links[key]));
+}
+
+export function isNetaMeProfile(value: unknown): value is NetaMeProfile {
+  if (!isRecord(value) || !isRecord(value.user) || !isRecord(value.session) ||
+    !isRecord(value.preferences) || !isRecord(value.localization)) return false;
+  return isNonEmptyString(value.user.id) && isNonEmptyString(value.user.email) && isNonEmptyString(value.user.name) &&
+    (value.user.role === 'freelancer' || value.user.role === 'client') && isNullableString(value.user.clientId) &&
+    value.user.disabled === false && isNullableAbsoluteHttpUrl(value.user.imageUrl) && isIsoInstant(value.session.expiresAt) &&
+    isColorMode(value.preferences.colorMode) && isNonEmptyString(value.preferences.locale) && isValidIanaTimeZone(value.preferences.timezone) &&
+    isNonEmptyString(value.localization.userPreferenceLocale) && isNullableString(value.localization.clientDefaultLocale) &&
+    isNonEmptyString(value.localization.resolvedLocale) && isNullableString(value.localization.requestedLocale) &&
+    isNonEmptyString(value.localization.instanceDefaultLocale) &&
+    (value.localization.source === 'query' || value.localization.source === 'accept-language' ||
+      value.localization.source === 'preference' || value.localization.source === 'portal' || value.localization.source === 'instance') &&
+    isStringArray(value.localization.fallbackChain);
+}
+
+export function isNetaMePreferencesMutation(value: unknown): value is NetaMePreferencesMutation {
+  if (!isRecord(value) || !hasOnlyKeys(value, ['colorMode', 'locale', 'timezone'])) return false;
+  if (!Object.keys(value).length) return false;
+  return (value.colorMode === undefined || isColorMode(value.colorMode)) &&
+    (value.locale === undefined || isNonEmptyString(value.locale)) &&
+    (value.timezone === undefined || isValidIanaTimeZone(value.timezone));
+}
+
+export function isNetaRuntimeCatalog(value: unknown): value is NetaRuntimeCatalog {
+  if (!isRecord(value) || !isTranslationCatalog(value)) return false;
+  const candidate: Record<string, unknown> = value;
+  return candidate.catalogVersion === value.version &&
+    isNullableString(candidate.requestedLocale) && isNonEmptyString(candidate.defaultLocale) &&
+    (candidate.source === 'query' || candidate.source === 'accept-language' || candidate.source === 'preference' ||
+      candidate.source === 'portal' || candidate.source === 'instance') &&
+    isStringArray(candidate.fallbackChain) && isStringArray(candidate.namespaces);
+}
+
 export function isApiEnvelope<T>(
   value: unknown,
   isData: (candidate: unknown) => candidate is T,
@@ -797,6 +1167,10 @@ export function isClientDetail(value: unknown): value is ClientDetail {
     (typeof record['notes'] === 'string' || record['notes'] === null) &&
     isLocalizedTextPayload(record['translations'])
   );
+}
+
+export function isPortalInvitationResult(value: unknown): value is PortalInvitationResult {
+  return isRecord(value) && isClientDetail(value.client) && typeof value.expiresAt === 'string' && !Number.isNaN(Date.parse(value.expiresAt)) && isAbsoluteHttpUrl(value.invitationUrl);
 }
 
 export function isClientActivity(value: unknown): value is ClientActivity {
@@ -1041,6 +1415,21 @@ export function isFinanceSummary(value: unknown): value is FinanceSummary {
   );
 }
 
+export function isMultiCurrencyFinanceSummary(value: unknown): value is MultiCurrencyFinanceSummary {
+  if (!isRecord(value) || !Array.isArray(value.currencies)) return false;
+  return isIsoInstant(value.generatedAt) && isDateMonth(value.month) && isNullableString(value.taxDisclaimer) &&
+    value.currencies.every((group, index, groups) => {
+      if (!isRecord(group) || !/^[A-Z]{3}$/.test(String(group.currency))) return false;
+      const previous = groups[index - 1];
+      return isFinanceSummary({
+        generatedAt: value.generatedAt,
+        month: value.month,
+        taxDisclaimer: value.taxDisclaimer,
+        totals: group.totals,
+      }) && (index === 0 || (isRecord(previous) && String(previous.currency) < String(group.currency)));
+    });
+}
+
 export function isFinanceTransactionListItem(value: unknown): value is FinanceTransactionListItem {
   return (
     isRecord(value) &&
@@ -1186,6 +1575,17 @@ export function isDeviceSessionInfo(value: unknown): value is DeviceSessionInfo 
   return isAuthSessionInfo(value) &&
     (record.platform === 'android' || record.platform === 'ios' || record.platform === 'unknown') &&
     (record.revokedAt === null || isIsoInstant(record.revokedAt));
+}
+
+export function isPairingChallenge(value: unknown): value is PairingChallenge {
+  return isRecord(value) && typeof value.challengeId === 'string' && isIsoInstant(value.expiresAt) &&
+    typeof value.manualCode === 'string' && typeof value.qrPayload === 'string';
+}
+
+export function isDeviceTokenPair(value: unknown): value is DeviceTokenPair {
+  return isRecord(value) && typeof value.accessToken === 'string' && isIsoInstant(value.accessExpiresAt) &&
+    typeof value.refreshToken === 'string' && isIsoInstant(value.refreshExpiresAt) &&
+    value.tokenType === 'Bearer' && (value.deviceSessionId === undefined || typeof value.deviceSessionId === 'string');
 }
 
 export function isGeneralSettings(value: unknown): value is GeneralSettings {
@@ -1406,6 +1806,46 @@ function isNullableString(value: unknown): value is string | null {
   return typeof value === 'string' || value === null;
 }
 
+function hasConsistentCapabilities(capabilities: unknown, details: unknown): boolean {
+  if (!Array.isArray(capabilities) || !capabilities.every(isNonEmptyString) ||
+    !Array.isArray(details) || !details.every(isNetaCapability)) return false;
+  return capabilities.every((id) => details.some((capability) =>
+    capability.id === id && capability.status === 'available'));
+}
+
+function isNetaBootstrapLocale(value: unknown): value is NetaBootstrapLocale {
+  return isRecord(value) && isNonEmptyString(value.code) && isNonEmptyString(value.name) &&
+    isNonEmptyString(value.nativeName) && isNonEmptyString(value.status) &&
+    (value.textDirection === 'ltr' || value.textDirection === 'rtl');
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function isColorMode(value: unknown): value is NetaColorMode {
+  return value === 'light' || value === 'dark' || value === 'system';
+}
+
+function isValidIanaTimeZone(value: unknown): value is string {
+  if (!isNonEmptyString(value) || value.length > 64) return false;
+  try {
+    new Intl.DateTimeFormat('en', { timeZone: value }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isNullableAbsoluteHttpUrl(value: unknown): value is string | null {
+  return value === null || (typeof value === 'string' && isAbsoluteHttpUrl(value));
+}
+
+function hasOnlyKeys(value: Record<string, unknown>, keys: readonly string[]): boolean {
+  const allowed = new Set(keys);
+  return Object.keys(value).every((key) => allowed.has(key));
+}
+
 function isNullableNumber(value: unknown): value is number | null {
   return typeof value === 'number' || value === null;
 }
@@ -1463,7 +1903,8 @@ function isNullableNonNegativeInteger(value: unknown): value is number | null {
   return value === null || isNonNegativeInteger(value);
 }
 
-function isAbsoluteHttpUrl(value: string): boolean {
+function isAbsoluteHttpUrl(value: unknown): boolean {
+  if (typeof value !== 'string') return false;
   try {
     const url = new URL(value);
     return url.protocol === 'https:' || url.protocol === 'http:';

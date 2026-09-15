@@ -8,5 +8,8 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "test": "node --test src/bootstrap-contracts.test.ts"
+  },
   "types": "./src/index.ts"
 }

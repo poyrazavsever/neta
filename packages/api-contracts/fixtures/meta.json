@@ -1,0 +1,85 @@
+{
+  "protocol": { "name": "neta", "discoveryVersion": 1, "apiVersion": "1" },
+  "server": { "version": "0.1.0" },
+  "instance": {
+    "id": "01991f5e-7b77-7000-8000-000000000001",
+    "createdAt": "2026-09-03T09:00:00.000Z",
+    "applicationName": "Neta",
+    "workspaceName": "Örnek Çalışma Alanı",
+    "metaTitle": "Neta",
+    "shortName": "Neta",
+    "organizationName": "Örnek Çalışma Alanı"
+  },
+  "branding": {
+    "primaryColor": "#B4232D",
+    "accentColor": "#D97706",
+    "defaultColorMode": "system",
+    "radiusScale": "default",
+    "lightLogoUrl": null,
+    "darkLogoUrl": null,
+    "iconUrl": null,
+    "faviconUrl": null
+  },
+  "localization": {
+    "defaultLocale": "tr",
+    "supportedLocales": [
+      { "code": "tr", "name": "Turkish", "nativeName": "Türkçe", "status": "active", "textDirection": "ltr" },
+      { "code": "en", "name": "English", "nativeName": "English", "status": "active", "textDirection": "ltr" }
+    ],
+    "catalogVersion": 7
+  },
+  "contracts": {
+    "preferenceMutation": { "endpoint": "PATCH /api/v1/me/preferences", "canonicalFields": ["locale", "colorMode", "timezone"] },
+    "catalogDownload": { "versionField": "version", "legacyVersionField": "catalogVersion" }
+  },
+  "client": { "minimumSupportedVersion": "0.1.0", "platforms": ["ios", "android"] },
+  "authentication": { "sessionMethod": "better-auth-cookie", "devicePairing": "available" },
+  "capabilities": [
+    "instance.discovery",
+    "instance.branding",
+    "instance.localization",
+    "auth.better-auth-cookie",
+    "auth.device-pairing.v1",
+    "freelancer.dashboard.v1",
+    "freelancer.clients.v1",
+    "freelancer.projects.v1",
+    "freelancer.tasks.v1",
+    "freelancer.calendar.v1",
+    "freelancer.core-mutations.v1",
+    "freelancer.finance.v1",
+    "freelancer.journal.v1",
+    "freelancer.settings.v1",
+    "instance.locales.admin.v1",
+    "files.v1",
+    "portal.client.v1"
+  ],
+  "capabilityDetails": [
+    { "id": "mobile-v1", "version": 1, "status": "planned", "access": "public" },
+    { "id": "instance.discovery", "version": 1, "status": "available", "access": "public" },
+    { "id": "instance.branding", "version": 1, "status": "available", "access": "public" },
+    { "id": "instance.localization", "version": 1, "status": "available", "access": "public" },
+    { "id": "auth.better-auth-cookie", "version": 1, "status": "available", "access": "session" },
+    { "id": "auth.device-pairing.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "freelancer.dashboard.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "freelancer.clients.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "freelancer.projects.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "freelancer.tasks.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "freelancer.calendar.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "freelancer.core-mutations.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "freelancer.finance.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "freelancer.journal.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "freelancer.settings.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "instance.locales.admin.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "files.v1", "version": 1, "status": "available", "access": "freelancer" },
+    { "id": "portal.client.v1", "version": 1, "status": "available", "access": "client" },
+    { "id": "ai.assistant.v1", "version": 1, "status": "planned", "access": "freelancer" }
+  ],
+  "links": {
+    "discovery": "https://neta.example.com/.well-known/neta",
+    "apiBase": "https://neta.example.com/api/v1",
+    "health": "https://neta.example.com/api/v1/health",
+    "me": "https://neta.example.com/api/v1/me",
+    "preferences": "https://neta.example.com/api/v1/me/preferences",
+    "catalog": "https://neta.example.com/api/v1/localization/catalog"
+  }
+}

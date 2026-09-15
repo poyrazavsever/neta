@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid preference payload.",
+    "details": {
+      "fieldErrors": { "locale": ["Geçerli ve aktif bir dil seçin."] },
+      "messageKey": "validation.required"
+    }
+  }
+}

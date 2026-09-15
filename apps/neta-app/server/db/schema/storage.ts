@@ -30,6 +30,7 @@ export const files = sqliteTable(
     mimeType: text("mime_type").notNull(),
     byteSize: integer("byte_size").notNull(),
     sha256: text("sha256").notNull(),
+    metadataSanitized: integer("metadata_sanitized", { mode: "boolean" }).default(false).notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).default(nowMs).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .default(nowMs)

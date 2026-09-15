@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { createHash, createHmac, randomBytes, randomUUID } from "node:crypto";
 import { hashPassword } from "better-auth/crypto";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
@@ -63,14 +63,18 @@ export type PortalInvitationPreview = {
   locale: string;
 };
 
-export async function createPortalInvitation(
+export function createPortalInvitation(
   actor: SessionContext,
   input: z.input<typeof createInvitationSchema>,
-): Promise<{ id: number; invitationUrl: string; expiresAt: Date; locale: string }> {
+  options: { rawToken?: string } = {},
+): { id: number; invitationUrl: string; expiresAt: Date; locale: string } {
   assertFreelancerActor(actor);
 
   const parsed = parseOrThrow(createInvitationSchema, input);
-  const rawToken = randomBytes(32).toString("base64url");
+  const rawToken = options.rawToken ?? randomBytes(32).toString("base64url");
+  if (!/^[A-Za-z0-9_-]{43,128}$/.test(rawToken)) {
+    throw new PortalInvitationError("INVALID_INPUT", "Davet token'ı geçersiz.");
+  }
   const tokenHash = hashInvitationToken(rawToken);
   const now = new Date();
   const expiresAt = new Date(now.getTime() + parsed.expiresInHours * 60 * 60 * 1000);
@@ -181,6 +185,14 @@ export async function createPortalInvitation(
     expiresAt,
     locale: parsed.locale,
   };
+}
+
+/** Retry-safe API invitations derive a secret token without persisting its plaintext. */
+export function derivePortalInvitationToken(actor: SessionContext, clientId: string, idempotencyKey: string): string {
+  const secret = getServerConfig().betterAuthSecret ?? "neta-development-only-invitation-secret";
+  return createHmac("sha256", secret)
+    .update(`neta:portal-invitation:${actor.user.id}:${clientId}:${idempotencyKey}`)
+    .digest("base64url");
 }
 
 export function getPortalInvitationPreview(rawToken: string): PortalInvitationPreview | null {
