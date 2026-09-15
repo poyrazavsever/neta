@@ -15,8 +15,8 @@
 ## Nedir?
 
 Neta Mobile, owner çalışma alanını ve yetkileri sınırlı müşteri portalını
-React Native'e taşır. Her fork build sırasında tek bir Neta instance'ına
-bağlanır; kullanıcıdan domain girmesi veya instance değiştirmesi istenmez.
+React Native'e taşır. Tek evrensel binary, runtime'da uyumlu bir self-hosted
+Neta domainine veya secret taşımayan `neta://connect` QR bağlantısına bağlanır.
 Uygulama native navigasyon, modal formlar, sistem tarih/dosya seçicileri,
 güvenli oturum saklama, light/dark tema, reduced motion ve klavye güvenli form
 yerleşimleri kullanır.
@@ -27,15 +27,10 @@ sözleşme, fatura ve abonelikler bilinçli olarak kapsam dışıdır.
 
 ## Production durumu
 
-Mobil istemci; statik analiz, test, erişilebilirlik, native linking,
-konfigürasyon, güvenlik ve production bundle kapılarından geçmektedir.
-`https://demo.takeneta.com` public bootstrap akışı sağlıklıdır.
-
-Demo backend, mobil ekranların gerektirdiği authenticated feature API yüzeyini
-henüz sunmuyor. Temsili `/api/v1/dashboard`, `clients`, `projects`, `tasks`,
-`calendar`, `finance`, `journal`, `chat`, `settings` ve `portal` route'ları şu
-anda `404` dönüyor. Bu route'lar ve authorization testleri deploy edilmeden
-store yayını blokludur. Mobil istemci eksik sunucu verisini mock ile gizlemez.
+Repository backend'i dashboard, müşteri, proje, görev ve takvim için minimum
+owner read dilimini artık sunuyor ve canlı smoke ile doğruluyor. Finans, günlük,
+AI, ayarlar, dosyalar, portal parity ve yazma işlemleri planlanandır. Store yayını
+signed iOS/Android ve iki canlı instance kanıtına kadar blokludur.
 
 ## Gereksinimler
 
@@ -64,17 +59,17 @@ pnpm mobile:ios
 pnpm mobile:android
 ```
 
-Repository'deki örnek public demo instance'ı hedefler. Fork build'i almadan
-önce `apps/neta-mobile/.env` dosyasını düzenleyin. Environment dosyaları Git
-tarafından yok sayılır.
+Development varsayılanı localhost'tur. Production evrensel build origin'i boş
+bırakır; kullanıcı domain girer veya yöneticinin QR kodunu tarar.
 
 ## Yapılandırma
 
-Production için gerekli iki public değer:
+Production ortamı zorunludur; origin opsiyoneldir:
 
 ```dotenv
 EXPO_PUBLIC_APP_ENV=production
-EXPO_PUBLIC_NETA_ORIGIN=https://demo.takeneta.com
+# Yalnız opsiyonel development/demo/fork varsayılanı:
+EXPO_PUBLIC_NETA_ORIGIN=
 ```
 
 Uygulama adı, scheme, bundle/package kimlikleri, sürüm ve native build

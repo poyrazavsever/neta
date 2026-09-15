@@ -17,6 +17,7 @@ import {
 
 import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
+import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
 
 export type ProjectListFilters = {
@@ -30,6 +31,7 @@ export function listProjects(
   user: MeProfile,
   filters: ProjectListFilters,
 ): Promise<ResourceResult<PaginatedResponse<ProjectListItem>>> {
+  requireInstanceCapability(instance, 'freelancer.projects.v1');
   const params = new URLSearchParams();
 
   if (filters.search) {
@@ -60,6 +62,7 @@ export function getProjectDetail(
   user: MeProfile,
   projectId: string,
 ): Promise<ResourceResult<ProjectDetail>> {
+  requireInstanceCapability(instance, 'freelancer.projects.v1');
   return requestResource(instance, user, {
     cachePolicy: 'medium',
     filters: { projectId },
@@ -74,6 +77,7 @@ export function listPlanningSections(
   user: MeProfile,
   projectId: string,
 ): Promise<ResourceResult<PaginatedResponse<PlanningSection>>> {
+  requireInstanceCapability(instance, 'freelancer.projects.v1');
   return requestResource(instance, user, {
     cachePolicy: 'medium',
     filters: { projectId },
@@ -88,6 +92,7 @@ export function listProjectRevisions(
   user: MeProfile,
   projectId: string,
 ): Promise<ResourceResult<PaginatedResponse<ProjectRevision>>> {
+  requireInstanceCapability(instance, 'freelancer.projects.v1');
   return requestResource(instance, user, {
     cachePolicy: 'short',
     filters: { projectId },
@@ -116,6 +121,7 @@ export function createProject(
   user: MeProfile,
   payload: ProjectMutationPayload,
 ): Promise<ResourceResult<ProjectDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     idempotencyKey: createIdempotencyKey('project-create'),
@@ -132,6 +138,7 @@ export function updateProject(
   projectId: string,
   payload: ProjectMutationPayload,
 ): Promise<ResourceResult<ProjectDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     method: 'PATCH',

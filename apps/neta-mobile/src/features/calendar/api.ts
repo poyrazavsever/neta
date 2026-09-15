@@ -11,6 +11,7 @@ import {
 
 import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
+import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
 
 export type CalendarRangeFilters = {
@@ -24,6 +25,7 @@ export function listCalendarEvents(
   user: MeProfile,
   filters: CalendarRangeFilters,
 ): Promise<ResourceResult<CalendarRangeResponse>> {
+  requireInstanceCapability(instance, 'freelancer.calendar.v1');
   const params = new URLSearchParams(filters);
 
   return requestResource(instance, user, {
@@ -40,6 +42,7 @@ export function getCalendarEventDetail(
   user: MeProfile,
   eventId: string,
 ): Promise<ResourceResult<CalendarEventDetail>> {
+  requireInstanceCapability(instance, 'freelancer.calendar.v1');
   return requestResource(instance, user, {
     cachePolicy: 'short',
     filters: { eventId },
@@ -54,6 +57,7 @@ export function createCalendarEvent(
   user: MeProfile,
   payload: CalendarEventMutationPayload,
 ): Promise<ResourceResult<CalendarEventDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     idempotencyKey: createIdempotencyKey('calendar-event-create'),
@@ -71,6 +75,7 @@ export function updateCalendarEvent(
   eventId: string,
   payload: CalendarEventMutationPayload,
 ): Promise<ResourceResult<CalendarEventDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     invalidates: ['calendar'],
@@ -85,9 +90,12 @@ export function deleteCalendarEvent(
   instance: StoredInstance,
   user: MeProfile,
   eventId: string,
+  version: string,
 ): Promise<ResourceResult<DeleteResult>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     method: 'DELETE',
+    ifMatch: version,
     invalidates: ['calendar'],
     parser: parseDeleteResult,
     path: `calendar/events/${encodeURIComponent(eventId)}`,

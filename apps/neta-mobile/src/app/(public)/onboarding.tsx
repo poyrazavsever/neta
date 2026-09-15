@@ -1,52 +1,93 @@
-import { router, type Href } from 'expo-router';
+import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
 
-import { Button, Card, Screen } from '@/components/ui';
+import { Badge, Button, Card, Screen, TextField, Toast } from '@/components/ui';
 import { useOnboarding } from '@/providers/onboarding-provider';
+import { useSession } from '@/providers/session-provider';
 import { useTheme } from '@/providers/theme-provider';
 import { spacing } from '@/theme/tokens';
 
-const benefits = [
-  ['Tek bir çalışma alanı', 'Bu uygulama, yayınlayan kişinin güvenilir Neta sunucusuna özel olarak yapılandırıldı.'],
-  ['İşlerin her yerde', 'Müşteri, proje, görev ve finans akışlarını mobilde takip et.'],
-  ['Rolüne uygun deneyim', 'Girişten sonra owner veya müşteri portalı otomatik ve güvenli biçimde açılır.'],
-] as const;
-
 export default function OnboardingScreen() {
   const { complete } = useOnboarding();
+  const session = useSession();
+  const { connectInstance } = session;
   const { colors, resolvedColorMode } = useTheme();
-  const finish = async () => { await complete(); router.replace('/login' as Href); };
+  const { connect } = useLocalSearchParams<{ connect?: string }>();
+  const handledDeepLink = useRef<string | null>(null);
+  const [domain, setDomain] = useState('');
+  const [pairingCode, setPairingCode] = useState('');
+
+  useEffect(() => {
+    if (!connect || handledDeepLink.current === connect) return;
+    handledDeepLink.current = connect;
+    setDomain(connect);
+    void connectInstance(connect);
+  }, [connect, connectInstance]);
+
+  const confirm = async () => {
+    const connected = await session.confirmInstanceConnection(pairingCode);
+    if (!connected) return;
+    await complete();
+    router.replace('/login' as Href);
+  };
 
   return (
     <Screen scroll>
       <View style={styles.content}>
         <Image accessibilityIgnoresInvertColors accessibilityLabel="Neta" resizeMode="contain" source={resolvedColorMode === 'dark' ? require('../../../assets/logo/lightLogoLong.png') : require('../../../assets/logo/blackLogoLong.png')} style={styles.logo} />
-        <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>Neta her zaman yanında.</Text>
-        <Text style={[styles.lead, { color: colors.textMuted }]}>Kendi sunucunda, kendi verilerinle, dikkat dağıtmayan bir çalışma alanı.</Text>
-        <View style={styles.list}>
-          {benefits.map(([title, description], index) => (
-            <Card key={title} style={styles.card}>
-              <View accessible accessibilityLabel={`${index + 1}. ${title}. ${description}`} style={[styles.number, { backgroundColor: colors.primary }]}><Text style={[styles.numberText, { color: colors.primaryForeground }]}>{index + 1}</Text></View>
-              <View style={styles.copy}><Text style={[styles.cardTitle, { color: colors.text }]}>{title}</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>{description}</Text></View>
-            </Card>
-          ))}
-        </View>
-        <Button accessibilityHint="Onboarding'i tamamlar ve giriş ekranını açar" onPress={() => void finish()}>Başlayalım</Button>
+        <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>Çalışma alanına bağlan.</Text>
+        <Text style={[styles.lead, { color: colors.textMuted }]}>Self-hosted Neta domainini gir veya yöneticinin verdiği <Text style={styles.strong}>neta://connect</Text> QR bağlantısını okut.</Text>
+        {!session.pendingInstance ? (
+          <Card style={styles.form}>
+            <TextField
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!session.isBusy}
+              keyboardType="url"
+              label="Neta domaini veya QR bağlantısı"
+              onChangeText={setDomain}
+              onSubmitEditing={() => void session.connectInstance(domain)}
+              placeholder="neta.ornek.com"
+              returnKeyType="go"
+              value={domain}
+            />
+            <Button disabled={!domain.trim()} loading={session.isBusy} onPress={() => void connectInstance(domain)}>Instance’ı doğrula</Button>
+            <Text style={[styles.hint, { color: colors.textMuted }]}>Telefon kamerasıyla Neta QR kodunu taradığında bu ekran otomatik olarak doğrulamayı başlatır. Giriş bilgileri keşif isteğine eklenmez.</Text>
+          </Card>
+        ) : (
+          <Card style={styles.form}>
+            <View style={styles.row}><Badge tone="success">Doğrulandı</Badge><Text style={[styles.origin, { color: colors.textMuted }]}>{session.pendingInstance.origin}</Text></View>
+            <Text style={[styles.workspace, { color: colors.text }]}>{session.pendingInstance.workspaceName}</Text>
+            <Text style={[styles.hint, { color: colors.textMuted }]}>Instance kimliği: {session.pendingInstance.instanceId}</Text>
+            <TextField
+              autoCapitalize="characters"
+              autoCorrect={false}
+              editable={!session.isBusy}
+              label="Owner pairing kodu (isteğe bağlı)"
+              onChangeText={setPairingCode}
+              placeholder="10 karakterli kod"
+              value={pairingCode}
+            />
+            <Button loading={session.isBusy} onPress={() => void confirm()}>Bu instance’a bağlan</Button>
+            <Button disabled={session.isBusy} onPress={session.cancelInstanceConnection} variant="secondary">Geri dön</Button>
+          </Card>
+        )}
+        {session.error ? <Toast message={session.error.message} tone="danger" /> : null}
       </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { alignItems: 'flex-start', flexDirection: 'row', gap: spacing.md },
-  cardText: { fontSize: 15, lineHeight: 22 },
-  cardTitle: { fontSize: 17, fontWeight: '800' },
   content: { flex: 1, gap: spacing.lg, justifyContent: 'center', paddingVertical: spacing.xl },
-  copy: { flex: 1, gap: spacing.xs },
+  form: { gap: spacing.md },
+  hint: { fontSize: 14, lineHeight: 21 },
   lead: { fontSize: 18, lineHeight: 27 },
-  list: { gap: spacing.sm },
   logo: { height: 52, width: 150 },
-  number: { alignItems: 'center', borderRadius: 18, height: 36, justifyContent: 'center', width: 36 },
-  numberText: { fontSize: 15, fontWeight: '900' },
+  origin: { flex: 1, fontSize: 13, textAlign: 'right' },
+  row: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm, justifyContent: 'space-between' },
+  strong: { fontWeight: '800' },
   title: { fontSize: 36, fontWeight: '900', letterSpacing: -1.1, lineHeight: 42 },
+  workspace: { fontSize: 24, fontWeight: '900' },
 });

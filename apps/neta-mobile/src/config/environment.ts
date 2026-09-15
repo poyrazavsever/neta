@@ -15,11 +15,11 @@ export const appEnvironment: AppEnvironment = isAppEnvironment(configuredEnviron
   ? configuredEnvironment
   : 'development';
 
-export const netaOrigin = readConfiguredOrigin(configuredOrigin);
+export const defaultNetaOrigin = readConfiguredOrigin(configuredOrigin);
 
-function readConfiguredOrigin(value: unknown): string {
+function readConfiguredOrigin(value: unknown): string | null {
   if (typeof value !== 'string' || !value.trim()) {
-    throw new Error('Neta origin build yapılandırmasında bulunamadı.');
+    return null;
   }
 
   const url = new URL(value);

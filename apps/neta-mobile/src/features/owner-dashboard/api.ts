@@ -6,6 +6,7 @@ import {
 
 import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
+import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
 import { ownerDashboardOverviewPath } from './policy';
 
@@ -16,6 +17,7 @@ export async function getOwnerDashboardBundle(
   user: MeProfile,
   range: DashboardRange,
 ): Promise<OwnerDashboardBundle> {
+  requireInstanceCapability(instance, 'freelancer.dashboard.v1');
   return requestResource(instance, user, {
     cachePolicy: 'short',
     filters: { range },

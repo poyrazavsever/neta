@@ -57,7 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   extra: {
     environment: APP_ENV,
-    netaOrigin: NETA_ORIGIN,
+    ...(NETA_ORIGIN ? { netaOrigin: NETA_ORIGIN } : {}),
   },
 });
 
@@ -67,10 +67,10 @@ function readEnvironment(value: string | undefined): 'development' | 'preview' |
   throw new Error('EXPO_PUBLIC_APP_ENV development, preview veya production olmalıdır.');
 }
 
-function readNetaOrigin(value: string | undefined, environment: string): string {
+function readNetaOrigin(value: string | undefined, environment: string): string | null {
   const fallback = environment === 'development' ? 'http://localhost:3000' : '';
   const candidate = value?.trim() || fallback;
-  if (!candidate) throw new Error('Preview/production build için EXPO_PUBLIC_NETA_ORIGIN zorunludur.');
+  if (!candidate) return null;
   let url: URL;
   try { url = new URL(candidate); } catch { throw new Error('EXPO_PUBLIC_NETA_ORIGIN geçerli bir absolute origin olmalıdır.'); }
   if ((url.protocol !== 'https:' && url.protocol !== 'http:') || url.username || url.password || url.pathname !== '/' || url.search || url.hash) {

@@ -16,5 +16,5 @@ export default function BootstrapRoute() {
     return <Redirect href={session.role === 'freelancer' ? '/(owner)' : '/(portal)'} />;
   }
 
-  return <Redirect href={(onboarding.completed ? '/login' : '/onboarding') as Href} />;
+  return <Redirect href={(session.instance ? '/login' : '/onboarding') as Href} />;
 }

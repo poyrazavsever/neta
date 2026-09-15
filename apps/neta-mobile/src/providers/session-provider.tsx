@@ -9,17 +9,19 @@ import {
   useState,
 } from 'react';
 
-import { netaOrigin } from '@/config/environment';
+import { appEnvironment, defaultNetaOrigin } from '@/config/environment';
 import { NetaClientError, toClientError } from '@/lib/api/errors';
 import { createNativeAuthClient } from '@/lib/auth/native-auth-client';
 import { discoverInstance, type DiscoveryStep } from '@/lib/instance/discovery';
 import {
   clearInstanceSession,
+  forgetInstance,
   getActiveInstance,
   saveDiscoveredInstance,
   updateStoredInstance,
 } from '@/lib/instance/registry';
-import type { MeProfile, StoredInstance } from '@/lib/instance/types';
+import { parseInstanceConnectInput } from '@/lib/instance/domain';
+import type { DiscoveryResult, MeProfile, StoredInstance } from '@/lib/instance/types';
 import { recordPerformanceSample } from '@/lib/performance/metrics';
 import { clearResourceCacheForInstance, purgeLegacyResourceCache } from '@/lib/resource/resource-cache';
 
@@ -51,11 +53,16 @@ type UnauthenticatedSessionState = {
 type SessionState = UnauthenticatedSessionState | AuthenticatedSessionState;
 
 type SessionContextValue = SessionState & {
+  cancelInstanceConnection: () => void;
+  confirmInstanceConnection: (pairingCode?: string) => Promise<boolean>;
+  connectInstance: (input: string) => Promise<void>;
+  forgetCurrentInstance: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
   retryBootstrap: () => Promise<void>;
   updateInstance: (patch: Partial<StoredInstance>) => Promise<void>;
+  pendingInstance: StoredInstance | null;
 };
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -65,6 +72,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const { setBrandColors, setColorMode } = useTheme();
   const lastSessionCheckAtRef = useRef(0);
   const [session, setSession] = useState<SessionState>(createLoadingState());
+  const [pendingDiscovery, setPendingDiscovery] = useState<DiscoveryResult | null>(null);
+  const pendingPairingSecretRef = useRef<string | null>(null);
 
   const applyInstanceBranding = useCallback((instance: StoredInstance | null) => {
     setBrandColors({ accent: instance?.accentColor ?? null, primary: instance?.primaryColor ?? null });
@@ -78,23 +87,28 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const startedAt = Date.now();
     setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: true, status: 'loading' }));
     let instance = await getActiveInstance();
-    if (instance?.origin !== netaOrigin) instance = null;
 
     try {
       await purgeLegacyResourceCache();
-      if (isOnline) {
-        const result = await discoverInstance(netaOrigin, {
+      const discoveryOrigin = instance?.origin ?? defaultNetaOrigin;
+      if (isOnline && discoveryOrigin) {
+        const result = await discoverInstance(discoveryOrigin, {
           onStep: (discoveryStep) => setSession((current) => ({
             ...toUnauthenticated(current), discoveryStep, error: null, isBusy: true, status: 'loading',
           })),
         });
-        await saveDiscoveredInstance(result.instance, result.catalog);
+        const saved = await saveDiscoveredInstance(result.instance, result.catalog);
+        if (saved.instanceIdChanged && saved.previousInstanceId) {
+          await clearResourceCacheForInstance(saved.previousInstanceId);
+        }
         instance = result.instance;
       }
 
       applyInstanceBranding(instance);
       if (!instance) {
-        throw new NetaClientError('NETWORK_ERROR', 'Yapılandırılan Neta alanına ulaşılamadı.');
+        setSession(createUnauthenticatedState(null));
+        recordPerformanceSample('cold-shell', Date.now() - startedAt);
+        return;
       }
 
       const user = await createNativeAuthClient(instance).getMe();
@@ -115,6 +129,78 @@ export function SessionProvider({ children }: PropsWithChildren) {
       recordPerformanceSample('cold-shell', Date.now() - startedAt);
     }
   }, [applyInstanceBranding, applyUserPreferences, isOnline]);
+
+  const connectInstance = useCallback(async (input: string) => {
+    setPendingDiscovery(null);
+    setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: true }));
+    try {
+      const parsed = parseInstanceConnectInput(input, { environment: appEnvironment });
+      pendingPairingSecretRef.current = parsed.pairingSecret ?? null;
+      const result = await discoverInstance(parsed.origin, {
+        onStep: (discoveryStep) => setSession((current) => ({
+          ...toUnauthenticated(current), discoveryStep, error: null, isBusy: true,
+        })),
+      });
+      setPendingDiscovery(result);
+      setSession((current) => ({ ...toUnauthenticated(current), discoveryStep: 'ready-for-auth', isBusy: false }));
+    } catch (error) {
+      setSession((current) => ({
+        ...toUnauthenticated(current),
+        error: toClientError(error, 'Neta instance doğrulanamadı.'),
+        isBusy: false,
+      }));
+    }
+  }, []);
+
+  const cancelInstanceConnection = useCallback(() => {
+    setPendingDiscovery(null);
+    pendingPairingSecretRef.current = null;
+    setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: false }));
+  }, []);
+
+  const confirmInstanceConnection = useCallback(async (pairingCode?: string) => {
+    if (!pendingDiscovery) return false;
+    const result = pendingDiscovery;
+    setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: true }));
+    try {
+      const saved = await saveDiscoveredInstance(result.instance, result.catalog);
+      if (saved.instanceIdChanged && saved.previousInstanceId) {
+        await clearResourceCacheForInstance(saved.previousInstanceId);
+      }
+      setPendingDiscovery(null);
+      applyInstanceBranding(result.instance);
+      const credential = pendingPairingSecretRef.current
+        ? { secret: pendingPairingSecretRef.current }
+        : pairingCode?.trim() ? { code: pairingCode.trim() } : null;
+      pendingPairingSecretRef.current = null;
+      if (credential) {
+        const user = await createNativeAuthClient(result.instance).pairDevice(credential);
+        applyUserPreferences(user);
+        setSession(authenticatedState(result.instance, user));
+      } else {
+        setSession(createUnauthenticatedState(result.instance));
+      }
+      return true;
+    } catch (error) {
+      setSession((current) => ({
+        ...toUnauthenticated(current),
+        error: toClientError(error, 'Instance kaydedilemedi.'),
+        isBusy: false,
+      }));
+      return false;
+    }
+  }, [applyInstanceBranding, applyUserPreferences, pendingDiscovery]);
+
+  const forgetCurrentInstance = useCallback(async () => {
+    const instance = session.instance;
+    if (!instance) return;
+    setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: true }));
+    await clearResourceCacheForInstance(instance.instanceId);
+    await forgetInstance(instance.instanceId);
+    setPendingDiscovery(null);
+    applyInstanceBranding(null);
+    setSession(createUnauthenticatedState(null));
+  }, [applyInstanceBranding, session.instance]);
 
   useEffect(() => {
     const timeout = setTimeout(() => { void bootstrap(); }, 0);
@@ -172,7 +258,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const updateInstance = useCallback(async (patch: Partial<StoredInstance>) => {
     if (!session.instance) return;
-    const instance = { ...session.instance, ...patch, origin: netaOrigin };
+    const instance = { ...session.instance, ...patch, origin: session.instance.origin };
     await updateStoredInstance(instance);
     applyInstanceBranding(instance);
     setSession((current) => ({ ...current, instance } as SessionState));
@@ -180,12 +266,17 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const value = useMemo<SessionContextValue>(() => ({
     ...session,
+    cancelInstanceConnection,
+    confirmInstanceConnection,
+    connectInstance,
+    forgetCurrentInstance,
     login,
     logout,
     refreshSession,
     retryBootstrap: bootstrap,
     updateInstance,
-  }), [bootstrap, login, logout, refreshSession, session, updateInstance]);
+    pendingInstance: pendingDiscovery?.instance ?? null,
+  }), [bootstrap, cancelInstanceConnection, confirmInstanceConnection, connectInstance, forgetCurrentInstance, login, logout, pendingDiscovery, refreshSession, session, updateInstance]);
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }

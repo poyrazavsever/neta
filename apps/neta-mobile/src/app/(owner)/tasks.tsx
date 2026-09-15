@@ -5,12 +5,7 @@ import { type Href, router, useFocusEffect } from 'expo-router';
 import type { PaginatedResponse, TaskListItem, TaskStatus } from '@neta/api-contracts';
 
 import { Badge, Button, Card, EmptyState, Screen, Skeleton, TextField, Toast } from '@/components/ui';
-import {
-  completeTask,
-  listTasks,
-  updateTaskStatus,
-  type TaskListFilters,
-} from '@/features/tasks/api';
+import { completeTask, listTasks, updateTaskStatus, type TaskListFilters } from '@/features/tasks/api';
 import { toClientError, type NetaClientError } from '@/lib/api/errors';
 import { formatDateTime } from '@/lib/resource/format';
 import { useSession } from '@/providers/session-provider';
@@ -27,12 +22,7 @@ const statuses: readonly { label: string; value: TaskStatus | undefined }[] = [
   { label: 'İptal', value: 'cancelled' },
 ];
 
-const nextStatus: Record<TaskStatus, TaskStatus> = {
-  cancelled: 'todo',
-  done: 'todo',
-  in_progress: 'done',
-  todo: 'in_progress',
-};
+const nextStatus: Record<TaskStatus, TaskStatus> = { cancelled: 'todo', done: 'todo', in_progress: 'done', todo: 'in_progress' };
 
 export default function TasksScreen() {
   const { colors } = useTheme();
@@ -85,44 +75,17 @@ export default function TasksScreen() {
 
   const changeStatus = async (task: TaskListItem) => {
     if (session.status !== 'authenticated' || session.role !== 'freelancer' || pendingTaskId) return;
-    const previousPage = page;
-    const statusValue = nextStatus[task.status];
-    setRollbackMessage(null);
-    setPendingTaskId(task.id);
-    setPage((current) =>
-      current
-        ? {
-            ...current,
-            items: current.items.map((item) =>
-              item.id === task.id ? { ...item, status: statusValue } : item,
-            ),
-          }
-        : current,
-    );
-
+    const previousPage = page; const statusValue = nextStatus[task.status];
+    setRollbackMessage(null); setPendingTaskId(task.id);
+    setPage((current) => current ? { ...current, items: current.items.map((item) => item.id === task.id ? { ...item, status: statusValue } : item) } : current);
     try {
-      const result =
-        statusValue === 'done'
-          ? await completeTask(session.instance, session.user, task.id)
-          : await updateTaskStatus(session.instance, session.user, task.id, {
-              status: statusValue,
-            });
-      setPage((current) =>
-        current
-          ? {
-              ...current,
-              items: current.items.map((item) =>
-                item.id === task.id ? { ...item, ...result.data } : item,
-              ),
-            }
-          : current,
-      );
+      const result = statusValue === 'done'
+        ? await completeTask(session.instance, session.user, task.id, task.updatedAt)
+        : await updateTaskStatus(session.instance, session.user, task.id, { status: statusValue, version: task.updatedAt });
+      setPage((current) => current ? { ...current, items: current.items.map((item) => item.id === task.id ? { ...item, ...result.data } : item) } : current);
     } catch (statusError) {
-      setPage(previousPage);
-      setRollbackMessage(toClientError(statusError, 'Durum güncellenemedi.').message);
-    } finally {
-      setPendingTaskId(null);
-    }
+      setPage(previousPage); setRollbackMessage(toClientError(statusError, 'Durum güncellenemedi.').message);
+    } finally { setPendingTaskId(null); }
   };
 
   const items = page?.items ?? [];
@@ -138,7 +101,7 @@ export default function TasksScreen() {
       <View style={styles.content}>
         <Badge tone="primary">Görevler</Badge>
         <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>Görev yönetimi</Text>
-        <Button accessibilityHint="Yeni görev formunu modal olarak açar" onPress={() => router.push('/(forms)/task' as Href)}>Yeni görev</Button>
+        <Button accessibilityHint="Yeni görev formunu modal olarak açar" onPress={() => router.push('/task' as Href)}>Yeni görev</Button>
         <View accessibilityLabel="Görünüm" accessibilityRole="radiogroup" style={styles.filterRow}>
           {(['list', 'kanban'] as const).map((mode) => (
             <FilterButton
@@ -206,11 +169,7 @@ export default function TasksScreen() {
                     <Text style={[styles.caption, { color: colors.textMuted }]}>Son tarih {formatDateTime(task.dueAt, locale)}</Text>
                   ) : null}
                 </Pressable>
-                <Button
-                  loading={pendingTaskId === task.id}
-                  onPress={() => void changeStatus(task)}
-                  variant="secondary"
-                >
+                <Button loading={pendingTaskId === task.id} onPress={() => void changeStatus(task)} variant="secondary">
                   {task.status === 'done' ? 'Yeniden aç' : 'Sonraki duruma taşı'}
                 </Button>
               </Card>

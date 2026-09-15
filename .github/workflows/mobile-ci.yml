@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - "apps/neta-mobile/**"
+      - "apps/neta-app/app/api/v1/**"
+      - "apps/neta-app/server/api/v1/**"
+      - "apps/neta-app/server/settings/preferences.ts"
+      - "apps/neta-app/server/domain/errors.ts"
       - "packages/**"
       - "docs/mobile/**"
       - "package.json"
@@ -14,6 +18,10 @@ on:
     branches: [main]
     paths:
       - "apps/neta-mobile/**"
+      - "apps/neta-app/app/api/v1/**"
+      - "apps/neta-app/server/api/v1/**"
+      - "apps/neta-app/server/settings/preferences.ts"
+      - "apps/neta-app/server/domain/errors.ts"
       - "packages/**"
       - "docs/mobile/**"
       - "package.json"
@@ -36,6 +44,7 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm contract:check
       - run: pnpm mobile:release:check
         env:
           EXPO_PUBLIC_APP_ENV: production

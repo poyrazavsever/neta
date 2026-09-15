@@ -2,14 +2,14 @@ import {
   createIdempotencyKey,
   isDeleteResult,
   isFinanceAnalysis,
-  isFinanceSummary,
+  isMultiCurrencyFinanceSummary,
   isFinanceTransactionDetail,
   isFinanceTransactionListItem,
   isPaginatedResponse,
   type DeleteResult,
   type FinanceAnalysis,
   type FinancePaymentStatus,
-  type FinanceSummary,
+  type MultiCurrencyFinanceSummary,
   type FinanceTransactionDetail,
   type FinanceTransactionKind,
   type FinanceTransactionListItem,
@@ -19,6 +19,7 @@ import {
 
 import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
+import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
 
 export type FinanceTransactionFilters = {
@@ -31,11 +32,14 @@ export type FinanceTransactionFilters = {
   search?: string;
 };
 
+const versionByTransaction = new Map<string, string>();
+
 export function getFinanceSummary(
   instance: StoredInstance,
   user: MeProfile,
   month: string,
-): Promise<ResourceResult<FinanceSummary>> {
+): Promise<ResourceResult<MultiCurrencyFinanceSummary>> {
+  requireInstanceCapability(instance, 'freelancer.finance.v1');
   return requestResource(instance, user, {
     cachePolicy: 'short',
     filters: { month },
@@ -50,6 +54,7 @@ export function listFinanceTransactions(
   user: MeProfile,
   filters: FinanceTransactionFilters,
 ): Promise<ResourceResult<PaginatedResponse<FinanceTransactionListItem>>> {
+  requireInstanceCapability(instance, 'freelancer.finance.v1');
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(filters)) {
     if (value) params.set(key, value);
@@ -64,18 +69,21 @@ export function listFinanceTransactions(
   });
 }
 
-export function getFinanceTransactionDetail(
+export async function getFinanceTransactionDetail(
   instance: StoredInstance,
   user: MeProfile,
   transactionId: string,
 ): Promise<ResourceResult<FinanceTransactionDetail>> {
-  return requestResource(instance, user, {
+  requireInstanceCapability(instance, 'freelancer.finance.v1');
+  const result = await requestResource(instance, user, {
     cachePolicy: 'short',
     filters: { transactionId },
     parser: parseFinanceTransactionDetail,
     path: `finance/transactions/${encodeURIComponent(transactionId)}`,
     resource: 'finance',
   });
+  if (result.data.version) versionByTransaction.set(`${instance.instanceId}:${transactionId}`, result.data.version);
+  return result;
 }
 
 export function createFinanceTransaction(
@@ -83,6 +91,7 @@ export function createFinanceTransaction(
   user: MeProfile,
   payload: FinanceTransactionMutationPayload,
 ): Promise<ResourceResult<FinanceTransactionDetail>> {
+  requireInstanceCapability(instance, 'freelancer.finance.v1');
   return requestResource(instance, user, {
     body: payload,
     idempotencyKey: createIdempotencyKey('finance-create'),
@@ -100,6 +109,7 @@ export function updateFinanceTransaction(
   transactionId: string,
   payload: FinanceTransactionMutationPayload,
 ): Promise<ResourceResult<FinanceTransactionDetail>> {
+  requireInstanceCapability(instance, 'freelancer.finance.v1');
   return requestResource(instance, user, {
     body: payload,
     invalidates: ['finance', 'dashboard', 'calendar'],
@@ -114,10 +124,14 @@ export function deleteFinanceTransaction(
   instance: StoredInstance,
   user: MeProfile,
   transactionId: string,
+  version = versionByTransaction.get(`${instance.instanceId}:${transactionId}`),
 ): Promise<ResourceResult<DeleteResult>> {
+  requireInstanceCapability(instance, 'freelancer.finance.v1');
+  if (!version) return Promise.reject(new NetaClientError('CONFLICT', 'Kayıt sürümü bilinmiyor; detayı yeniden yükleyin.'));
   return requestResource(instance, user, {
     invalidates: ['finance', 'dashboard', 'calendar'],
     method: 'DELETE',
+    ifMatch: version,
     parser: parseDeleteResult,
     path: `finance/transactions/${encodeURIComponent(transactionId)}`,
     resource: 'finance',
@@ -139,8 +153,8 @@ export function requestFinanceAnalysis(
   });
 }
 
-function parseFinanceSummary(value: unknown): FinanceSummary {
-  if (!isFinanceSummary(value)) throw contractError('Finance summary');
+function parseFinanceSummary(value: unknown): MultiCurrencyFinanceSummary {
+  if (!isMultiCurrencyFinanceSummary(value)) throw contractError('Finance summary');
   return value;
 }
 

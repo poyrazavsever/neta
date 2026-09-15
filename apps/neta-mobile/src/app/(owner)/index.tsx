@@ -48,9 +48,9 @@ export default function OwnerDashboardScreen() {
       <View accessibilityLabel="Dashboard tarih aralığı" accessibilityRole="radiogroup" style={[styles.rangeRow, { backgroundColor: colors.surfaceMuted }]}>{ranges.map((item) => { const selected = item.value === range; return <Pressable accessibilityRole="radio" accessibilityState={{ checked: selected }} key={item.value} onPress={() => setRange(item.value)} style={[styles.rangeButton, selected && { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.rangeLabel, { color: selected ? colors.primary : colors.textMuted }]}>{item.label}</Text></Pressable>; })}</View>
 
       <View style={styles.quickRow}>
-        <QuickAction icon={{ ios: 'person.badge.plus', android: 'person_add' }} label="Müşteri" onPress={() => router.navigate('/(owner)/clients' as Href)} />
-        <QuickAction icon={{ ios: 'folder.badge.plus', android: 'create_new_folder' }} label="Proje" onPress={() => router.navigate('/(owner)/projects' as Href)} />
-        <QuickAction icon={{ ios: 'checkmark.circle', android: 'add_task' }} label="Görev" onPress={() => router.navigate('/(forms)/task' as Href)} />
+        <QuickAction icon={{ ios: 'person.2.fill', android: 'group' }} label="Müşteriler" onPress={() => router.navigate('/(owner)/clients' as Href)} />
+        <QuickAction icon={{ ios: 'folder.fill', android: 'folder' }} label="Projeler" onPress={() => router.navigate('/(owner)/projects' as Href)} />
+        <QuickAction icon={{ ios: 'checkmark.circle', android: 'task_alt' }} label="Görevler" onPress={() => router.navigate('/(owner)/tasks' as Href)} />
       </View>
 
       {isLoading && !bundle ? <DashboardSkeleton /> : null}

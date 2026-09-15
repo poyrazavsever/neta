@@ -16,6 +16,7 @@ import {
 
 import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
+import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
 
 export type TaskListFilters = {
@@ -34,6 +35,7 @@ export function listTasks(
   user: MeProfile,
   filters: TaskListFilters,
 ): Promise<ResourceResult<PaginatedResponse<TaskListItem>>> {
+  requireInstanceCapability(instance, 'freelancer.tasks.v1');
   const params = new URLSearchParams();
 
   for (const [key, value] of Object.entries(filters)) {
@@ -57,6 +59,7 @@ export function getTaskDetail(
   user: MeProfile,
   taskId: string,
 ): Promise<ResourceResult<TaskDetail>> {
+  requireInstanceCapability(instance, 'freelancer.tasks.v1');
   return requestResource(instance, user, {
     cachePolicy: 'medium',
     filters: { taskId },
@@ -71,6 +74,7 @@ export function createTask(
   user: MeProfile,
   payload: TaskMutationPayload,
 ): Promise<ResourceResult<TaskDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     idempotencyKey: createIdempotencyKey('task-create'),
@@ -88,6 +92,7 @@ export function updateTask(
   taskId: string,
   payload: TaskMutationPayload,
 ): Promise<ResourceResult<TaskDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     invalidates: ['tasks', 'dashboard', 'projects', 'calendar'],
@@ -104,6 +109,7 @@ export function updateTaskStatus(
   taskId: string,
   payload: TaskStatusMutationPayload,
 ): Promise<ResourceResult<TaskDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     invalidates: ['tasks', 'dashboard', 'projects', 'calendar'],
@@ -120,6 +126,7 @@ export function completeTask(
   taskId: string,
   version?: string | null,
 ): Promise<ResourceResult<TaskDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: version === undefined ? {} : { version },
     idempotencyKey: createIdempotencyKey('task-complete'),
@@ -135,9 +142,12 @@ export function deleteTask(
   instance: StoredInstance,
   user: MeProfile,
   taskId: string,
+  version: string,
 ): Promise<ResourceResult<DeleteResult>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     method: 'DELETE',
+    ifMatch: version,
     invalidates: ['tasks', 'dashboard', 'projects', 'calendar'],
     parser: parseDeleteResult,
     path: `tasks/${encodeURIComponent(taskId)}`,

@@ -11,10 +11,13 @@ import {
   isPaginatedResponse,
   type PaginatedResponse,
   type PortalInvitationPayload,
+  type PortalInvitationResult,
+  isPortalInvitationResult,
 } from '@neta/api-contracts';
 
 import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
+import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
 
 export type ClientListFilters = {
@@ -27,6 +30,7 @@ export async function listClients(
   user: MeProfile,
   filters: ClientListFilters,
 ): Promise<ResourceResult<PaginatedResponse<ClientListItem>>> {
+  requireInstanceCapability(instance, 'freelancer.clients.v1');
   const params = new URLSearchParams();
 
   if (filters.search) {
@@ -53,6 +57,7 @@ export function getClientDetail(
   user: MeProfile,
   clientId: string,
 ): Promise<ResourceResult<ClientDetail>> {
+  requireInstanceCapability(instance, 'freelancer.clients.v1');
   return requestResource(instance, user, {
     cachePolicy: 'medium',
     filters: { clientId },
@@ -60,6 +65,13 @@ export function getClientDetail(
     path: `clients/${encodeURIComponent(clientId)}`,
     resource: 'clients',
   });
+}
+
+function parsePortalInvitationResult(value: unknown): PortalInvitationResult {
+  if (!isPortalInvitationResult(value)) {
+    throw new NetaClientError('SERVER_ERROR', 'Portal invitation API kontratı beklenen formatta değil.');
+  }
+  return value;
 }
 
 export function listClientActivities(
@@ -82,6 +94,7 @@ export function createClientActivity(
   clientId: string,
   payload: ClientActivityMutationPayload,
 ): Promise<ResourceResult<ClientActivity>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     idempotencyKey: createIdempotencyKey('client-activity-create'),
@@ -98,6 +111,7 @@ export function createClient(
   user: MeProfile,
   payload: ClientMutationPayload,
 ): Promise<ResourceResult<ClientDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     idempotencyKey: createIdempotencyKey('client-create'),
@@ -114,6 +128,7 @@ export function updateClient(
   clientId: string,
   payload: ClientMutationPayload,
 ): Promise<ResourceResult<ClientDetail>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     method: 'PATCH',
@@ -139,12 +154,13 @@ export function inviteClientPortal(
   user: MeProfile,
   clientId: string,
   payload: PortalInvitationPayload,
-): Promise<ResourceResult<ClientDetail>> {
+): Promise<ResourceResult<PortalInvitationResult>> {
+  requireInstanceCapability(instance, 'freelancer.core-mutations.v1');
   return requestResource(instance, user, {
     body: payload,
     idempotencyKey: createIdempotencyKey('portal-invite'),
     method: 'POST',
-    parser: parseClientDetail,
+    parser: parsePortalInvitationResult,
     path: `clients/${encodeURIComponent(clientId)}/portal-invitations`,
     resource: 'clients',
   });

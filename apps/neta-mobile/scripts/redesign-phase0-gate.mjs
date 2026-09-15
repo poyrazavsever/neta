@@ -11,14 +11,12 @@ const source = (await Promise.all(sourceFiles.map((file) => readFile(file, 'utf8
 
 for (const forbidden of [
   ['business route/feature', /features\/business|\(owner\)\/business/],
-  ['domain connection action', /connectDomain|disconnectInstance/],
-  ['device pairing action', /pairDevice|auth\/pairing/],
   ['pairing token family', /token-family|TOKEN_FAMILY/],
 ]) {
   if (forbidden[1].test(source)) failures.push(`Kaldırılmış mobil kapsam bulundu: ${forbidden[0]}`);
 }
 
-for (const required of ['business-records', 'domain-entry', 'instance-switching', 'device-pairing']) {
+for (const required of ['business-records', 'device-pairing']) {
   if (!inventory.removedMobileScope.includes(required)) failures.push(`Envanter silme listesinde eksik: ${required}`);
 }
 
@@ -27,7 +25,8 @@ for (const route of ['src/app/(public)/onboarding.tsx', 'src/app/(public)/login.
 }
 
 const appConfig = await readFile(new URL('app.config.ts', mobileRoot), 'utf8');
-if (!appConfig.includes('EXPO_PUBLIC_NETA_ORIGIN')) failures.push('app.config.ts tek-instance origin kullanmıyor.');
+if (!source.includes('parseInstanceConnectInput') || !source.includes('confirmInstanceConnection')) failures.push('Universal instance bağlantı state machine eksik.');
+if (!appConfig.includes('EXPO_PUBLIC_NETA_ORIGIN')) failures.push('app.config.ts opsiyonel geliştirme origin desteğini kaybetti.');
 
 if (failures.length) {
   process.stderr.write(`${failures.join('\n')}\n`);

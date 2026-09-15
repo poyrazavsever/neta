@@ -8,6 +8,7 @@ import { AppIcon, Badge, Button, Card, EmptyState, InfoBox, Screen, Skeleton, Te
 import { listClients, type ClientListFilters } from '@/features/clients/api';
 import { toClientError, type NetaClientError } from '@/lib/api/errors';
 import { formatDateTime } from '@/lib/resource/format';
+import { hasInstanceCapability } from '@/lib/instance/capabilities';
 import { useSession } from '@/providers/session-provider';
 import { useTheme } from '@/providers/theme-provider';
 import { radius, spacing } from '@/theme/tokens';
@@ -29,6 +30,7 @@ export default function ClientsScreen() {
   const [error, setError] = useState<NetaClientError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const requestRef = useRef(0);
+  const canMutate = session.instance ? hasInstanceCapability(session.instance, 'freelancer.core-mutations.v1') : false;
 
   const loadClients = useCallback(async () => {
     if (session.status !== 'authenticated' || session.role !== 'freelancer') return;
@@ -67,7 +69,7 @@ export default function ClientsScreen() {
             <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>Müşteri ilişkileri</Text>
             <Text style={[styles.description, { color: colors.textMuted }]}>İletişim, proje geçmişi, aktiviteler ve portal erişimi tek yerde.</Text>
           </View>
-          <Button accessibilityHint="Müşteri formunu modal olarak açar" onPress={() => router.push('/(forms)/client' as Href)}>Yeni müşteri</Button>
+          {canMutate ? <Button onPress={() => router.push('/client' as Href)}>Yeni müşteri</Button> : null}
         </View>
 
         <Card style={styles.filters}>
@@ -79,7 +81,7 @@ export default function ClientsScreen() {
 
         {error ? <InfoBox action={<Button onPress={() => void loadClients()} variant="ghost">Tekrar dene</Button>} description={error.message} title="Müşteriler yüklenemedi" tone="danger" /> : null}
         {isLoading && !page ? <><ListSkeleton /><ListSkeleton /></> : null}
-        {!isLoading && page?.items.length === 0 ? <EmptyState action={<Button onPress={() => router.push('/(forms)/client' as Href)}>İlk müşteriyi ekle</Button>} description="Arama veya filtreyi değiştir ya da yeni bir müşteri oluştur." title="Müşteri bulunamadı" /> : null}
+        {!isLoading && page?.items.length === 0 ? <EmptyState description={canMutate ? 'Arama veya filtreyi değiştir ya da yeni bir müşteri oluştur.' : 'Arama veya filtreyi değiştir.'} title="Müşteri bulunamadı" /> : null}
 
         <View style={styles.list}>
           {page?.items.map((client) => <ClientRow client={client} key={client.id} locale={session.instance?.defaultLocale ?? 'tr'} />)}

@@ -15,8 +15,8 @@
 ## About
 
 Neta Mobile brings the owner workspace and the restricted client portal to
-React Native. Each fork is bound at build time to one Neta instance; users are
-never asked to enter or switch domains. The app uses native navigation, modal
+React Native. One universal binary connects at runtime to a compatible
+self-hosted Neta domain or a secret-free `neta://connect` QR link. The app uses native navigation, modal
 forms, system date and document pickers, secure session storage, light/dark
 themes, reduced-motion support, and keyboard-safe form layouts.
 
@@ -27,16 +27,11 @@ intentionally out of scope.
 
 ## Production status
 
-The mobile client passes its static, unit, accessibility, native-linking,
-configuration, security, and production-bundle gates. The public bootstrap for
-`https://demo.takeneta.com` is healthy.
-
-The demo backend does **not yet expose the authenticated feature API surface**
-required by the mobile screens. Representative `/api/v1/dashboard`, `clients`,
-`projects`, `tasks`, `calendar`, `finance`, `journal`, `chat`, `settings`, and
-`portal` routes currently return `404`. A store release remains blocked until
-those routes and their authorization tests are deployed. The client does not
-replace missing server data with mocks.
+The repository backend now exposes and tests the minimum owner read slice for
+dashboard, clients, projects, tasks and calendar. Finance, journal, AI,
+settings, files, portal parity and write operations remain planned. A store
+release is still blocked on signed iOS/Android and two-live-instance evidence;
+the client does not replace missing server data with mocks.
 
 ## Requirements
 
@@ -65,17 +60,17 @@ pnpm mobile:ios
 pnpm mobile:android
 ```
 
-The checked-in example targets the public demo instance. Edit
-`apps/neta-mobile/.env` before building a fork. Environment files are ignored
-by Git.
+The development default targets localhost. A production universal build leaves
+the origin empty and asks the user to connect a domain or scan the administrator's QR.
 
 ## Configuration
 
-The two required public production values are:
+The production environment is required; the origin is optional:
 
 ```dotenv
 EXPO_PUBLIC_APP_ENV=production
-EXPO_PUBLIC_NETA_ORIGIN=https://demo.takeneta.com
+# Optional development/demo/fork default only:
+EXPO_PUBLIC_NETA_ORIGIN=
 ```
 
 App name, scheme, bundle identifiers, package name, version, and native build

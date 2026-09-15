@@ -3,7 +3,7 @@ import { AccessibilityInfo, Modal, Pressable, ScrollView, StyleSheet, Text, View
 import { type Href, router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { FinanceAnalysis, FinanceSummary, FinanceTransactionKind, FinanceTransactionListItem } from '@neta/api-contracts';
+import type { FinanceAnalysis, MultiCurrencyFinanceSummary, FinanceTransactionKind, FinanceTransactionListItem } from '@neta/api-contracts';
 
 import { Badge, Button, Card, EmptyState, InfoBox, Screen, Skeleton } from '@/components/ui';
 import { getFinanceSummary, listFinanceTransactions, requestFinanceAnalysis } from '@/features/finance/api';
@@ -13,7 +13,7 @@ import { toClientError } from '@/lib/api/errors'; import { formatMoney } from '@
 export default function FinanceScreen() {
   const session = useSession(); const { colors, reduceMotion } = useTheme(); const insets = useSafeAreaInsets(); const locale = session.user?.preferences?.locale ?? session.instance?.defaultLocale ?? 'tr';
   const [month, setMonth] = useState(() => toLocalCalendarKey(new Date()).slice(0, 7)); const [kind, setKind] = useState<FinanceTransactionKind | undefined>();
-  const [summary, setSummary] = useState<FinanceSummary | null>(null); const [items, setItems] = useState<FinanceTransactionListItem[]>([]);
+  const [summary, setSummary] = useState<MultiCurrencyFinanceSummary | null>(null); const [items, setItems] = useState<FinanceTransactionListItem[]>([]);
   const [analysis, setAnalysis] = useState<FinanceAnalysis | null>(null); const [analysisOpen, setAnalysisOpen] = useState(false); const [analysisError, setAnalysisError] = useState<string | null>(null); const [analysisLoading, setAnalysisLoading] = useState(false);
   const [error, setError] = useState<string | null>(null); const [loading, setLoading] = useState(false); const requestRef = useRef(0); const analysisTriggerRef = useRef<View>(null); const analysisHeadingRef = useRef<Text>(null);
 
@@ -34,7 +34,7 @@ export default function FinanceScreen() {
     finally { setAnalysisLoading(false); }
   };
   const closeAnalysis = () => { setAnalysisOpen(false); requestAnimationFrame(() => focus(analysisTriggerRef.current)); };
-  const stats = summary ? [{ label: 'Gelir', value: summary.totals.income }, { label: 'Gider', value: summary.totals.expense }, { label: 'Net', value: summary.totals.net }, { label: 'Bekleyen', value: summary.totals.pending }] : [];
+  const stats = summary ? summary.currencies.flatMap((group) => [{ label: `${group.currency} Gelir`, value: group.totals.income }, { label: `${group.currency} Gider`, value: group.totals.expense }, { label: `${group.currency} Net`, value: group.totals.net }, { label: `${group.currency} Bekleyen`, value: group.totals.pending }]) : [];
 
   return <><Screen onRefresh={() => void load()} refreshing={loading && summary !== null} scroll><View style={styles.content}>
     <View style={styles.heading}><View style={styles.copy}><Badge tone="primary">Finans</Badge><Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>Finans merkezi</Text><Text style={[styles.description, { color: colors.textMuted }]}>Gelir, gider ve ödeme durumlarını aylık izle.</Text></View><Button onPress={() => router.push('/finance-record' as Href)}>Yeni kayıt</Button></View>

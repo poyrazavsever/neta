@@ -38,7 +38,7 @@ export default function FilesScreen() {
   const loadAssets = useCallback(async () => {
     if (!projectId.trim() || session.status !== 'authenticated' || session.role !== 'freelancer') return;
     setLoading(true); setError(null);
-    try { setAssets((await listProjectAssets(session.instance, session.user, projectId.trim())).data); }
+    try { setAssets((await listProjectAssets(session.instance, session.user, projectId.trim())).data.items); }
     catch (value) { setError(toClientError(value, 'Project dosyaları alınamadı.')); }
     finally { setLoading(false); }
   }, [projectId, session]);

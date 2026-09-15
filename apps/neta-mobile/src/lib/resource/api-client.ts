@@ -8,6 +8,7 @@ import { NetaClientError, toClientError } from '@/lib/api/errors';
 import { createApiUrl, fetchJson } from '@/lib/api/http';
 import { getNativeAuthHeaders } from '@/lib/auth/native-auth-client';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
+import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { recordPerformanceSample } from '@/lib/performance/metrics';
 
 import { createQueryKey, type QueryFilters, type QueryKey } from './query-key';
@@ -23,6 +24,7 @@ type ResourceRequestOptions<T> = {
   cachePolicy?: CachePolicy;
   filters?: QueryFilters;
   idempotencyKey?: string;
+  ifMatch?: string;
   invalidates?: ResourceName[];
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   parser: (value: unknown) => T;
@@ -44,6 +46,8 @@ export async function requestResource<T>(
   user: MeProfile,
   options: ResourceRequestOptions<T>,
 ): Promise<ResourceResult<T>> {
+  const requiredCapability = capabilityFor(options.path);
+  if (requiredCapability) requireInstanceCapability(instance, requiredCapability);
   const locale = user.preferences?.locale ?? instance.defaultLocale;
   const cachePolicy = effectiveCachePolicy(options.resource, options.cachePolicy ?? 'none');
   const queryKey = createQueryKey(instance.instanceId, user.id, user.role, locale, options.resource, options.filters);
@@ -64,6 +68,7 @@ export async function requestResource<T>(
       createRequestMetadata(user, locale, options.idempotencyKey),
       options.body !== undefined,
       authHeaders,
+      options.ifMatch,
     ),
     credentials: 'include',
     method: options.method ?? 'GET',
@@ -117,6 +122,17 @@ export async function requestResource<T>(
   };
 }
 
+function capabilityFor(path: string): string | null {
+  if (path.startsWith('portal/')) return 'portal.client.v1';
+  if (path === 'device-sessions' || path.startsWith('device-sessions/')) return 'auth.device-pairing.v1';
+  if (path.startsWith('finance/')) return 'freelancer.finance.v1';
+  if (path.startsWith('journal/')) return 'freelancer.journal.v1';
+  if (path.startsWith('settings/locales')) return 'instance.locales.admin.v1';
+  if (path.startsWith('settings/') || path.startsWith('me/profile') || path.startsWith('me/password') || path.startsWith('me/sessions')) return 'freelancer.settings.v1';
+  if (path === 'files' || /projects\/[^/]+\/assets/.test(path)) return 'files.v1';
+  return null;
+}
+
 function createRequestMetadata(
   user: MeProfile,
   locale: string,
@@ -137,7 +153,7 @@ function createRequestMetadata(
   return metadata;
 }
 
-function createRequestHeaders(metadata: RequestMetadata, hasBody: boolean, authHeaders: Record<string, string>): Record<string, string> {
+function createRequestHeaders(metadata: RequestMetadata, hasBody: boolean, authHeaders: Record<string, string>, ifMatch?: string): Record<string, string> {
   const headers = {
     'Accept-Language': metadata.locale,
     ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
@@ -145,6 +161,7 @@ function createRequestHeaders(metadata: RequestMetadata, hasBody: boolean, authH
     'X-Neta-Client-Version': metadata.version,
     'X-Neta-Platform': metadata.platform,
     ...authHeaders,
+    ...(ifMatch ? { 'If-Match': `"${ifMatch}"` } : {}),
   };
 
   return metadata.idempotencyKey

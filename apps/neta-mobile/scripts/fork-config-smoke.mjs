@@ -24,11 +24,19 @@ const config = JSON.parse(execFileSync(expoBin, ['config', '--type', 'public', '
   env: baseEnv,
 }));
 
+const universalEnv = { ...baseEnv, EXPO_PUBLIC_NETA_ORIGIN: '' };
+const universalConfig = JSON.parse(execFileSync(expoBin, ['config', '--type', 'public', '--json'], {
+  cwd: projectRoot,
+  encoding: 'utf8',
+  env: universalEnv,
+}));
+
 const failures = [];
 if (config.name !== 'Example Neta' || config.slug !== 'example-neta' || config.scheme !== 'exampleneta') failures.push('Fork uygulama kimliği env değerlerinden üretilmedi');
 if (config.version !== '1.2.3' || config.ios?.buildNumber !== '17' || config.android?.versionCode !== 42) failures.push('Fork store sürüm değerleri env değerlerinden üretilmedi');
 if (config.ios?.bundleIdentifier !== 'com.example.neta' || config.android?.package !== 'com.example.neta') failures.push('Fork bundle/package kimliği env değerlerinden üretilmedi');
 if (config.extra?.netaOrigin !== 'https://neta.example.com' || config.extra?.environment !== 'production') failures.push('Production Neta origin/environment config içine doğru yazılmadı');
+if ((universalConfig.extra?.netaOrigin ?? null) !== null) failures.push('Universal production build origin olmadan üretilemedi');
 
 try {
   execFileSync(expoBin, ['config', '--type', 'public', '--json'], {

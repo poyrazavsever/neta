@@ -1,6 +1,7 @@
 import * as Linking from 'expo-linking';
 import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useMemo, useRef, useState } from 'react';
+import { router, type Href } from 'expo-router';
 
 import { Badge, Button, Card, ColorModeControl, Screen, TextField, Toast } from '@/components/ui';
 import { createPasswordResetFallback } from '@/features/linking/deep-link';
@@ -42,6 +43,11 @@ export default function LoginScreen() {
     try { setExternalError(null); await Linking.openURL(url); } catch { setExternalError('Şifre sıfırlama sayfası açılamadı.'); }
   };
 
+  const changeInstance = async () => {
+    await session.forgetCurrentInstance();
+    router.replace('/onboarding' as Href);
+  };
+
   return (
     <Screen centered scroll>
       <View style={styles.content}>
@@ -57,6 +63,7 @@ export default function LoginScreen() {
           <TextField autoComplete="current-password" editable={!session.isBusy && Boolean(session.instance)} error={errors.password} label="Şifre" onChangeText={(value) => { setPassword(value); setErrors((current) => current.email ? { email: current.email } : {}); }} onSubmitEditing={submit} ref={passwordRef} returnKeyType="go" secureTextEntry textContentType="password" value={password} />
           <Button disabled={!session.instance} loading={session.isBusy} onPress={submit}>Giriş yap</Button>
           <Button disabled={session.isBusy} onPress={() => void resetPassword()} variant="ghost">Şifremi unuttum</Button>
+          <Button disabled={session.isBusy} onPress={() => void changeInstance()} variant="ghost">Başka çalışma alanına bağlan</Button>
         </Card>
         {session.error ? <Toast message={session.error.message} tone="danger" /> : null}
         {externalError ? <Toast message={externalError} tone="danger" /> : null}

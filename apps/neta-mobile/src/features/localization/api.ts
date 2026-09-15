@@ -1,9 +1,11 @@
 import {
   createIdempotencyKey,
   isLocaleDefinition,
+  isNetaRuntimeCatalog,
   isTranslationCatalog,
   type LocaleDefinition,
   type LocaleMutationPayload,
+  type NetaRuntimeCatalog,
   type TranslationCatalog,
 } from '@neta/api-contracts';
 
@@ -18,9 +20,10 @@ export function getTranslations(instance: StoredInstance, user: MeProfile, code:
 export function updateTranslations(instance: StoredInstance, user: MeProfile, code: string, catalog: TranslationCatalog): Promise<ResourceResult<TranslationCatalog>> { return requestResource(instance, user, { body: { messages: catalog.messages, version: catalog.version }, method: 'PUT', parser: parseCatalog, path: `settings/locales/${encodeURIComponent(code)}/translations`, resource: 'localization' }); }
 export function importTranslations(instance: StoredInstance, user: MeProfile, catalog: TranslationCatalog): Promise<ResourceResult<TranslationCatalog>> { return requestResource(instance, user, { body: catalog, idempotencyKey: createIdempotencyKey('locale-import'), method: 'POST', parser: parseCatalog, path: 'settings/locales/import', resource: 'localization' }); }
 export function exportTranslations(instance: StoredInstance, user: MeProfile, code: string): Promise<ResourceResult<TranslationCatalog>> { return requestResource(instance, user, { parser: parseCatalog, path: `settings/locales/export?${new URLSearchParams({ locale: code }).toString()}`, resource: 'localization' }); }
-export function getRuntimeCatalog(instance: StoredInstance, user: MeProfile, locale: string): Promise<ResourceResult<TranslationCatalog>> { return requestResource(instance, user, { cachePolicy: 'long', filters: { locale, version: instance.catalogVersion }, parser: parseCatalog, path: `localization/catalog?${new URLSearchParams({ locale }).toString()}`, resource: 'localization' }); }
+export function getRuntimeCatalog(instance: StoredInstance, user: MeProfile, locale: string): Promise<ResourceResult<NetaRuntimeCatalog>> { return requestResource(instance, user, { cachePolicy: 'long', filters: { locale, version: instance.catalogVersion }, parser: parseRuntimeCatalog, path: `localization/catalog?${new URLSearchParams({ locale }).toString()}`, resource: 'localization' }); }
 
 function parseLocales(value: unknown): LocaleDefinition[] { if (!Array.isArray(value) || !value.every(isLocaleDefinition)) throw contractError('Locale list'); return value; }
 function parseLocale(value: unknown): LocaleDefinition { if (!isLocaleDefinition(value)) throw contractError('Locale'); return value; }
 function parseCatalog(value: unknown): TranslationCatalog { if (!isTranslationCatalog(value)) throw contractError('Translation catalog'); return value; }
+function parseRuntimeCatalog(value: unknown): NetaRuntimeCatalog { if (!isNetaRuntimeCatalog(value)) throw contractError('Runtime translation catalog'); return value; }
 function contractError(name: string): NetaClientError { return new NetaClientError('SERVER_ERROR', `${name} API kontratı beklenen formatta değil.`); }

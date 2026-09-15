@@ -7,6 +7,11 @@ export type NormalizedOrigin = {
   origin: string;
 };
 
+export type InstanceConnectInput = NormalizedOrigin & {
+  source: 'domain' | 'qr';
+  pairingSecret?: string;
+};
+
 type NormalizeOptions = {
   environment?: AppEnvironment;
 };
@@ -61,6 +66,27 @@ export function normalizeNetaOrigin(
     isLocalDevelopment,
     origin: url.origin,
   };
+}
+
+export function parseInstanceConnectInput(
+  input: string,
+  options: NormalizeOptions = {},
+): InstanceConnectInput {
+  const trimmed = input.trim();
+  if (/^neta:\/\//i.test(trimmed)) {
+    const url = parseUrl(trimmed);
+    const isPair = url.hostname === 'pair';
+    if ((!isPair && url.hostname !== 'connect') || (url.pathname !== '' && url.pathname !== '/') || url.hash ||
+      [...url.searchParams.keys()].some((key) => key !== 'origin' && !(isPair && key === 'secret'))) {
+      throw new NetaClientError('INVALID_DOMAIN', 'Neta bağlantı QR’ı geçersiz.');
+    }
+    const origin = url.searchParams.get('origin');
+    if (!origin) throw new NetaClientError('INVALID_DOMAIN', 'Neta bağlantı QR’ı origin içermiyor.');
+    const pairingSecret = isPair ? url.searchParams.get('secret') : null;
+    if (isPair && !pairingSecret) throw new NetaClientError('INVALID_DOMAIN', 'Pairing QR’ı secret içermiyor.');
+    return { ...normalizeNetaOrigin(origin, options), source: 'qr', ...(pairingSecret ? { pairingSecret } : {}) };
+  }
+  return { ...normalizeNetaOrigin(trimmed, options), source: 'domain' };
 }
 
 export function isSameTrustedOrigin(candidate: string, trustedOrigin: string): boolean {

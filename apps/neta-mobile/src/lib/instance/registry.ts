@@ -10,6 +10,7 @@ const CATALOG_NAME = 'public-catalog';
 
 export type SaveInstanceResult = {
   instanceIdChanged: boolean;
+  previousInstanceId: string | null;
 };
 
 export async function getActiveInstance(): Promise<StoredInstance | null> {
@@ -50,6 +51,10 @@ export async function saveDiscoveredInstance(
 
   if (instanceIdChanged && previous) {
     await clearInstanceSession(previous.instanceId);
+    await AsyncStorage.multiRemove([
+      createInstanceKey(previous.instanceId),
+      createCatalogKey(previous.instanceId),
+    ]);
   }
 
   await AsyncStorage.setItem(createInstanceKey(instance.instanceId), JSON.stringify(instance));
@@ -59,11 +64,21 @@ export async function saveDiscoveredInstance(
     await AsyncStorage.setItem(createCatalogKey(instance.instanceId), JSON.stringify(catalog));
   }
 
-  return { instanceIdChanged };
+  return { instanceIdChanged, previousInstanceId: previous?.instanceId ?? null };
 }
 
 export async function clearActiveInstance(): Promise<void> {
   await AsyncStorage.removeItem(ACTIVE_INSTANCE_KEY);
+}
+
+export async function forgetInstance(instanceId: string): Promise<void> {
+  const activeId = await AsyncStorage.getItem(ACTIVE_INSTANCE_KEY);
+  await clearInstanceSession(instanceId);
+  await AsyncStorage.multiRemove([
+    createInstanceKey(instanceId),
+    createCatalogKey(instanceId),
+    ...(activeId === instanceId ? [ACTIVE_INSTANCE_KEY] : []),
+  ]);
 }
 
 export async function clearInstanceSession(instanceId: string): Promise<void> {

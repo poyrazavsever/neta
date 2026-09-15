@@ -10,6 +10,7 @@ import {
   isAuthSessionInfo,
   isDeleteResult,
   isGeneralSettings,
+  isDeviceSessionInfo,
   type AiSettings,
   type AiSettingsMutationPayload,
   type AppearanceAsset,
@@ -18,6 +19,7 @@ import {
   type AppearanceSettings,
   type AuthSessionInfo,
   type DeleteResult,
+  type DeviceSessionInfo,
   type GeneralSettings,
   type MePreferencesMutationPayload,
   type MeProfileMutationPayload,
@@ -28,6 +30,7 @@ import { NetaClientError } from '@/lib/api/errors';
 import { createApiUrl, unwrapEnvelope } from '@/lib/api/http';
 import { getNativeAuthHeaders, normalizeMeProfile } from '@/lib/auth/native-auth-client';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
+import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
 
 export function updateMeProfile(instance: StoredInstance, user: MeProfile, payload: MeProfileMutationPayload): Promise<ResourceResult<MeProfile>> {
@@ -48,6 +51,12 @@ export function revokeAuthSession(instance: StoredInstance, user: MeProfile, id:
 export function revokeAllAuthSessions(instance: StoredInstance, user: MeProfile): Promise<ResourceResult<DeleteResult>> {
   return requestResource(instance, user, { method: 'DELETE', parser: parseDelete, path: 'me/sessions', resource: 'me' });
 }
+export function listDeviceSessions(instance: StoredInstance, user: MeProfile): Promise<ResourceResult<DeviceSessionInfo[]>> {
+  return requestResource(instance, user, { cachePolicy: 'short', parser: parseDeviceSessions, path: 'device-sessions', resource: 'me' });
+}
+export function revokeDeviceSession(instance: StoredInstance, user: MeProfile, id: string): Promise<ResourceResult<DeleteResult>> {
+  return requestResource(instance, user, { method: 'DELETE', parser: parseDelete, path: `device-sessions/${encodeURIComponent(id)}`, resource: 'me' });
+}
 export function getGeneralSettings(instance: StoredInstance, user: MeProfile): Promise<ResourceResult<GeneralSettings>> { return requestResource(instance, user, { cachePolicy: 'short', parser: parseGeneral, path: 'settings/general', resource: 'settings' }); }
 export function updateGeneralSettings(instance: StoredInstance, user: MeProfile, payload: GeneralSettings): Promise<ResourceResult<GeneralSettings>> { return requestResource(instance, user, { body: payload, invalidates: ['settings', 'dashboard'], method: 'PATCH', parser: parseGeneral, path: 'settings/general', resource: 'settings' }); }
 export function getAppearanceSettings(instance: StoredInstance, user: MeProfile): Promise<ResourceResult<AppearanceSettings>> { return requestResource(instance, user, { cachePolicy: 'short', parser: parseAppearance, path: 'settings/appearance', resource: 'settings' }); }
@@ -56,6 +65,7 @@ export function getAiSettings(instance: StoredInstance, user: MeProfile): Promis
 export function updateAiSettings(instance: StoredInstance, user: MeProfile, payload: AiSettingsMutationPayload): Promise<ResourceResult<AiSettings>> { return requestResource(instance, user, { body: payload, method: 'PATCH', parser: parseAi, path: 'settings/ai', resource: 'settings' }); }
 
 export async function uploadAppearanceAsset(instance: StoredInstance, user: MeProfile, kind: AppearanceAssetKind, uri: string): Promise<AppearanceAsset> {
+  requireInstanceCapability(instance, 'freelancer.settings.v1');
   const file = new File(uri);
   if (!file.exists || file.size > 5 * 1024 * 1024) throw new NetaClientError('SERVER_ERROR', 'Görsel 5 MB veya daha küçük olmalıdır.');
   const form = new FormData(); form.append('kind', kind); form.append('file', file);
@@ -73,6 +83,7 @@ async function nativeHeaders(instance: StoredInstance, user: MeProfile): Promise
 async function readResponse(response: Response): Promise<unknown> { const body = await response.json() as unknown; if (!response.ok) throw new NetaClientError('SERVER_ERROR', `Asset yükleme ${response.status} ile başarısız oldu.`, response.status); return unwrapEnvelope(body); }
 function parseMe(value: unknown): MeProfile { return normalizeMeProfile(value); }
 function parseSessions(value: unknown): AuthSessionInfo[] { if (!Array.isArray(value) || !value.every(isAuthSessionInfo)) throw contractError('Sessions'); return value; }
+function parseDeviceSessions(value: unknown): DeviceSessionInfo[] { if (!Array.isArray(value) || !value.every(isDeviceSessionInfo)) throw contractError('Device sessions'); return value; }
 function parseGeneral(value: unknown): GeneralSettings { if (!isGeneralSettings(value)) throw contractError('General settings'); return value; }
 function parseAppearance(value: unknown): AppearanceSettings { if (!isAppearanceSettings(value)) throw contractError('Appearance settings'); return value; }
 function parseAi(value: unknown): AiSettings { if (!isAiSettings(value)) throw contractError('AI settings'); return value; }

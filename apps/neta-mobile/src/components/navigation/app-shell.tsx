@@ -10,17 +10,18 @@ import { useTheme } from '@/providers/theme-provider';
 import { radius, shadow, spacing } from '@/theme/tokens';
 import { shellRouteTitle, shouldShowShellBack, type ShellRole } from './shell-policy';
 import { finishPerformanceMeasure, markPerformanceStart } from '@/lib/performance/metrics';
+import { hasInstanceCapability } from '@/lib/instance/capabilities';
 
 export type { ShellRole } from './shell-policy';
-type NavItem = { description?: string; href: string; icon: AppIconName; label: string; match: (pathname: string) => boolean };
+type NavItem = { capability?: string; description?: string; href: string; icon: AppIconName; label: string; match: (pathname: string) => boolean };
 type ShellContextValue = { inShell: true; openOthers: (returnFocusRef: RefObject<View | null>) => void; role: ShellRole };
 const ShellContext = createContext<ShellContextValue | null>(null);
 
 const ownerPrimary: readonly NavItem[] = [
-  { href: '/(owner)', icon: { ios: 'house.fill', android: 'home' }, label: 'Ana Sayfa', match: (path) => path === '/' },
-  { href: '/(owner)/clients', icon: { ios: 'person.2.fill', android: 'group' }, label: 'Müşteriler', match: (path) => path.startsWith('/clients') },
-  { href: '/(owner)/projects', icon: { ios: 'folder.fill', android: 'folder' }, label: 'Projeler', match: (path) => path.startsWith('/projects') },
-  { href: '/(owner)/tasks', icon: { ios: 'checkmark.circle.fill', android: 'task_alt' }, label: 'Görevler', match: (path) => path.startsWith('/tasks') },
+  { capability: 'freelancer.dashboard.v1', href: '/(owner)', icon: { ios: 'house.fill', android: 'home' }, label: 'Ana Sayfa', match: (path) => path === '/' },
+  { capability: 'freelancer.clients.v1', href: '/(owner)/clients', icon: { ios: 'person.2.fill', android: 'group' }, label: 'Müşteriler', match: (path) => path.startsWith('/clients') },
+  { capability: 'freelancer.projects.v1', href: '/(owner)/projects', icon: { ios: 'folder.fill', android: 'folder' }, label: 'Projeler', match: (path) => path.startsWith('/projects') },
+  { capability: 'freelancer.tasks.v1', href: '/(owner)/tasks', icon: { ios: 'checkmark.circle.fill', android: 'task_alt' }, label: 'Görevler', match: (path) => path.startsWith('/tasks') },
 ];
 
 const portalPrimary: readonly NavItem[] = [
@@ -31,12 +32,12 @@ const portalPrimary: readonly NavItem[] = [
 ];
 
 const ownerOthers: readonly NavItem[] = [
-  { description: 'Ay ve agenda görünümü', href: '/(owner)/calendar', icon: { ios: 'calendar', android: 'calendar_month' }, label: 'Takvim', match: (path) => path.startsWith('/calendar') },
-  { description: 'Gelir, gider ve nakit akışı', href: '/(owner)/finance', icon: { ios: 'chart.line.uptrend.xyaxis', android: 'account_balance_wallet' }, label: 'Finans', match: (path) => path.startsWith('/finance') },
+  { capability: 'freelancer.calendar.v1', description: 'Ay ve agenda görünümü', href: '/(owner)/calendar', icon: { ios: 'calendar', android: 'calendar_month' }, label: 'Takvim', match: (path) => path.startsWith('/calendar') },
+  { capability: 'freelancer.finance.v1', description: 'Gelir, gider ve nakit akışı', href: '/(owner)/finance', icon: { ios: 'chart.line.uptrend.xyaxis', android: 'account_balance_wallet' }, label: 'Finans', match: (path) => path.startsWith('/finance') },
   { description: 'Performans ve iş özetleri', href: '/(owner)/analytics', icon: { ios: 'chart.bar.fill', android: 'analytics' }, label: 'Analizler', match: (path) => path.startsWith('/analytics') },
-  { description: 'Mood ve kişisel notlar', href: '/(owner)/journal', icon: { ios: 'book.closed.fill', android: 'menu_book' }, label: 'Günlük', match: (path) => path.startsWith('/journal') },
-  { description: 'Sohbet ve proje risk analizi', href: '/(owner)/chat', icon: { ios: 'sparkles', android: 'auto_awesome' }, label: 'AI Asistan', match: (path) => path.startsWith('/chat') },
-  { description: 'Hesap, workspace ve içerik', href: '/(owner)/settings', icon: { ios: 'gearshape.fill', android: 'settings' }, label: 'Ayarlar', match: (path) => path.startsWith('/settings') || path.startsWith('/locales') || path.startsWith('/files') },
+  { capability: 'freelancer.journal.v1', description: 'Mood ve kişisel notlar', href: '/(owner)/journal', icon: { ios: 'book.closed.fill', android: 'menu_book' }, label: 'Günlük', match: (path) => path.startsWith('/journal') },
+  { capability: 'ai.assistant.v1', description: 'Sohbet ve proje risk analizi', href: '/(owner)/chat', icon: { ios: 'sparkles', android: 'auto_awesome' }, label: 'AI Asistan', match: (path) => path.startsWith('/chat') },
+  { capability: 'freelancer.settings.v1', description: 'Hesap, workspace ve içerik', href: '/(owner)/settings', icon: { ios: 'gearshape.fill', android: 'settings' }, label: 'Ayarlar', match: (path) => path.startsWith('/settings') || path.startsWith('/locales') || path.startsWith('/files') },
 ];
 
 const portalOthers: readonly NavItem[] = [
@@ -76,9 +77,10 @@ export function AppBottomBar({ role }: { role: ShellRole }) {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const shell = useAppShell();
+  const session = useSession();
   const moreRef = useRef<View>(null);
-  const items = role === 'owner' ? ownerPrimary : portalPrimary;
-  const otherItems = role === 'owner' ? ownerOthers : portalOthers;
+  const items = (role === 'owner' ? ownerPrimary : portalPrimary).filter((item) => !item.capability || (session.instance && hasInstanceCapability(session.instance, item.capability)));
+  const otherItems = (role === 'owner' ? ownerOthers : portalOthers).filter((item) => !item.capability || (session.instance && hasInstanceCapability(session.instance, item.capability)));
   const othersActive = otherItems.some((item) => item.match(pathname));
   useEffect(() => { finishPerformanceMeasure('tab-switch'); }, [pathname]);
   return (
@@ -124,8 +126,9 @@ function OthersSheet({ onClose, open, role }: { onClose: () => void; open: boole
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const { colors, reduceMotion } = useTheme();
+  const session = useSession();
   const firstItemRef = useRef<View>(null);
-  const items = role === 'owner' ? ownerOthers : portalOthers;
+  const items = (role === 'owner' ? ownerOthers : portalOthers).filter((item) => !item.capability || (session.instance && hasInstanceCapability(session.instance, item.capability)));
   const navigate = (href: string) => { onClose(); requestAnimationFrame(() => router.navigate(href as Href)); };
   const focusFirst = () => { const node = findNodeHandle(firstItemRef.current); if (node) AccessibilityInfo.setAccessibilityFocus(node); };
   return (
