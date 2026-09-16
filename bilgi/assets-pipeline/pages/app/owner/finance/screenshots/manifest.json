@@ -1,0 +1,61 @@
+{
+  "pageId": "finance",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/finance/screenshots/light-tr-desktop-default.png",
+      "sha256": "bd6f0f55eb0183284c84b409c94eaded40299e91243c31e774a003912b541103",
+      "bytes": 96671,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:16:40.036Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/finance",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "light",
+        "darkClass": false,
+        "background": "rgb(251, 251, 252)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/finance/screenshots/dark-tr-desktop-default.png",
+      "sha256": "3666d7099595cbf7389089c2f502007d5249ff8176b424784af34c1919998227",
+      "bytes": 96279,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:19:25.306Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/finance",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "dark",
+        "darkClass": true,
+        "background": "rgb(11, 14, 18)"
+      }
+    }
+  ]
+}

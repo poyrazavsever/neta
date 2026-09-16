@@ -1,0 +1,55 @@
+{
+  "pageId": "finance",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/finance/screenshots/light-tr-phone-default.png",
+      "sha256": "756df52b22ee84c8fc099f207199a9be358a928854caebbe3bebe54553dc5008",
+      "bytes": 179111,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:51:13.998Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/(owner)/finance",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/finance",
+        "group": "(owner)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/finance/screenshots/dark-tr-phone-default.png",
+      "sha256": "c320659b73af8e13bd33301b53516f4b78010dbc117bd601fd398f97d2dc153c",
+      "bytes": 166004,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:55:37.038Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/(owner)/finance",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/finance",
+        "group": "(owner)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

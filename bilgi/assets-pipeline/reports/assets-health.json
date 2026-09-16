@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-16T10:22:38.071Z",
+  "requireComplete": true,
+  "pages": 87,
+  "assets": 114,
+  "captures": 242,
+  "missingThemeCaptures": [],
+  "errors": [],
+  "passed": true,
+  "baselineApproval": "pending-review",
+  "nativeRuntime": "android-debug-dev-client"
+}

@@ -1,0 +1,61 @@
+{
+  "pageId": "register",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/app/public/register/screenshots/light-tr-desktop-default.png",
+      "sha256": "f830b1194462053a99ea280a6a913d31757f0cb55bd0685b56ea6ed506e33081",
+      "bytes": 64038,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:17:34.856Z",
+      "platform": "app",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/register",
+      "state": "redirect",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": "/login",
+      "renderedTheme": {
+        "colorMode": "light",
+        "darkClass": false,
+        "background": "rgb(251, 251, 252)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/app/public/register/screenshots/dark-tr-desktop-default.png",
+      "sha256": "15fdca7b4ffdf0204a03da252ae77f3f61047551160822b10dc3f6867a94596c",
+      "bytes": 63683,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:20:24.684Z",
+      "platform": "app",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/register",
+      "state": "redirect",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": "/login",
+      "renderedTheme": {
+        "colorMode": "dark",
+        "darkClass": true,
+        "background": "rgb(11, 14, 18)"
+      }
+    }
+  ]
+}

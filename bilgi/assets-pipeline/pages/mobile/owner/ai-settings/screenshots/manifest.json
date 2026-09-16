@@ -1,0 +1,55 @@
+{
+  "pageId": "ai-settings",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/ai-settings/screenshots/light-tr-phone-default.png",
+      "sha256": "fc42c45268c75e6905a8bd425f73e20ba1f08c4e69e3be7c11c9c9366d0f8b7a",
+      "bytes": 101509,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:49:37.833Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/ai-settings",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/ai-settings",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/ai-settings/screenshots/dark-tr-phone-default.png",
+      "sha256": "5974bedec0be3facb4dc4daf2aae948161a3cdf77a34810b83ec93fdf7f72573",
+      "bytes": 101444,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:54:03.248Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/ai-settings",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/ai-settings",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "pageId": "business-invoices",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/business-invoices/screenshots/light-tr-desktop-default.png",
+      "sha256": "704bfb5b9cde01a13be52f3d65ccd0287ed8545ba6ce695aed47400238a85efb",
+      "bytes": 41348,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:16:27.400Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/business/invoices",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "light",
+        "darkClass": false,
+        "background": "rgb(251, 251, 252)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/business-invoices/screenshots/dark-tr-desktop-default.png",
+      "sha256": "4b1554e49c9288c71536f07ea53ccf703c518cff049b3fb09d7088d5a0cae4de",
+      "bytes": 41832,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:19:13.664Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/business/invoices",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "dark",
+        "darkClass": true,
+        "background": "rgb(11, 14, 18)"
+      }
+    }
+  ]
+}

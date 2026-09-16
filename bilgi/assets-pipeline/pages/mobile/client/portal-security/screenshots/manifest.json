@@ -1,0 +1,55 @@
+{
+  "pageId": "portal-security",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/client/portal-security/screenshots/light-tr-phone-default.png",
+      "sha256": "f7184ed1cfa6a2a546f26e7e8e633d9e226a941f0b14bd2fc69dd9a64e15aa6f",
+      "bytes": 52628,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:53:30.287Z",
+      "platform": "android",
+      "actor": "client",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/portal-security",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/portal-security",
+        "group": "(portal-forms)",
+        "status": "authenticated",
+        "role": "client",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/client/portal-security/screenshots/dark-tr-phone-default.png",
+      "sha256": "7c162b53e6aa962c38b417f40825ea5c4bfb719ecdfaebf859df53303c6a6d38",
+      "bytes": 52989,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:57:38.867Z",
+      "platform": "android",
+      "actor": "client",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/portal-security",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/portal-security",
+        "group": "(portal-forms)",
+        "status": "authenticated",
+        "role": "client",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

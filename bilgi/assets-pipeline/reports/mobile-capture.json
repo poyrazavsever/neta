@@ -1,0 +1,37 @@
+{
+  "capturedAt": "2026-09-16T10:16:11.310Z",
+  "results": [
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "projects-id",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "projects-id",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "projects-id",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "projects-id",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    }
+  ]
+}

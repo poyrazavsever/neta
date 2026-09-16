@@ -1,0 +1,45 @@
+{
+  "status": "baseline",
+  "goal": "Kurulum ve kullanım bilgisini konu ve dil üzerinden bul.",
+  "primaryAction": "İlgili dokümantasyon konusunu aç",
+  "userProblems": [],
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "offline",
+    "validation",
+    "permission-denied"
+  ],
+  "variants": {
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "locales": [
+      "tr",
+      "en"
+    ],
+    "sizes": [
+      "desktop",
+      "narrow"
+    ]
+  },
+  "assetRequests": [],
+  "acceptance": [
+    "a11y",
+    "functional",
+    "visual",
+    "localization"
+  ],
+  "implementationStarted": false,
+  "reviewWave": 7,
+  "briefStatus": "draft-needs-ux-review",
+  "reviewQuestions": [
+    "Birincil aksiyon ilk bakışta anlaşılır mı?",
+    "Geri dönüş ve hata kurtarma akışı açık mı?",
+    "Rol, ilişki ve veri kapsamı doğru anlaşılır mı?",
+    "Klavye, ekran okuyucu ve dar ekran kullanımı yeterli mi?"
+  ]
+}

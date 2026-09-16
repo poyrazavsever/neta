@@ -1,0 +1,55 @@
+{
+  "pageId": "calendar-event",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/calendar-event/screenshots/light-tr-phone-default.png",
+      "sha256": "471051117e3d20f2d6ae022ae6379adbea3d3c0d8c1b31b5946a3b4f1c181d57",
+      "bytes": 132769,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:49:47.588Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/calendar-event",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/calendar-event",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/calendar-event/screenshots/dark-tr-phone-default.png",
+      "sha256": "56c3c18b8fefd2662d20d66c41d5acf04e5f87f5a56badd166dc8e7deaf6f852",
+      "bytes": 133071,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:54:12.187Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/calendar-event",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/calendar-event",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

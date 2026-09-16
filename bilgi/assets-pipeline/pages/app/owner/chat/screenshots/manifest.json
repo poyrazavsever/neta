@@ -1,0 +1,61 @@
+{
+  "pageId": "chat",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/chat/screenshots/light-tr-desktop-default.png",
+      "sha256": "3ce93ec3cdf7d175316f56e37fed5b5f3b6b36c75897bad800a4d69c8267ccba",
+      "bytes": 45703,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:16:34.069Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/chat",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "light",
+        "darkClass": false,
+        "background": "rgb(251, 251, 252)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/chat/screenshots/dark-tr-desktop-default.png",
+      "sha256": "3ca9dc9eaeecd01f09e36e86850e1c23b3345f284750264584c0fa3b0c704722",
+      "bytes": 46383,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:19:19.841Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/chat",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "dark",
+        "darkClass": true,
+        "background": "rgb(11, 14, 18)"
+      }
+    }
+  ]
+}

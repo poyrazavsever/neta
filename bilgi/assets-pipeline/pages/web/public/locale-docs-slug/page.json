@@ -1,0 +1,46 @@
+{
+  "id": "locale-docs-slug",
+  "platform": "web",
+  "actor": "public",
+  "source": "apps/neta-web/app/[locale]/docs/[[...slug]]/page.tsx",
+  "route": "/[locale]/docs/[[...slug]]",
+  "dependencies": [
+    "apps/neta-web/app/[locale]/docs/[[...slug]]/page.tsx",
+    "apps/neta-web/app/[locale]/docs/layout.tsx",
+    "apps/neta-web/app/globals.css",
+    "apps/neta-web/app/layout.tsx",
+    "apps/neta-web/components/app-icon.tsx",
+    "apps/neta-web/components/docs/code-block.tsx",
+    "apps/neta-web/components/docs/docs-pager.tsx",
+    "apps/neta-web/components/docs/docs-right-rail.tsx",
+    "apps/neta-web/components/docs/docs-sidebar.tsx",
+    "apps/neta-web/components/docs/markdown-renderer.tsx",
+    "apps/neta-web/components/language-dropdown.tsx",
+    "apps/neta-web/components/locale-html-lang.tsx",
+    "apps/neta-web/lib/docs.ts",
+    "apps/neta-web/lib/i18n.ts",
+    "apps/neta-web/lib/rss.ts",
+    "apps/neta-web/node_modules/poyraz-ui/src/preset.css"
+  ],
+  "assets": [
+    "apps/neta-web/public/appSs/dashboard.png",
+    "apps/neta-web/public/appSs/finans.png",
+    "apps/neta-web/public/appSs/görevler.png",
+    "apps/neta-web/public/appSs/musteriler.png",
+    "apps/neta-web/public/appSs/projeler.png",
+    "apps/neta-web/public/appSs/takvim.png",
+    "apps/neta-web/public/apple-touch-icon.png",
+    "apps/neta-web/public/clientSs/dashboard.png",
+    "apps/neta-web/public/clientSs/projeİlerlemesi.png",
+    "apps/neta-web/public/clientSs/revizyın.png",
+    "apps/neta-web/public/favicon-16.png",
+    "apps/neta-web/public/favicon-32.png",
+    "apps/neta-web/public/flags/en.Png",
+    "apps/neta-web/public/flags/tr.Png",
+    "apps/neta-web/public/logo/blackLogoLong.png"
+  ],
+  "parameters": [
+    "locale",
+    "slug"
+  ]
+}

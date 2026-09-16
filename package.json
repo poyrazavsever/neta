@@ -20,11 +20,13 @@
     "web:dev": "pnpm --filter @neta/web dev",
     "web:build": "pnpm --filter @neta/web build",
     "mobile:start": "pnpm --filter @neta/mobile start",
+    "mobile:start:local": "pnpm --filter @neta/mobile start:local",
     "mobile:start:clear": "pnpm --filter @neta/mobile start:clear",
     "mobile:ios": "pnpm --filter @neta/mobile ios",
     "mobile:android": "pnpm --filter @neta/mobile android",
     "mobile:check": "pnpm --filter @neta/mobile check",
     "mobile:release:check": "pnpm --filter @neta/mobile release:check",
+    "mobile:security:check": "pnpm --filter @neta/app mobile:security:check && pnpm --filter @neta/mobile test",
     "contract:check": "pnpm --filter @neta/api-contracts test && pnpm --filter @neta/app mobile:contract:test && pnpm --filter @neta/app typecheck && pnpm --filter @neta/mobile typecheck && pnpm --filter @neta/mobile test",
     "vault:map": "node tools/vault/generate-map.mjs",
     "vault:map:check": "node tools/vault/generate-map.mjs --check",
@@ -70,6 +72,16 @@
     "i18n:v2-phase1-smoke": "pnpm --filter @neta/app i18n:v2-phase1-smoke",
     "i18n:backfill": "pnpm --filter @neta/app i18n:backfill",
     "i18n:integrity": "pnpm --filter @neta/app i18n:integrity",
-    "i18n:release-gate": "pnpm --filter @neta/app i18n:release-gate"
+    "i18n:release-gate": "pnpm --filter @neta/app i18n:release-gate",
+    "ui:assets:inventory": "node tools/ui-assets/inventory.mjs",
+    "ui:assets:fixture": "node apps/neta-app/scripts/ui-assets-fixture.mjs",
+    "ui:assets:capture:web": "node tools/ui-assets/capture-web.mjs",
+    "ui:assets:capture:mobile": "node tools/ui-assets/capture-mobile.mjs",
+    "ui:assets:smoke:mobile": "node tools/ui-assets/native-file-smoke.mjs",
+    "ui:assets:gallery": "node tools/ui-assets/gallery.mjs",
+    "ui:assets:check": "node tools/ui-assets/check.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
   }
 }

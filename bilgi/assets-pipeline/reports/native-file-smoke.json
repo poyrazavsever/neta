@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-09-16T10:13:27.574Z",
+  "runtime": "android-debug-dev-client",
+  "results": [
+    {
+      "check": "project-plan",
+      "passed": true
+    },
+    {
+      "check": "project-tasks",
+      "passed": true
+    },
+    {
+      "check": "project-revisions",
+      "passed": true
+    },
+    {
+      "check": "project-assets",
+      "passed": true
+    },
+    {
+      "check": "authenticated-download-share-cleanup",
+      "passed": true
+    },
+    {
+      "check": "native-picker-multipart-upload",
+      "passed": true
+    },
+    {
+      "check": "native-server-logout",
+      "passed": true
+    }
+  ],
+  "signedReleaseVerified": false,
+  "passed": true
+}

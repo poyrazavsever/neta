@@ -1,0 +1,55 @@
+{
+  "pageId": "journal-entry",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/journal-entry/screenshots/light-tr-phone-default.png",
+      "sha256": "255778ad54e116c61736a4b7f023d42e459a8e612602d6be7327d939c8624e20",
+      "bytes": 134042,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:50:10.127Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/journal-entry?date=2026-09-16",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/journal-entry",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/journal-entry/screenshots/dark-tr-phone-default.png",
+      "sha256": "a91d01d653ea4f37a245820b27c0dee6b4f21d971f403113974daa46dcdf1301",
+      "bytes": 133934,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:54:34.440Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/journal-entry?date=2026-09-16",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/journal-entry",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "pageId": "files",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/files/screenshots/light-tr-phone-default.png",
+      "sha256": "51aa7843b94b4edb7f8cf1c8d9cd7d09ecce39451604a1cef40ae765f156545e",
+      "bytes": 188269,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:51:09.153Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/(owner)/files",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/files",
+        "group": "(owner)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/files/screenshots/dark-tr-phone-default.png",
+      "sha256": "e84dd335d4b2b2b5c17da76192bc05b4f2b68aefb5bf2aacb553f815095e08a2",
+      "bytes": 183653,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:55:32.378Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/(owner)/files",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/files",
+        "group": "(owner)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/files/screenshots/light-tr-phone-upload-success.png",
+      "sha256": "cc0597bebf4c9ddf18d99a2acaecc1afe16406454056a75509fd3bd80573da07",
+      "bytes": 197755,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T10:13:14.652Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "state": "upload-success",
+      "route": "/(owner)/files",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/files",
+        "group": "(owner)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "surface": "app",
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

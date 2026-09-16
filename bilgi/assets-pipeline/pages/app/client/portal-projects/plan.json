@@ -1,0 +1,45 @@
+{
+  "status": "baseline",
+  "goal": "Projeleri durum ve teslim önceliğine göre bul.",
+  "primaryAction": "Projeyi aç veya oluştur",
+  "userProblems": [],
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "offline",
+    "validation",
+    "permission-denied"
+  ],
+  "variants": {
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "locales": [
+      "tr",
+      "en"
+    ],
+    "sizes": [
+      "desktop",
+      "narrow"
+    ]
+  },
+  "assetRequests": [],
+  "acceptance": [
+    "a11y",
+    "functional",
+    "visual",
+    "localization"
+  ],
+  "implementationStarted": false,
+  "reviewWave": 6,
+  "briefStatus": "draft-needs-ux-review",
+  "reviewQuestions": [
+    "Birincil aksiyon ilk bakışta anlaşılır mı?",
+    "Geri dönüş ve hata kurtarma akışı açık mı?",
+    "Rol, ilişki ve veri kapsamı doğru anlaşılır mı?",
+    "Klavye, ekran okuyucu ve dar ekran kullanımı yeterli mi?"
+  ]
+}

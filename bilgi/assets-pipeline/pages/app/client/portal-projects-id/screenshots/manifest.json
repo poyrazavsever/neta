@@ -1,0 +1,61 @@
+{
+  "pageId": "portal-projects-id",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/app/client/portal-projects-id/screenshots/light-tr-desktop-default.png",
+      "sha256": "c0a48ce7cffcab3f86071ba4348f70170692908088dae50435eeda81f440484f",
+      "bytes": 56215,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:17:20.460Z",
+      "platform": "app",
+      "actor": "client",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/portal/projects/ui-project-atlas",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "light",
+        "darkClass": false,
+        "background": "rgb(251, 251, 252)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/app/client/portal-projects-id/screenshots/dark-tr-desktop-default.png",
+      "sha256": "dfecb21703e430c524c8c49c0666f54cd6c27376023e982c113e8f112acaa7fe",
+      "bytes": 55885,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:20:03.456Z",
+      "platform": "app",
+      "actor": "client",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/portal/projects/ui-project-atlas",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "dark",
+        "darkClass": true,
+        "background": "rgb(11, 14, 18)"
+      }
+    }
+  ]
+}

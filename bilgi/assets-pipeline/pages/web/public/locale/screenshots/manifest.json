@@ -1,0 +1,117 @@
+{
+  "pageId": "locale",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale/screenshots/light-tr-desktop-tr.png",
+      "sha256": "a68059abd8bb6d322816e5d4e6f9e52d812c786e3b653ba21d7a5926a3b7a8d0",
+      "bytes": 2311697,
+      "width": 1440,
+      "height": 10188,
+      "capturedAt": "2026-09-16T10:18:22.987Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale/screenshots/light-en-desktop-en.png",
+      "sha256": "9a1e3a6158480247454dfc06a1f325a65e6017e4b4fc038ddea05db0ed12ad20",
+      "bytes": 2322316,
+      "width": 1440,
+      "height": 10237,
+      "capturedAt": "2026-09-16T10:18:27.063Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale/screenshots/dark-tr-desktop-tr.png",
+      "sha256": "419ef80f2fddfe6ef441534434771a2eab9fe7317fdf7d20a9bfc53d1bfd42cc",
+      "bytes": 2151337,
+      "width": 1440,
+      "height": 10188,
+      "capturedAt": "2026-09-16T10:21:15.470Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale/screenshots/dark-en-desktop-en.png",
+      "sha256": "9a1e3a6158480247454dfc06a1f325a65e6017e4b4fc038ddea05db0ed12ad20",
+      "bytes": 2322316,
+      "width": 1440,
+      "height": 10237,
+      "capturedAt": "2026-09-16T10:21:22.931Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    }
+  ]
+}

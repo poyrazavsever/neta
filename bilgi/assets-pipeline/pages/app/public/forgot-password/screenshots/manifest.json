@@ -1,0 +1,61 @@
+{
+  "pageId": "forgot-password",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/app/public/forgot-password/screenshots/light-tr-desktop-default.png",
+      "sha256": "62a5ee2acda1ff72b6f5363a5b35618803b6efa26b73d27c7fe3eca41e54ddb9",
+      "bytes": 63294,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:17:13.482Z",
+      "platform": "app",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/forgot-password",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "light",
+        "darkClass": false,
+        "background": "rgb(251, 251, 252)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/app/public/forgot-password/screenshots/dark-tr-desktop-default.png",
+      "sha256": "a1f156b6386809bc607853e6eb446dbd5765bb72b65cbcccd0abf6fcea37b3e3",
+      "bytes": 63249,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:19:57.338Z",
+      "platform": "app",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/forgot-password",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "dark",
+        "darkClass": true,
+        "background": "rgb(11, 14, 18)"
+      }
+    }
+  ]
+}

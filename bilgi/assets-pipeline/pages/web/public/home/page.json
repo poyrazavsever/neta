@@ -1,0 +1,32 @@
+{
+  "id": "home",
+  "platform": "web",
+  "actor": "public",
+  "source": "apps/neta-web/app/page.tsx",
+  "route": "/",
+  "dependencies": [
+    "apps/neta-web/app/globals.css",
+    "apps/neta-web/app/layout.tsx",
+    "apps/neta-web/app/page.tsx",
+    "apps/neta-web/components/locale-html-lang.tsx",
+    "apps/neta-web/lib/i18n.ts",
+    "apps/neta-web/node_modules/poyraz-ui/src/preset.css"
+  ],
+  "assets": [
+    "apps/neta-web/public/appSs/dashboard.png",
+    "apps/neta-web/public/appSs/finans.png",
+    "apps/neta-web/public/appSs/görevler.png",
+    "apps/neta-web/public/appSs/musteriler.png",
+    "apps/neta-web/public/appSs/projeler.png",
+    "apps/neta-web/public/appSs/takvim.png",
+    "apps/neta-web/public/apple-touch-icon.png",
+    "apps/neta-web/public/clientSs/dashboard.png",
+    "apps/neta-web/public/clientSs/projeİlerlemesi.png",
+    "apps/neta-web/public/clientSs/revizyın.png",
+    "apps/neta-web/public/favicon-16.png",
+    "apps/neta-web/public/favicon-32.png",
+    "apps/neta-web/public/flags/en.Png",
+    "apps/neta-web/public/flags/tr.Png"
+  ],
+  "parameters": []
+}

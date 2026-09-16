@@ -1,0 +1,1525 @@
+{
+  "capturedAt": "2026-09-16T10:22:17.520Z",
+  "results": [
+    {
+      "platform": "app",
+      "pageId": "analytics",
+      "actor": "owner",
+      "route": "/analytics",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "business-invoices",
+      "actor": "owner",
+      "route": "/business/invoices",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "business-proposals",
+      "actor": "owner",
+      "route": "/business/proposals",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "business-subscriptions",
+      "actor": "owner",
+      "route": "/business/subscriptions",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "calendar",
+      "actor": "owner",
+      "route": "/calendar",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "chat",
+      "actor": "owner",
+      "route": "/chat",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "clients-id",
+      "actor": "owner",
+      "route": "/clients/ui-client-atlas",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "clients",
+      "actor": "owner",
+      "route": "/clients",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "finance",
+      "actor": "owner",
+      "route": "/finance",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "journal",
+      "actor": "owner",
+      "route": "/journal",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "home",
+      "actor": "owner",
+      "route": "/",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "projects-id",
+      "actor": "owner",
+      "route": "/projects/ui-project-atlas",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "projects",
+      "actor": "owner",
+      "route": "/projects",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-ai",
+      "actor": "owner",
+      "route": "/settings/ai",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-appearance",
+      "actor": "owner",
+      "route": "/settings/appearance",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-general",
+      "actor": "owner",
+      "route": "/settings/general",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-language",
+      "actor": "owner",
+      "route": "/settings/language",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages-locale",
+      "actor": "owner",
+      "route": "/settings/languages/tr",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages-locale-translations",
+      "actor": "owner",
+      "route": "/settings/languages/tr/translations",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages-import-export",
+      "actor": "owner",
+      "route": "/settings/languages/import-export",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages-new",
+      "actor": "owner",
+      "route": "/settings/languages/new",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages",
+      "actor": "owner",
+      "route": "/settings/languages",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings",
+      "actor": "owner",
+      "route": "/settings",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": true
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-profile",
+      "actor": "owner",
+      "route": "/settings/profile",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-security",
+      "actor": "owner",
+      "route": "/settings/security",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "tasks",
+      "actor": "owner",
+      "route": "/tasks",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "forgot-password",
+      "actor": "public",
+      "route": "/forgot-password",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "invite-token",
+      "actor": "public",
+      "route": "/invite/[fixture]",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "login",
+      "actor": "public",
+      "route": "/login",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal",
+      "actor": "client",
+      "route": "/portal",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-projects-id",
+      "actor": "client",
+      "route": "/portal/projects/ui-project-atlas",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-projects",
+      "actor": "client",
+      "route": "/portal/projects",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-revisions",
+      "actor": "client",
+      "route": "/portal/revisions",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings-appearance",
+      "actor": "client",
+      "route": "/portal/settings/appearance",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings-language",
+      "actor": "client",
+      "route": "/portal/settings/language",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings",
+      "actor": "client",
+      "route": "/portal/settings",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": true
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings-profile",
+      "actor": "client",
+      "route": "/portal/settings/profile",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings-security",
+      "actor": "client",
+      "route": "/portal/settings/security",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-tasks",
+      "actor": "client",
+      "route": "/portal/tasks",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "register",
+      "actor": "public",
+      "route": "/register",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": true
+    },
+    {
+      "platform": "app",
+      "pageId": "reset-password",
+      "actor": "public",
+      "route": "/reset-password",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/02-nasil-kullanilir",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/03-ozellikler",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/04-ozellestirme",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/05-kod-yapisi",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/06-self-host-deploy",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/07-api-ve-mobil",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/08-yayin-kontrol-listesi",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/02-nasil-kullanilir",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/03-ozellikler",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/04-ozellestirme",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/05-kod-yapisi",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/06-self-host-deploy",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/07-api-ve-mobil",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/08-yayin-kontrol-listesi",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale",
+      "actor": "public",
+      "route": "/tr",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale",
+      "actor": "public",
+      "route": "/en",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/02-nasil-kullanilir",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/03-ozellikler",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/04-ozellestirme",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/05-kod-yapisi",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/06-self-host-deploy",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/07-api-ve-mobil",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/08-yayin-kontrol-listesi",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/02-nasil-kullanilir",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/03-ozellikler",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/04-ozellestirme",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/05-kod-yapisi",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/06-self-host-deploy",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/07-api-ve-mobil",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/08-yayin-kontrol-listesi",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "home",
+      "actor": "public",
+      "route": "/",
+      "theme": "light",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": true
+    },
+    {
+      "platform": "app",
+      "pageId": "analytics",
+      "actor": "owner",
+      "route": "/analytics",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "business-invoices",
+      "actor": "owner",
+      "route": "/business/invoices",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "business-proposals",
+      "actor": "owner",
+      "route": "/business/proposals",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "business-subscriptions",
+      "actor": "owner",
+      "route": "/business/subscriptions",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "calendar",
+      "actor": "owner",
+      "route": "/calendar",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "chat",
+      "actor": "owner",
+      "route": "/chat",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "clients-id",
+      "actor": "owner",
+      "route": "/clients/ui-client-atlas",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "clients",
+      "actor": "owner",
+      "route": "/clients",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "finance",
+      "actor": "owner",
+      "route": "/finance",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "journal",
+      "actor": "owner",
+      "route": "/journal",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "home",
+      "actor": "owner",
+      "route": "/",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "projects-id",
+      "actor": "owner",
+      "route": "/projects/ui-project-atlas",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "projects",
+      "actor": "owner",
+      "route": "/projects",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-ai",
+      "actor": "owner",
+      "route": "/settings/ai",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-appearance",
+      "actor": "owner",
+      "route": "/settings/appearance",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-general",
+      "actor": "owner",
+      "route": "/settings/general",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-language",
+      "actor": "owner",
+      "route": "/settings/language",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages-locale",
+      "actor": "owner",
+      "route": "/settings/languages/tr",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages-locale-translations",
+      "actor": "owner",
+      "route": "/settings/languages/tr/translations",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages-import-export",
+      "actor": "owner",
+      "route": "/settings/languages/import-export",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages-new",
+      "actor": "owner",
+      "route": "/settings/languages/new",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-languages",
+      "actor": "owner",
+      "route": "/settings/languages",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings",
+      "actor": "owner",
+      "route": "/settings",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": true
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-profile",
+      "actor": "owner",
+      "route": "/settings/profile",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "settings-security",
+      "actor": "owner",
+      "route": "/settings/security",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "tasks",
+      "actor": "owner",
+      "route": "/tasks",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "forgot-password",
+      "actor": "public",
+      "route": "/forgot-password",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "invite-token",
+      "actor": "public",
+      "route": "/invite/[fixture]",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "login",
+      "actor": "public",
+      "route": "/login",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal",
+      "actor": "client",
+      "route": "/portal",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-projects-id",
+      "actor": "client",
+      "route": "/portal/projects/ui-project-atlas",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-projects",
+      "actor": "client",
+      "route": "/portal/projects",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-revisions",
+      "actor": "client",
+      "route": "/portal/revisions",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings-appearance",
+      "actor": "client",
+      "route": "/portal/settings/appearance",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings-language",
+      "actor": "client",
+      "route": "/portal/settings/language",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings",
+      "actor": "client",
+      "route": "/portal/settings",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": true
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings-profile",
+      "actor": "client",
+      "route": "/portal/settings/profile",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-settings-security",
+      "actor": "client",
+      "route": "/portal/settings/security",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "portal-tasks",
+      "actor": "client",
+      "route": "/portal/tasks",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "app",
+      "pageId": "register",
+      "actor": "public",
+      "route": "/register",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": true
+    },
+    {
+      "platform": "app",
+      "pageId": "reset-password",
+      "actor": "public",
+      "route": "/reset-password",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/02-nasil-kullanilir",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/03-ozellikler",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/04-ozellestirme",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/05-kod-yapisi",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/06-self-host-deploy",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/07-api-ve-mobil",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs/08-yayin-kontrol-listesi",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/en/docs",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/02-nasil-kullanilir",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/03-ozellikler",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/04-ozellestirme",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/05-kod-yapisi",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/06-self-host-deploy",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/07-api-ve-mobil",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/08-yayin-kontrol-listesi",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale-docs-slug",
+      "actor": "public",
+      "route": "/tr/docs",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale",
+      "actor": "public",
+      "route": "/tr",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "locale",
+      "actor": "public",
+      "route": "/en",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/02-nasil-kullanilir",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/03-ozellikler",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/04-ozellestirme",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/05-kod-yapisi",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/06-self-host-deploy",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/07-api-ve-mobil",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs/08-yayin-kontrol-listesi",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/en/docs",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/02-nasil-kullanilir",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/03-ozellikler",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/04-ozellestirme",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/05-kod-yapisi",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/06-self-host-deploy",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/07-api-ve-mobil",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs/08-yayin-kontrol-listesi",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "docs-slug",
+      "actor": "public",
+      "route": "/tr/docs",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": false
+    },
+    {
+      "platform": "web",
+      "pageId": "home",
+      "actor": "public",
+      "route": "/",
+      "theme": "dark",
+      "status": "captured",
+      "httpStatus": 200,
+      "redirected": true
+    }
+  ]
+}

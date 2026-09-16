@@ -1,0 +1,55 @@
+{
+  "pageId": "finance-record",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/finance-record/screenshots/light-tr-phone-default.png",
+      "sha256": "7acf83711518239553b9fd73f48748fa26718de3f6a2c3c674a1d583673916b0",
+      "bytes": 127718,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:50:00.896Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/finance-record",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/finance-record",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/finance-record/screenshots/dark-tr-phone-default.png",
+      "sha256": "12f307019c53952f2974d890f45516f03866825c712ec5953f7308963d59701e",
+      "bytes": 127421,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:54:25.151Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/finance-record",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/finance-record",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "pageId": "journal",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/journal/screenshots/light-tr-desktop-default.png",
+      "sha256": "a0345dd543e0dbe3a6c7a214099d50c4a4dbab35f09d28c34f8fd2e71e809be0",
+      "bytes": 78879,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:16:41.805Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/journal",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "light",
+        "darkClass": false,
+        "background": "rgb(251, 251, 252)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/journal/screenshots/dark-tr-desktop-default.png",
+      "sha256": "5a6901bf9e7b3d1fab7ecb62894547871d9d1cbfbc9e12fc5e7173da2592f4d7",
+      "bytes": 78746,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:19:27.212Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/journal",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "dark",
+        "darkClass": true,
+        "background": "rgb(11, 14, 18)"
+      }
+    }
+  ]
+}

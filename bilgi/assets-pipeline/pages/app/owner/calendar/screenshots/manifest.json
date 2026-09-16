@@ -1,0 +1,61 @@
+{
+  "pageId": "calendar",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/calendar/screenshots/light-tr-desktop-default.png",
+      "sha256": "c90af6324c220b8bb90f8b5c9b03e809eaa5141dca9f3cdb1d7519fc238a0258",
+      "bytes": 76230,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:16:32.143Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/calendar",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "light",
+        "darkClass": false,
+        "background": "rgb(251, 251, 252)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/calendar/screenshots/dark-tr-desktop-default.png",
+      "sha256": "551186110f4a7da82c213d6fca2cfe9eb6a187328a7ea2382dd5e1ff2a01e019",
+      "bytes": 75923,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:19:18.237Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/calendar",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "dark",
+        "darkClass": true,
+        "background": "rgb(11, 14, 18)"
+      }
+    }
+  ]
+}

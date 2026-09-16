@@ -1,0 +1,1081 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "apps/neta-mobile/assets/expo.icon/Assets/expo-symbol 2.svg",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/expo.icon/Assets/expo-symbol 2.svg",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/expo.icon/Assets/expo-symbol 2.svg",
+      "bytes": 611,
+      "sha256": "0aab4b9a72b495d415a7088de655829e2db36a2021b17679af6bc47a1fe363d6",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/expo.icon/Assets/grid.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/expo.icon/Assets/grid.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/expo.icon/Assets/grid.png",
+      "bytes": 53681,
+      "sha256": "8247d79a2b31328fe4e330a973e6fae16924ed9aebd72c64d464d6856ab18c72",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/android-icon-background.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/android-icon-background.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/android-icon-background.png",
+      "bytes": 17549,
+      "sha256": "fb139c2dee362ebf2070e23b96da6fc0d43f8492de38b8af1fd7223e19b5861d",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/android-icon-foreground.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/android-icon-foreground.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/android-icon-foreground.png",
+      "bytes": 78796,
+      "sha256": "9e3d0315a33c6799de601dd34cd8bf8cc3a8d16f3bf75592baec2ceb7240b391",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/android-icon-monochrome.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/android-icon-monochrome.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/android-icon-monochrome.png",
+      "bytes": 4140,
+      "sha256": "6371fc2c12e33ad2215a86c281db3d682a81bebe7c957a842c13b8bf00cceb83",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/expo-badge-white.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/expo-badge-white.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/expo-badge-white.png",
+      "bytes": 4129,
+      "sha256": "d9ba28c5e93aea3c2dabd901ee96fea3bb296ad8e648f6f64706dae11a1a62bd",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/expo-badge.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/expo-badge.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/expo-badge.png",
+      "bytes": 4137,
+      "sha256": "ff353c7efadbd379903923cb604fca11c908cba0d4658cc2bd1f147d98317249",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/expo-logo.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/expo-logo.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/expo-logo.png",
+      "bytes": 3317,
+      "sha256": "27b060a757a29038c9618586baa0ba3894dbe60d084c6059df497ff429c2d92f",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/favicon.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/favicon.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/favicon.png",
+      "bytes": 1129,
+      "sha256": "a4e030697a7571b3e95d31860e4da55d2f98e5e861e2b55e414f45a8556828ba",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/icon.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/icon.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/icon.png",
+      "bytes": 799005,
+      "sha256": "7a667804bb80a6a424a5daf18a2599c4f32237cf06fe78fc0de45dbb09e0eccf",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/logo-glow.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/logo-glow.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/logo-glow.png",
+      "bytes": 331624,
+      "sha256": "bbd98a3f3c12d090f4df6065b7462fcdf6bc266209d002b4ef5fe554c245f66c",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/react-logo.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/react-logo.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/react-logo.png",
+      "bytes": 6341,
+      "sha256": "224b7636b15e672801579b5b418077cbc2ca42f0146389062364356b0ecb5c5c",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/react-logo@2x.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/react-logo@2x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/react-logo@2x.png",
+      "bytes": 14225,
+      "sha256": "fa600be9ad2f869c7a8dbaffc78bb15af741123e1319c948f0be51753a153cde",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/react-logo@3x.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/react-logo@3x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/react-logo@3x.png",
+      "bytes": 21252,
+      "sha256": "cd84e02a5d542a3e71b7fa10a685c1b9fb51db4aff92aca6c0da6461ce17be16",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/splash-icon.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/splash-icon.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/splash-icon.png",
+      "bytes": 3317,
+      "sha256": "27b060a757a29038c9618586baa0ba3894dbe60d084c6059df497ff429c2d92f",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/tabIcons/explore.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/tabIcons/explore.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/tabIcons/explore.png",
+      "bytes": 215,
+      "sha256": "e2dea1c2d20929d83e8eebd74818e808b1b72e376d3a1f3a03679fff0255d073",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/tabIcons/explore@2x.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/tabIcons/explore@2x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/tabIcons/explore@2x.png",
+      "bytes": 347,
+      "sha256": "1b54913b3a0acc3e1fb72d3b9b79ad04814304b35bbb9d03a533e6130ad6c26a",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/tabIcons/explore@3x.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/tabIcons/explore@3x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/tabIcons/explore@3x.png",
+      "bytes": 468,
+      "sha256": "2f3e43801df70ebe83273b90a7d170bacf5ca74a8a8dc5c154a020c2c8b06609",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/tabIcons/home.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/tabIcons/home.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/tabIcons/home.png",
+      "bytes": 253,
+      "sha256": "3829632ec7d495225395f5da3d0942935d7d055979b174613d1ade82fe420e76",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/tabIcons/home@2x.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/tabIcons/home@2x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/tabIcons/home@2x.png",
+      "bytes": 343,
+      "sha256": "21c5a07df9017d97464a0a8256e265288f2fca0741ca651de05e12b32f32f5ab",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/tabIcons/home@3x.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/tabIcons/home@3x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/tabIcons/home@3x.png",
+      "bytes": 479,
+      "sha256": "fe5b397975e7cb70ae7a122472d174ed12ec2ae106f7b49c968225ad37f8b3b8",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/images/tutorial-web.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/images/tutorial-web.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/images/tutorial-web.png",
+      "bytes": 58959,
+      "sha256": "e372ec23ad6262e2e0dc2799ce416b495a631a565bcd24f0615d4afc04dac3bd",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/logo/blackLogoLong.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/logo/blackLogoLong.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/logo/blackLogoLong.png",
+      "bytes": 17366,
+      "sha256": "e5e98bd10053c44a8dfe79b7bd4d455991a108bbffeae6255fc1ad68641f5fd7",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/logo/iconLogo.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/logo/iconLogo.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/logo/iconLogo.png",
+      "bytes": 14891,
+      "sha256": "b5ae353402800767dc9154f6897d298cacedc76902deeb8bf4681c389aebc071",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-mobile/assets/logo/lightLogoLong.png",
+      "platform": "mobile",
+      "source": "apps/neta-mobile/assets/logo/lightLogoLong.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/assets/logo/lightLogoLong.png",
+      "bytes": 14006,
+      "sha256": "fe682042d5758e401c6da0741982f8d8d5398243739e729f6278e195e6856e0e",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-app/public/logo/blackLogoLong.png",
+      "platform": "app",
+      "source": "apps/neta-app/public/logo/blackLogoLong.png",
+      "archive": "bilgi/assets-pipeline/shared/app/originals/public/logo/blackLogoLong.png",
+      "bytes": 17366,
+      "sha256": "e5e98bd10053c44a8dfe79b7bd4d455991a108bbffeae6255fc1ad68641f5fd7",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-app/public/logo/iconLogo.png",
+      "platform": "app",
+      "source": "apps/neta-app/public/logo/iconLogo.png",
+      "archive": "bilgi/assets-pipeline/shared/app/originals/public/logo/iconLogo.png",
+      "bytes": 14891,
+      "sha256": "b5ae353402800767dc9154f6897d298cacedc76902deeb8bf4681c389aebc071",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-app/public/logo/lightLogoLong.png",
+      "platform": "app",
+      "source": "apps/neta-app/public/logo/lightLogoLong.png",
+      "archive": "bilgi/assets-pipeline/shared/app/originals/public/logo/lightLogoLong.png",
+      "bytes": 14006,
+      "sha256": "fe682042d5758e401c6da0741982f8d8d5398243739e729f6278e195e6856e0e",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/appSs/ai.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/appSs/ai.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/appSs/ai.png",
+      "bytes": 449264,
+      "sha256": "1b876c9376b740d11b5e3f6eaeeb2f18e3a3540a93ae0422ed513521a75838e2",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/appSs/dashboard.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/appSs/dashboard.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/appSs/dashboard.png",
+      "bytes": 351017,
+      "sha256": "e4b73c3fab3a0cb9843bca36bf425cb11ecc4caa025bca354a6672fb11796c62",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/appSs/finans.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/appSs/finans.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/appSs/finans.png",
+      "bytes": 397535,
+      "sha256": "2dcdb3a4053cda705dde845bf0e30ff886596213d82459ac095219e194ebc92a",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/appSs/görevler.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/appSs/görevler.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/appSs/görevler.png",
+      "bytes": 339381,
+      "sha256": "03756875211384a7337fc44d69e8211b2b0b0a9f5401641aa5bd838c8a804c8e",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/appSs/musteriler.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/appSs/musteriler.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/appSs/musteriler.png",
+      "bytes": 414909,
+      "sha256": "edc7be76736ccb279900c8b4cdf35bbefbac2fb22f71f7ebec27b733e5a50921",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/appSs/projeler.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/appSs/projeler.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/appSs/projeler.png",
+      "bytes": 942117,
+      "sha256": "8a037f7fa313f2abc3d9a40064b4ba1b73e3b73e152ac87e633a6281d5d282a6",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/appSs/takvim.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/appSs/takvim.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/appSs/takvim.png",
+      "bytes": 383916,
+      "sha256": "e8f6c395ffdc9a4cd955e5c6563e62c342628410a90ff1bfd56ac8ae3d702bc3",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/apple-touch-icon.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/apple-touch-icon.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/apple-touch-icon.png",
+      "bytes": 8706,
+      "sha256": "c443068d7ef4a6979fde5db8511092b356d1bbe9edc41232ad3927dd209023a9",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/assets/neta-journey/neta-journey-desktop-poster.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/assets/neta-journey/neta-journey-desktop-poster.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/assets/neta-journey/neta-journey-desktop-poster.png",
+      "bytes": 1014736,
+      "sha256": "be33788fd4770f923495272b8909d56c25795ed1395793658ba2eeccf78f98c3",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/assets/neta-journey/neta-journey-desktop.mp4",
+      "platform": "web",
+      "source": "apps/neta-web/public/assets/neta-journey/neta-journey-desktop.mp4",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/assets/neta-journey/neta-journey-desktop.mp4",
+      "bytes": 18238275,
+      "sha256": "ce87d8c7a112344a23a1d8a8b5cd2ccfc9b829c07d1e36763448c1b6e20a2ae0",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/assets/neta-journey/neta-journey-final.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/assets/neta-journey/neta-journey-final.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/assets/neta-journey/neta-journey-final.png",
+      "bytes": 1735168,
+      "sha256": "ff390f6ac75d3bbd03a2aa37f41977794a595abd091697158a0d2f49aceef64a",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/assets/neta-journey/neta-journey-mobile-poster.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/assets/neta-journey/neta-journey-mobile-poster.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/assets/neta-journey/neta-journey-mobile-poster.png",
+      "bytes": 89758,
+      "sha256": "97952dbd3d7f5f304f7d0f800c5e5d90860fdd3e28df45230ae0658fe6af16a6",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/assets/neta-journey/neta-journey-mobile.mp4",
+      "platform": "web",
+      "source": "apps/neta-web/public/assets/neta-journey/neta-journey-mobile.mp4",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/assets/neta-journey/neta-journey-mobile.mp4",
+      "bytes": 2988424,
+      "sha256": "c96c08942e8bc93b5245dd280c8024b84df87ab85ebbe87edcde896cd9e8df7b",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/assets/neta-social.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/assets/neta-social.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/assets/neta-social.png",
+      "bytes": 358360,
+      "sha256": "6f725f557e2a127243305a8d2e673f83e312ee9f954c2ea8ae8a965afaa75bdc",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/clientSs/dashboard.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/clientSs/dashboard.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/clientSs/dashboard.png",
+      "bytes": 249492,
+      "sha256": "2345dc4065b9e4d5b7a91ed84590cac52a827db0cdb3f0d54fc833a914b2d75e",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/clientSs/projeİlerlemesi.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/clientSs/projeİlerlemesi.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/clientSs/projeİlerlemesi.png",
+      "bytes": 254056,
+      "sha256": "6d5ebd0bae6825cf63d7de02805f2d7656aa3c64b228817a3d5b562cd0bf5e0c",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/clientSs/revizyın.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/clientSs/revizyın.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/clientSs/revizyın.png",
+      "bytes": 243690,
+      "sha256": "93a501100979a47d5627a3c7e1b6ee27064d0f18708ca026864ca5fd76488636",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/defaultHero.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/defaultHero.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/defaultHero.png",
+      "bytes": 1545553,
+      "sha256": "fe9e334fc888e81ea7fb00e27031be8a978b1df8341149687668c920640285dc",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/favicon-16.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/favicon-16.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/favicon-16.png",
+      "bytes": 1156,
+      "sha256": "40c1d9d50ac99cb6fd858654a720596e8457f80497ca0e655a3cf75990da7d0b",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/favicon-32.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/favicon-32.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/favicon-32.png",
+      "bytes": 2067,
+      "sha256": "0feb9cfd19193712f20bcdeddbc7367903cbbdaced02a5fd48653c4e7bd3903c",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/flags/en.Png",
+      "platform": "web",
+      "source": "apps/neta-web/public/flags/en.Png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/flags/en.Png",
+      "bytes": 5871,
+      "sha256": "d0d7ed56e1c2e39a68ed1afa0040522ebce0bafc723553260fa0fa2618fe09e1",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/flags/tr.Png",
+      "platform": "web",
+      "source": "apps/neta-web/public/flags/tr.Png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/flags/tr.Png",
+      "bytes": 4374,
+      "sha256": "057eff5ae6c92dcde1817d18d89d987ce05815c273269f177215063e1eb4037e",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/hero.mp4",
+      "platform": "web",
+      "source": "apps/neta-web/public/hero.mp4",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/hero.mp4",
+      "bytes": 2262666,
+      "sha256": "b4d749750ec93aa5876d656d3af07fb100022ba0c77d6c01038a7e0e1a21d6bb",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/icon-192.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/icon-192.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/icon-192.png",
+      "bytes": 9357,
+      "sha256": "9e81ad28d9428605da625494f4bc80ec6ab2065d3c6bece135fe5b414747ffba",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/icon-512.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/icon-512.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/icon-512.png",
+      "bytes": 30551,
+      "sha256": "b5d99da122feafe0657f56a742719707f4958a6198e4f76c70d1a6beec99599d",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/icon-maskable-512.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/icon-maskable-512.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/icon-maskable-512.png",
+      "bytes": 30551,
+      "sha256": "b5d99da122feafe0657f56a742719707f4958a6198e4f76c70d1a6beec99599d",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/images/heroSection.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/images/heroSection.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/images/heroSection.png",
+      "bytes": 971235,
+      "sha256": "5233592a6326a48ee1f5607827a4d9ae6b110218333c7767837ff5bbe3fbf715",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/logo/blackLogoLong.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/logo/blackLogoLong.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/logo/blackLogoLong.png",
+      "bytes": 17366,
+      "sha256": "e5e98bd10053c44a8dfe79b7bd4d455991a108bbffeae6255fc1ad68641f5fd7",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/logo/iconLogo.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/logo/iconLogo.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/logo/iconLogo.png",
+      "bytes": 14891,
+      "sha256": "b5ae353402800767dc9154f6897d298cacedc76902deeb8bf4681c389aebc071",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/public/logo/lightLogoLong.png",
+      "platform": "web",
+      "source": "apps/neta-web/public/logo/lightLogoLong.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/public/logo/lightLogoLong.png",
+      "bytes": 14006,
+      "sha256": "fe682042d5758e401c6da0741982f8d8d5398243739e729f6278e195e6856e0e",
+      "role": "runtime"
+    },
+    {
+      "id": "apps/neta-web/refs/neta-character-sheet.png",
+      "platform": "web",
+      "source": "apps/neta-web/refs/neta-character-sheet.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/refs/neta-character-sheet.png",
+      "bytes": 17649832,
+      "sha256": "5e06f6ef53dc5432da207af525c2a5bcbe31b256d9489b8d49307102f8d9281a",
+      "role": "reference"
+    },
+    {
+      "id": "apps/neta-web/refs/neta-journey-source.mp4",
+      "platform": "web",
+      "source": "apps/neta-web/refs/neta-journey-source.mp4",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/refs/neta-journey-source.mp4",
+      "bytes": 11294468,
+      "sha256": "c3c1171265996283fe2c102f0ac97565a0ca26d08eefe36f245bca37c05ff71a",
+      "role": "reference"
+    },
+    {
+      "id": "apps/neta-web/refs/neta-journey-storyboard.png",
+      "platform": "web",
+      "source": "apps/neta-web/refs/neta-journey-storyboard.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/refs/neta-journey-storyboard.png",
+      "bytes": 8886232,
+      "sha256": "8eba4d3fd0b00ac12fa62ec7a77bffbb7d343b848f6052991a0ab1ba58421f38",
+      "role": "reference"
+    },
+    {
+      "id": "apps/neta-web/refs/neta-portal-light.png",
+      "platform": "web",
+      "source": "apps/neta-web/refs/neta-portal-light.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/refs/neta-portal-light.png",
+      "bytes": 16136725,
+      "sha256": "36f673c35b7ca69c5554223b4fff9cc9d07a745cfb7ed6400e02f28fa7588ac1",
+      "role": "reference"
+    },
+    {
+      "id": "apps/neta-web/refs/neta-server-light.png",
+      "platform": "web",
+      "source": "apps/neta-web/refs/neta-server-light.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/refs/neta-server-light.png",
+      "bytes": 16574021,
+      "sha256": "b325ed2482974037163fb92e01fec08bca8c93405d06aef160cc54b7c3bc2f25",
+      "role": "reference"
+    },
+    {
+      "id": "apps/neta-web/refs/neta-start-light.png",
+      "platform": "web",
+      "source": "apps/neta-web/refs/neta-start-light.png",
+      "archive": "bilgi/assets-pipeline/shared/web/originals/refs/neta-start-light.png",
+      "bytes": 124048,
+      "sha256": "64b72584491b962b0a0bb4054c1b1e8f1b4b7a71f1f52e73af4b780b08ee585e",
+      "role": "reference"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/arrow_down.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/arrow_down.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/arrow_down.png",
+      "bytes": 9456,
+      "sha256": "6deca32b56b97fa1fa87facd6996b46cc45190a553400e7febdf1d2093099b57",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/arrow_right.xml",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/arrow_right.xml",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/arrow_right.xml",
+      "bytes": 307,
+      "sha256": "e53f1e69f862e595f5d119c042863ff2a444fe42996d22bbab876b30073d0fba",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/checkmark.xml",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/checkmark.xml",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/checkmark.xml",
+      "bytes": 312,
+      "sha256": "fda3f183ae85e63bcbce70a74276ea220332ae841f746c370b0b2ab40355a357",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/error.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/error.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/error.png",
+      "bytes": 469,
+      "sha256": "c15ec72a74d13957211808313d5c35deb7f7606c6d22dbddceb0000d4e0547ad",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/file.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/file.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/file.png",
+      "bytes": 138,
+      "sha256": "a69a2edb5b6c60b8433d5b6d23c69f520ccd8a602f3f60e7996e489718bc175c",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/forward.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/forward.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/forward.png",
+      "bytes": 188,
+      "sha256": "708a79cf561b8a2a4850ce0254584d3a5231046be08fb7fadf4b6edfdb31178b",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/logotype.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/logotype.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/logotype.png",
+      "bytes": 1743,
+      "sha256": "639842ef85225f6211ff3a399736d22202a075b88a164815a2a6dd9ffeba84df",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/pkg.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/pkg.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/pkg.png",
+      "bytes": 364,
+      "sha256": "27f4d229d440925bf7212d5dfffa45d596b2c7b3bb2905c96b839b2081a1dbeb",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/drawer/toggle-drawer-icon.png",
+      "bytes": 116,
+      "sha256": "be0fe8887311ef7c6b6f57af984f64f5b9676db9008ae66e10ea6835480a724e",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@1x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@1x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/drawer/toggle-drawer-icon@1x.android.png",
+      "bytes": 84,
+      "sha256": "b6975a4a87b772a75c5699c70addedcb49ccb02437eae1a8318f2aae8c424cdb",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@1x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@1x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/drawer/toggle-drawer-icon@1x.ios.png",
+      "bytes": 108,
+      "sha256": "37fa5f2551348a5eb41475a27bc8ce788040a3ef3b3231185c786c0584274809",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@2x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@2x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/drawer/toggle-drawer-icon@2x.android.png",
+      "bytes": 100,
+      "sha256": "d0bd79567318159ea382e6d84ff364f7b4bde5437b071205f94b16dbcbeefb3a",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@2x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@2x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/drawer/toggle-drawer-icon@2x.ios.png",
+      "bytes": 163,
+      "sha256": "5a4e296a810edee23bbac5f13671be66d3d241564b67d1054395232ab9a4ada5",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@3x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@3x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/drawer/toggle-drawer-icon@3x.android.png",
+      "bytes": 126,
+      "sha256": "0a0b86b3506bef23cf42ea4995b580ac8d0eac3f8d11cc4eeffaec68daa52732",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@3x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@3x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/drawer/toggle-drawer-icon@3x.ios.png",
+      "bytes": 212,
+      "sha256": "7b569f04df7d1171309f658063bfa4b76012d3bee92ab0261bff1a958b8a2cb3",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@4x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@4x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/drawer/toggle-drawer-icon@4x.android.png",
+      "bytes": 116,
+      "sha256": "be0fe8887311ef7c6b6f57af984f64f5b9676db9008ae66e10ea6835480a724e",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@4x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/drawer/toggle-drawer-icon@4x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/drawer/toggle-drawer-icon@4x.ios.png",
+      "bytes": 219,
+      "sha256": "2f8982673d31f93c9bc8049be4125843469929d1718b935b085d1c8a22532155",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon-mask.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon-mask.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon-mask.png",
+      "bytes": 653,
+      "sha256": "9adb8c5efca932e2b732b293da813bd2e31952263056bce9e2517fec0f0b6a76",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon.png",
+      "bytes": 207,
+      "sha256": "84cf5eb3b20250f69e0e4733beb4da5f417f0682892a5ad1b5e62570753c21b1",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@1x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@1x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon@1x.android.png",
+      "bytes": 100,
+      "sha256": "8b61a4c7ef70dc92753f0494976482f66fd4150ec23dfc772ab65e10373afa55",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@1x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@1x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon@1x.ios.png",
+      "bytes": 290,
+      "sha256": "2cdfeb8e5ccde7976f7012fb8cce73af2229029ee21d4f1509fed114871c6cd8",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@2x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@2x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon@2x.android.png",
+      "bytes": 134,
+      "sha256": "906666dd689346ada232ce3689adef907b4257fa1b593f03638d2b9497f64884",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@2x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@2x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon@2x.ios.png",
+      "bytes": 405,
+      "sha256": "2b7443a9a58e92ca11a575bdc11598615a57dde305cd8ce70d602606b302cd98",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@3x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@3x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon@3x.android.png",
+      "bytes": 167,
+      "sha256": "ffa7ee45b76405ba73921495008f7d68c9de6395f4b6941db063465f6e382320",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@3x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@3x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon@3x.ios.png",
+      "bytes": 761,
+      "sha256": "3ddd0773ed27e23d25789f301731b3ac455ad8be5aa27a0a1b838f89c6d27225",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@4x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@4x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon@4x.android.png",
+      "bytes": 207,
+      "sha256": "84cf5eb3b20250f69e0e4733beb4da5f417f0682892a5ad1b5e62570753c21b1",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@4x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/back-icon@4x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/back-icon@4x.ios.png",
+      "bytes": 809,
+      "sha256": "92ed8176ac8cb44362a5fc6a3703626a0006ac6b7cb272ee99f5850262ec070e",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/clear-icon.png",
+      "bytes": 645,
+      "sha256": "c86bb485eee687e06c500fc4234f51a6784b4530c2ae11d0c76481110bce3105",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon@1x.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon@1x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/clear-icon@1x.png",
+      "bytes": 220,
+      "sha256": "d03a5cd7a66ef10c5147916f9d5878b2d0a0a5ad46f405a31cd9967efaa55afd",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon@2x.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon@2x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/clear-icon@2x.png",
+      "bytes": 334,
+      "sha256": "ab5613d2ce70fa67c5926e831353664945199fc195fa6fe76c5fe3cec452e31a",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon@3x.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon@3x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/clear-icon@3x.png",
+      "bytes": 502,
+      "sha256": "c4e54e6a0a7de636aa153378fbc62ea4a41695bfedf807f90df7b18ffd733f67",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon@4x.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/clear-icon@4x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/clear-icon@4x.png",
+      "bytes": 645,
+      "sha256": "c86bb485eee687e06c500fc4234f51a6784b4530c2ae11d0c76481110bce3105",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/close-icon.png",
+      "bytes": 332,
+      "sha256": "2325c53a73e54c438cbbc60dffdd8b513d471ba42e2f56713ef404b95e0ca1fc",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon@1x.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon@1x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/close-icon@1x.png",
+      "bytes": 141,
+      "sha256": "b1bc1810ca23e2c38cd76971c43591d726161061240d8b792b05757196ddb528",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon@2x.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon@2x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/close-icon@2x.png",
+      "bytes": 201,
+      "sha256": "cbdf9213e55f65c48d076acd8423b7c9aee4f1b81101ff6c95a38c4cd8a86461",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon@3x.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon@3x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/close-icon@3x.png",
+      "bytes": 266,
+      "sha256": "d05c9d30d79f45a78e5585a2e7ec67c6a06a883dd9137e1d5059e8c87b33ce76",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon@4x.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/close-icon@4x.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/close-icon@4x.png",
+      "bytes": 332,
+      "sha256": "2325c53a73e54c438cbbc60dffdd8b513d471ba42e2f56713ef404b95e0ca1fc",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/search-icon.png",
+      "bytes": 928,
+      "sha256": "5d075e0c287c4f4441b5b5c8fc7ea5cd27c11bb617ecea09755955bcb1889083",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@1x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@1x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/search-icon@1x.android.png",
+      "bytes": 258,
+      "sha256": "ba722fb24bff0a4c52e656cdf205deac5c5df85e5bae2bf6d30713bd50c6d5f7",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@1x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@1x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/search-icon@1x.ios.png",
+      "bytes": 317,
+      "sha256": "dc56b976bd45638e1125f6689743525e6886ae0bef2c8f4651994833685a831f",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@2x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@2x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/search-icon@2x.android.png",
+      "bytes": 483,
+      "sha256": "5300f50be3659d17d8cee868ec4e6c0d3f4e89944fd5899d3c20f6a767a045f5",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@2x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@2x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/search-icon@2x.ios.png",
+      "bytes": 589,
+      "sha256": "ef13fc0dfc52ec23817585fd7e109fbdf593a3b2549c40ce71ac9b0eda12cc2c",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@3x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@3x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/search-icon@3x.android.png",
+      "bytes": 728,
+      "sha256": "6c8f11bfd1c7e22769dc135c16ecd0e053bb55554da88b9611d9cf71d12136f1",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@3x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@3x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/search-icon@3x.ios.png",
+      "bytes": 839,
+      "sha256": "b434a7cf18c2d4ce747c70942ea2fee2d4412d93967ed92b372f810bb9261ea5",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@4x.android.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@4x.android.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/search-icon@4x.android.png",
+      "bytes": 928,
+      "sha256": "5d075e0c287c4f4441b5b5c8fc7ea5cd27c11bb617ecea09755955bcb1889083",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@4x.ios.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/react-navigation/elements/search-icon@4x.ios.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/react-navigation/elements/search-icon@4x.ios.png",
+      "bytes": 589,
+      "sha256": "ef13fc0dfc52ec23817585fd7e109fbdf593a3b2549c40ce71ac9b0eda12cc2c",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/sitemap.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/sitemap.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/sitemap.png",
+      "bytes": 465,
+      "sha256": "acf691957a3bcce7d195856dce98a5cf14dce10bea28aa5c10b3550c078e23b5",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/unmatched.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/expo-router@57.0.17_56b8a82a6fa1741b389483dc4b58102c/node_modules/expo-router/assets/unmatched.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/expo-router/unmatched.png",
+      "bytes": 4752,
+      "sha256": "efc79da3c4c97dfb1571bff6202958ab0529c5aa31e8392600578b3e359d1447",
+      "role": "dependency-runtime",
+      "package": "expo-router"
+    },
+    {
+      "id": "node_modules/.pnpm/@expo-google-fonts+material-symbols@0.4.45/node_modules/@expo-google-fonts/material-symbols/400Regular/MaterialSymbols_400Regular.ttf",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/@expo-google-fonts+material-symbols@0.4.45/node_modules/@expo-google-fonts/material-symbols/400Regular/MaterialSymbols_400Regular.ttf",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/material-symbols/MaterialSymbols_400Regular.ttf",
+      "bytes": 963776,
+      "sha256": "53e4f7bd9f6ee6bbd8d428f2cb38a0e0036f1afa0d9731cf18eac75f6b59fca3",
+      "role": "dependency-runtime",
+      "package": "material-symbols"
+    },
+    {
+      "id": "node_modules/.pnpm/@expo-google-fonts+material-symbols@0.4.45/node_modules/@expo-google-fonts/material-symbols/400Regular/MaterialSymbols_400Regular.ttf.png",
+      "platform": "mobile",
+      "source": "node_modules/.pnpm/@expo-google-fonts+material-symbols@0.4.45/node_modules/@expo-google-fonts/material-symbols/400Regular/MaterialSymbols_400Regular.ttf.png",
+      "archive": "bilgi/assets-pipeline/shared/mobile/originals/dependencies/material-symbols/MaterialSymbols_400Regular.ttf.png",
+      "bytes": 101118,
+      "sha256": "471cc7af7b967322e0ee51361fc928bd719f5bbff4127982fc6b0b0a4b78d323",
+      "role": "dependency-reference",
+      "package": "material-symbols"
+    }
+  ]
+}

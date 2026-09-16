@@ -1,0 +1,55 @@
+{
+  "pageId": "project-risk",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/project-risk/screenshots/light-tr-phone-default.png",
+      "sha256": "433dd828a24606349378891596eedb34ebb6ba0a5d1b5fe82d536ee71f67c210",
+      "bytes": 66028,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:50:29.403Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/project-risk?projectId=ui-project-atlas",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/project-risk",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/project-risk/screenshots/dark-tr-phone-default.png",
+      "sha256": "70b0f79790d26521ed353e7f54935a8975c92e3a3ad202a7cf77b2936648d138",
+      "bytes": 67804,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:54:52.048Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/project-risk?projectId=ui-project-atlas",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/project-risk",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

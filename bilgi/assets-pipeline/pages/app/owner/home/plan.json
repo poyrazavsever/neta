@@ -1,0 +1,45 @@
+{
+  "status": "baseline",
+  "goal": "Güncel iş durumunu ve sonraki adımı anlaşılır göster.",
+  "primaryAction": "Öncelikli işe geç",
+  "userProblems": [],
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "offline",
+    "validation",
+    "permission-denied"
+  ],
+  "variants": {
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "locales": [
+      "tr",
+      "en"
+    ],
+    "sizes": [
+      "desktop",
+      "narrow"
+    ]
+  },
+  "assetRequests": [],
+  "acceptance": [
+    "a11y",
+    "functional",
+    "visual",
+    "localization"
+  ],
+  "implementationStarted": false,
+  "reviewWave": 2,
+  "briefStatus": "draft-needs-ux-review",
+  "reviewQuestions": [
+    "Birincil aksiyon ilk bakışta anlaşılır mı?",
+    "Geri dönüş ve hata kurtarma akışı açık mı?",
+    "Rol, ilişki ve veri kapsamı doğru anlaşılır mı?",
+    "Klavye, ekran okuyucu ve dar ekran kullanımı yeterli mi?"
+  ]
+}

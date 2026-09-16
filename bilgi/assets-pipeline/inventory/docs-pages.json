@@ -1,0 +1,84 @@
+{
+  "pages": [
+    {
+      "source": "apps/neta-web/content/docs/en/02-nasil-kullanilir.md",
+      "locale": "en",
+      "route": "/en/docs/02-nasil-kullanilir"
+    },
+    {
+      "source": "apps/neta-web/content/docs/en/03-ozellikler.md",
+      "locale": "en",
+      "route": "/en/docs/03-ozellikler"
+    },
+    {
+      "source": "apps/neta-web/content/docs/en/04-ozellestirme.md",
+      "locale": "en",
+      "route": "/en/docs/04-ozellestirme"
+    },
+    {
+      "source": "apps/neta-web/content/docs/en/05-kod-yapisi.md",
+      "locale": "en",
+      "route": "/en/docs/05-kod-yapisi"
+    },
+    {
+      "source": "apps/neta-web/content/docs/en/06-self-host-deploy.md",
+      "locale": "en",
+      "route": "/en/docs/06-self-host-deploy"
+    },
+    {
+      "source": "apps/neta-web/content/docs/en/07-api-ve-mobil.md",
+      "locale": "en",
+      "route": "/en/docs/07-api-ve-mobil"
+    },
+    {
+      "source": "apps/neta-web/content/docs/en/08-yayin-kontrol-listesi.md",
+      "locale": "en",
+      "route": "/en/docs/08-yayin-kontrol-listesi"
+    },
+    {
+      "source": "apps/neta-web/content/docs/en/index.md",
+      "locale": "en",
+      "route": "/en/docs"
+    },
+    {
+      "source": "apps/neta-web/content/docs/tr/02-nasil-kullanilir.md",
+      "locale": "tr",
+      "route": "/tr/docs/02-nasil-kullanilir"
+    },
+    {
+      "source": "apps/neta-web/content/docs/tr/03-ozellikler.md",
+      "locale": "tr",
+      "route": "/tr/docs/03-ozellikler"
+    },
+    {
+      "source": "apps/neta-web/content/docs/tr/04-ozellestirme.md",
+      "locale": "tr",
+      "route": "/tr/docs/04-ozellestirme"
+    },
+    {
+      "source": "apps/neta-web/content/docs/tr/05-kod-yapisi.md",
+      "locale": "tr",
+      "route": "/tr/docs/05-kod-yapisi"
+    },
+    {
+      "source": "apps/neta-web/content/docs/tr/06-self-host-deploy.md",
+      "locale": "tr",
+      "route": "/tr/docs/06-self-host-deploy"
+    },
+    {
+      "source": "apps/neta-web/content/docs/tr/07-api-ve-mobil.md",
+      "locale": "tr",
+      "route": "/tr/docs/07-api-ve-mobil"
+    },
+    {
+      "source": "apps/neta-web/content/docs/tr/08-yayin-kontrol-listesi.md",
+      "locale": "tr",
+      "route": "/tr/docs/08-yayin-kontrol-listesi"
+    },
+    {
+      "source": "apps/neta-web/content/docs/tr/index.md",
+      "locale": "tr",
+      "route": "/tr/docs"
+    }
+  ]
+}

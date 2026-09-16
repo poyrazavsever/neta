@@ -1,0 +1,901 @@
+{
+  "pageId": "locale-docs-slug",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-en-desktop-en-docs-02-nasil-kullanilir.png",
+      "sha256": "03fdaabdab3222cb76ac66c296bcef9cbbe00ac88225f52349ceef7dc5632c74",
+      "bytes": 518233,
+      "width": 1440,
+      "height": 5416,
+      "capturedAt": "2026-09-16T10:17:39.299Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/02-nasil-kullanilir",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-en-desktop-en-docs-03-ozellikler.png",
+      "sha256": "3ab815ea6e1fae9138776d231f27541ee8a7257cf4c18a43985ca2c488f2c18a",
+      "bytes": 565409,
+      "width": 1440,
+      "height": 5757,
+      "capturedAt": "2026-09-16T10:17:41.919Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/03-ozellikler",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-en-desktop-en-docs-04-ozellestirme.png",
+      "sha256": "88850be641b701ea0d67e8377c5e83fcb52feb4a9c3f0604ff42fa65f916cd7a",
+      "bytes": 523637,
+      "width": 1440,
+      "height": 5397,
+      "capturedAt": "2026-09-16T10:17:44.656Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/04-ozellestirme",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-en-desktop-en-docs-05-kod-yapisi.png",
+      "sha256": "6a79d41d2b9fb12e6e7b9e51c652d9614870f4cf1b399fd51349317410c5efdf",
+      "bytes": 645772,
+      "width": 1440,
+      "height": 7509,
+      "capturedAt": "2026-09-16T10:17:47.509Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/05-kod-yapisi",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-en-desktop-en-docs-06-self-host-deploy.png",
+      "sha256": "28e65dc046fc2845375d2f5c81528404306cdac5c64d9efd6fee2b87c18f80f0",
+      "bytes": 730617,
+      "width": 1440,
+      "height": 8700,
+      "capturedAt": "2026-09-16T10:17:50.914Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/06-self-host-deploy",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-en-desktop-en-docs-07-api-ve-mobil.png",
+      "sha256": "aeedaea669cb88313405106843f656506eb8f20e53b844bb0471c262a6b90d8a",
+      "bytes": 367797,
+      "width": 1440,
+      "height": 3325,
+      "capturedAt": "2026-09-16T10:17:52.975Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/07-api-ve-mobil",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-en-desktop-en-docs-08-yayin-kontrol-listesi.png",
+      "sha256": "a046f2f0faa6359b60949c1c050f73d4c8c1dc308d56c20d354299226f33311a",
+      "bytes": 450634,
+      "width": 1440,
+      "height": 5262,
+      "capturedAt": "2026-09-16T10:17:55.381Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/08-yayin-kontrol-listesi",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-en-desktop-en-docs.png",
+      "sha256": "d2a13cb7d9d4891ad2ec482bdd029979414bc398bc05ad3b4d107c4c3f83bf78",
+      "bytes": 456536,
+      "width": 1440,
+      "height": 4049,
+      "capturedAt": "2026-09-16T10:17:57.496Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-tr-desktop-tr-docs-02-nasil-kullanilir.png",
+      "sha256": "ba7f31b6525dacd800e7fc890ddb2df06894e8a5b68283013b8168f9e81a179a",
+      "bytes": 524123,
+      "width": 1440,
+      "height": 5448,
+      "capturedAt": "2026-09-16T10:17:59.980Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/02-nasil-kullanilir",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-tr-desktop-tr-docs-03-ozellikler.png",
+      "sha256": "62a72c82fd29daa7c01bd74d1d4e51e852bf248840ed13af90bdff7f26048628",
+      "bytes": 557843,
+      "width": 1440,
+      "height": 5789,
+      "capturedAt": "2026-09-16T10:18:02.519Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/03-ozellikler",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-tr-desktop-tr-docs-04-ozellestirme.png",
+      "sha256": "d60e210faf2619613ba3d04547b280ea459a3068fd8a1f3a336b26d78ac5ef0a",
+      "bytes": 514533,
+      "width": 1440,
+      "height": 5449,
+      "capturedAt": "2026-09-16T10:18:04.801Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/04-ozellestirme",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-tr-desktop-tr-docs-05-kod-yapisi.png",
+      "sha256": "5873dc42027f8a96585e071a7dcc7f425aeaf07c0f8352bc721a02d82cce5b39",
+      "bytes": 637282,
+      "width": 1440,
+      "height": 7477,
+      "capturedAt": "2026-09-16T10:18:07.786Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/05-kod-yapisi",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-tr-desktop-tr-docs-06-self-host-deploy.png",
+      "sha256": "6c3fa9c221e3e145af04647f40b46f2c78327c7c66365395239be5e980ce1fee",
+      "bytes": 727007,
+      "width": 1440,
+      "height": 8812,
+      "capturedAt": "2026-09-16T10:18:11.357Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/06-self-host-deploy",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-tr-desktop-tr-docs-07-api-ve-mobil.png",
+      "sha256": "9464b0603e37f21402668bb63ba9492342eeb9b6fc1a5383713c53566a3a9737",
+      "bytes": 364568,
+      "width": 1440,
+      "height": 3346,
+      "capturedAt": "2026-09-16T10:18:13.568Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/07-api-ve-mobil",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-tr-desktop-tr-docs-08-yayin-kontrol-listesi.png",
+      "sha256": "75bb65adeb8fe70fb615c626f0c3da4eb60a23da5b46194fd842b2c8ba205e70",
+      "bytes": 443904,
+      "width": 1440,
+      "height": 5262,
+      "capturedAt": "2026-09-16T10:18:16.356Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/08-yayin-kontrol-listesi",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/light-tr-desktop-tr-docs.png",
+      "sha256": "41c0b927110cb735cb4db6854fca835150a6b3ddd4a4f9c243068ee68ab7f58e",
+      "bytes": 457349,
+      "width": 1440,
+      "height": 4017,
+      "capturedAt": "2026-09-16T10:18:18.576Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-en-desktop-en-docs-02-nasil-kullanilir.png",
+      "sha256": "03fdaabdab3222cb76ac66c296bcef9cbbe00ac88225f52349ceef7dc5632c74",
+      "bytes": 518233,
+      "width": 1440,
+      "height": 5416,
+      "capturedAt": "2026-09-16T10:20:29.137Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/02-nasil-kullanilir",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-en-desktop-en-docs-03-ozellikler.png",
+      "sha256": "3ab815ea6e1fae9138776d231f27541ee8a7257cf4c18a43985ca2c488f2c18a",
+      "bytes": 565409,
+      "width": 1440,
+      "height": 5757,
+      "capturedAt": "2026-09-16T10:20:31.701Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/03-ozellikler",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-en-desktop-en-docs-04-ozellestirme.png",
+      "sha256": "d9edfa5333da5eabe704ccd0827b0375340fdb0710c05853fbfc39ff554b742b",
+      "bytes": 523635,
+      "width": 1440,
+      "height": 5397,
+      "capturedAt": "2026-09-16T10:20:34.110Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/04-ozellestirme",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-en-desktop-en-docs-05-kod-yapisi.png",
+      "sha256": "7f4e51fc1da9a671a8598ab720a0f99822c3f4c5487db6c588efd4343d3088bc",
+      "bytes": 645762,
+      "width": 1440,
+      "height": 7509,
+      "capturedAt": "2026-09-16T10:20:36.988Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/05-kod-yapisi",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-en-desktop-en-docs-06-self-host-deploy.png",
+      "sha256": "28e65dc046fc2845375d2f5c81528404306cdac5c64d9efd6fee2b87c18f80f0",
+      "bytes": 730617,
+      "width": 1440,
+      "height": 8700,
+      "capturedAt": "2026-09-16T10:20:40.581Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/06-self-host-deploy",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-en-desktop-en-docs-07-api-ve-mobil.png",
+      "sha256": "aeedaea669cb88313405106843f656506eb8f20e53b844bb0471c262a6b90d8a",
+      "bytes": 367797,
+      "width": 1440,
+      "height": 3325,
+      "capturedAt": "2026-09-16T10:20:42.638Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/07-api-ve-mobil",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-en-desktop-en-docs-08-yayin-kontrol-listesi.png",
+      "sha256": "a046f2f0faa6359b60949c1c050f73d4c8c1dc308d56c20d354299226f33311a",
+      "bytes": 450634,
+      "width": 1440,
+      "height": 5262,
+      "capturedAt": "2026-09-16T10:20:45.412Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs/08-yayin-kontrol-listesi",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-en-desktop-en-docs.png",
+      "sha256": "d2a13cb7d9d4891ad2ec482bdd029979414bc398bc05ad3b4d107c4c3f83bf78",
+      "bytes": 456536,
+      "width": 1440,
+      "height": 4049,
+      "capturedAt": "2026-09-16T10:20:47.634Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/en/docs",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-tr-desktop-tr-docs-02-nasil-kullanilir.png",
+      "sha256": "ba7f31b6525dacd800e7fc890ddb2df06894e8a5b68283013b8168f9e81a179a",
+      "bytes": 524123,
+      "width": 1440,
+      "height": 5448,
+      "capturedAt": "2026-09-16T10:20:49.944Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/02-nasil-kullanilir",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-tr-desktop-tr-docs-03-ozellikler.png",
+      "sha256": "62a72c82fd29daa7c01bd74d1d4e51e852bf248840ed13af90bdff7f26048628",
+      "bytes": 557843,
+      "width": 1440,
+      "height": 5789,
+      "capturedAt": "2026-09-16T10:20:52.391Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/03-ozellikler",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-tr-desktop-tr-docs-04-ozellestirme.png",
+      "sha256": "d60e210faf2619613ba3d04547b280ea459a3068fd8a1f3a336b26d78ac5ef0a",
+      "bytes": 514533,
+      "width": 1440,
+      "height": 5449,
+      "capturedAt": "2026-09-16T10:20:54.668Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/04-ozellestirme",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-tr-desktop-tr-docs-05-kod-yapisi.png",
+      "sha256": "6765bb85d940820e0454b8a46aeb0b912c518f75d1baa83b8c869db2c9e98827",
+      "bytes": 637262,
+      "width": 1440,
+      "height": 7477,
+      "capturedAt": "2026-09-16T10:20:57.251Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/05-kod-yapisi",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-tr-desktop-tr-docs-06-self-host-deploy.png",
+      "sha256": "6c3fa9c221e3e145af04647f40b46f2c78327c7c66365395239be5e980ce1fee",
+      "bytes": 727007,
+      "width": 1440,
+      "height": 8812,
+      "capturedAt": "2026-09-16T10:21:00.479Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/06-self-host-deploy",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-tr-desktop-tr-docs-07-api-ve-mobil.png",
+      "sha256": "9464b0603e37f21402668bb63ba9492342eeb9b6fc1a5383713c53566a3a9737",
+      "bytes": 364568,
+      "width": 1440,
+      "height": 3346,
+      "capturedAt": "2026-09-16T10:21:02.447Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/07-api-ve-mobil",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-tr-desktop-tr-docs-08-yayin-kontrol-listesi.png",
+      "sha256": "75bb65adeb8fe70fb615c626f0c3da4eb60a23da5b46194fd842b2c8ba205e70",
+      "bytes": 443904,
+      "width": 1440,
+      "height": 5262,
+      "capturedAt": "2026-09-16T10:21:05.031Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs/08-yayin-kontrol-listesi",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/web/public/locale-docs-slug/screenshots/dark-tr-desktop-tr-docs.png",
+      "sha256": "41c0b927110cb735cb4db6854fca835150a6b3ddd4a4f9c243068ee68ab7f58e",
+      "bytes": 457349,
+      "width": 1440,
+      "height": 4017,
+      "capturedAt": "2026-09-16T10:21:07.955Z",
+      "platform": "web",
+      "actor": "public",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tr/docs",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-next",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": null,
+        "darkClass": false,
+        "background": "rgb(243, 245, 247)"
+      }
+    }
+  ]
+}

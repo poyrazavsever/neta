@@ -1,0 +1,19 @@
+{
+  "id": null,
+  "status": "requested",
+  "page": null,
+  "component": null,
+  "purpose": null,
+  "format": null,
+  "dimensions": null,
+  "themes": ["light", "dark"],
+  "locales": ["tr", "en"],
+  "source": null,
+  "export": null,
+  "license": null,
+  "attribution": null,
+  "altText": {},
+  "decorative": false,
+  "sha256": null,
+  "review": null
+}

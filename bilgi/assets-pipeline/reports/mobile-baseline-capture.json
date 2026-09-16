@@ -1,0 +1,677 @@
+{
+  "capturedAt": "2026-09-16T09:57:52.643Z",
+  "results": [
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "ai-settings",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "appearance-settings",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "calendar-event",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "client-activity",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "client",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "finance-record",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "invitation",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "journal-entry",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "owner-preferences",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "owner-profile",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "owner-security",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "project-risk",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "project",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "task",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "workspace-settings",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "analytics",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "calendar",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "chat",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "clients",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "clients-id",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "files",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "finance",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "home",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "journal",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "locales",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "projects",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "projects-id",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "settings",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "tasks",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "tasks-id",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "public",
+      "pageId": "login",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "public",
+      "pageId": "onboarding",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "public",
+      "pageId": "home",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "home",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "projects-id",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "projects",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "revisions",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "settings",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "tasks",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "portal-profile",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "portal-revision",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "portal-security",
+      "theme": "light",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "ai-settings",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "appearance-settings",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "calendar-event",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "client-activity",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "client",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "finance-record",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "invitation",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "journal-entry",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "owner-preferences",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "owner-profile",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "owner-security",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "project-risk",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "project",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "task",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "workspace-settings",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "analytics",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "calendar",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "chat",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "clients",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "clients-id",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "files",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "finance",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "home",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "journal",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "locales",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "projects",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "projects-id",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "settings",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "tasks",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "owner",
+      "pageId": "tasks-id",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "public",
+      "pageId": "login",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "public",
+      "pageId": "onboarding",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "public",
+      "pageId": "home",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "home",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "projects-id",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "projects",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "revisions",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "settings",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "tasks",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "portal-profile",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "portal-revision",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    },
+    {
+      "platform": "mobile",
+      "actor": "client",
+      "pageId": "portal-security",
+      "theme": "dark",
+      "state": "default",
+      "status": "captured"
+    }
+  ]
+}

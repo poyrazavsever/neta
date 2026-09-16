@@ -1,0 +1,61 @@
+{
+  "pageId": "tasks",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/tasks/screenshots/light-tr-desktop-default.png",
+      "sha256": "43f19005bea858124285784c5d73c58574906c1b096d4ad218d428df43bad67c",
+      "bytes": 87482,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:17:11.709Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tasks",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "light",
+        "darkClass": false,
+        "background": "rgb(251, 251, 252)"
+      }
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/app/owner/tasks/screenshots/dark-tr-desktop-default.png",
+      "sha256": "44fe35bccd6045d7d74ecf91b9bfb2e941b1f0d309a9f1e21b3624327cef4b60",
+      "bytes": 87653,
+      "width": 1440,
+      "height": 1000,
+      "capturedAt": "2026-09-16T10:19:55.832Z",
+      "platform": "app",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/tasks",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "production-standalone",
+      "browser": "Microsoft Edge",
+      "httpStatus": 200,
+      "redirectedTo": null,
+      "renderedTheme": {
+        "colorMode": "dark",
+        "darkClass": true,
+        "background": "rgb(11, 14, 18)"
+      }
+    }
+  ]
+}

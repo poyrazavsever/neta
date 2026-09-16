@@ -1,0 +1,55 @@
+{
+  "pageId": "chat",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/chat/screenshots/light-tr-phone-default.png",
+      "sha256": "fd9374dacc8b18432b4b9cec24fbd05472d1ff3bfbf327803b5d276057e5b381",
+      "bytes": 134795,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:50:55.663Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/(owner)/chat",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/chat",
+        "group": "(owner)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/chat/screenshots/dark-tr-phone-default.png",
+      "sha256": "8610e42d7490377441ac6ee7e066fa8ce6343dbc63d0b148d58a6e6ce982fe46",
+      "bytes": 135930,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:55:18.604Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/(owner)/chat",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/chat",
+        "group": "(owner)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "pageId": "project",
+  "captures": [
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/project/screenshots/light-tr-phone-default.png",
+      "sha256": "dfa137caa565193c9f16a5c54e051406f29522dba5e5bdb23f4d819687cd670e",
+      "bytes": 132573,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:50:33.679Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "light",
+      "locale": "tr",
+      "route": "/project",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/project",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "light"
+      },
+      "captureVersion": "native-v2-clean"
+    },
+    {
+      "file": "bilgi/assets-pipeline/pages/mobile/owner/project/screenshots/dark-tr-phone-default.png",
+      "sha256": "b80021e47e29ed8e692ee8226aff68080fef47a722da4173475fc71c2a7bd5c3",
+      "bytes": 132189,
+      "width": 1080,
+      "height": 2400,
+      "capturedAt": "2026-09-16T09:54:56.341Z",
+      "platform": "android",
+      "actor": "owner",
+      "theme": "dark",
+      "locale": "tr",
+      "route": "/project",
+      "state": "default",
+      "fixture": "ui-assets-v1",
+      "runtime": "debug-dev-client",
+      "device": "emulator-5554",
+      "renderedRoute": {
+        "pathname": "/project",
+        "group": "(forms)",
+        "status": "authenticated",
+        "role": "freelancer",
+        "theme": "dark"
+      },
+      "captureVersion": "native-v2-clean"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "page": null,
+  "reviewedAt": null,
+  "status": "pending",
+  "before": [],
+  "after": [],
+  "checks": { "taskFlow": null, "keyboard": null, "screenReader": null, "contrast": null, "fontScale": null, "localization": null, "responsive": null, "functional": null },
+  "blockingIssues": [],
+  "decision": null
+}

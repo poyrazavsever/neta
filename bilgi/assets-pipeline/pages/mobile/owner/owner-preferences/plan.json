@@ -1,0 +1,45 @@
+{
+  "status": "baseline",
+  "goal": "Tema ve dil tercihlerini sonucu görünür olacak şekilde değiştir.",
+  "primaryAction": "Tercihi kaydet",
+  "userProblems": [],
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "offline",
+    "validation",
+    "permission-denied"
+  ],
+  "variants": {
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "locales": [
+      "tr",
+      "en"
+    ],
+    "sizes": [
+      "phone",
+      "tablet"
+    ]
+  },
+  "assetRequests": [],
+  "acceptance": [
+    "a11y",
+    "functional",
+    "visual",
+    "localization"
+  ],
+  "implementationStarted": false,
+  "reviewWave": 5,
+  "briefStatus": "draft-needs-ux-review",
+  "reviewQuestions": [
+    "Birincil aksiyon ilk bakışta anlaşılır mı?",
+    "Geri dönüş ve hata kurtarma akışı açık mı?",
+    "Rol, ilişki ve veri kapsamı doğru anlaşılır mı?",
+    "Klavye, ekran okuyucu ve dar ekran kullanımı yeterli mi?"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "recordedAt": "2026-09-16",
+  "baselineApproval": "pending-review",
+  "notes": [
+    {
+      "platform": "web",
+      "scope": "landing story sections",
+      "observation": "Full-page PNG preserves current scroll-dependent rendering. Off-screen animated story visuals can be hidden; separate viewport/scroll-state captures are still required for UX review.",
+      "status": "additional-states-planned"
+    },
+    {
+      "platform": "web",
+      "scope": "production-next image disk cache",
+      "observation": "The local capture server logged EPERM while creating .next/cache/images. All 152 page navigations returned HTTP 200; source and archived asset hashes passed. This does not verify every image-network response.",
+      "followUp": "The cache directory was created in the workspace. Verify cache writes and image resource responses in the pinned visual capture environment.",
+      "status": "visual-environment-review-open"
+    }
+  ]
+}
