@@ -6,7 +6,7 @@ import type { ProjectListItem, ProjectRiskAnalysis } from '@neta/api-contracts';
 import { FormSheet, RelationPickerField } from '@/components/forms';
 import { Badge, InfoBox } from '@/components/ui';
 import { analyzeProjectRisk } from '@/features/chat/api';
-import { listProjects } from '@/features/projects/api';
+import { listAllProjects as listProjects } from '@/features/projects/api';
 import { toClientError } from '@/lib/api/errors';
 import { useAppEnvironment } from '@/providers/app-environment-provider';
 import { useSession } from '@/providers/session-provider';

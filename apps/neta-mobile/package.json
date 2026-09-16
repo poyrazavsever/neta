@@ -41,6 +41,7 @@
   "scripts": {
     "dev": "expo start --dev-client",
     "start": "expo start --dev-client",
+    "start:local": "node --dns-result-order=ipv4first ./scripts/start-local.mjs",
     "start:clear": "expo start --dev-client --clear",
     "start:go": "expo start --go",
     "android": "expo run:android",

@@ -3,9 +3,11 @@ import { NetaClientError, redactErrorMessage, serverErrorMessage } from './error
 const DEFAULT_TIMEOUT_MS = 10_000;
 const MAX_REDIRECTS = 3;
 
-type FetchJsonOptions = RequestInit & {
+export type FetchJsonOptions = RequestInit & {
   missingEndpointMessage?: string;
   timeoutMs?: number;
+  transport?: (input: string, options: RequestInit) => Promise<Response>;
+  allowRedirects?: boolean;
 };
 
 export type JsonResponse<T> = {
@@ -17,11 +19,20 @@ export async function fetchJson<T>(
   input: string,
   options: FetchJsonOptions = {},
 ): Promise<JsonResponse<T>> {
+  const response = await fetchResponse(input, options);
+  const parsed = tryJsonParse(await response.text());
+
+  if (!parsed.ok) {
+    throw new NetaClientError('SERVER_ERROR', 'Sunucu JSON olmayan yanıt döndürdü.', response.status);
+  }
+  return { data: unwrapEnvelope<T>(parsed.value), response };
+}
+
+export async function fetchResponse(input: string, options: FetchJsonOptions = {}): Promise<Response> {
   const response = await fetchWithRedirects(input, options);
-  const text = await response.text();
-  const parsed = tryJsonParse(text);
 
   if (!response.ok) {
+    const parsed = tryJsonParse(await response.text());
     if (!parsed.ok && response.status === 404 && options.missingEndpointMessage) {
       throw new NetaClientError(
         'MISSING_CAPABILITY',
@@ -42,11 +53,7 @@ export async function fetchJson<T>(
     );
   }
 
-  if (!parsed.ok) {
-    throw new NetaClientError('SERVER_ERROR', 'Sunucu JSON olmayan yanıt döndürdü.', response.status);
-  }
-
-  return { data: unwrapEnvelope<T>(parsed.value), response };
+  return response;
 }
 
 function statusErrorCode(status: number): 'AUTH_REQUIRED' | 'FORBIDDEN' | 'NOT_FOUND' | 'CONFLICT' | 'VALIDATION_ERROR' | 'SERVER_ERROR' {
@@ -83,10 +90,13 @@ async function fetchWithRedirects(
 ): Promise<Response> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
-  const { missingEndpointMessage: _missingEndpointMessage, timeoutMs: _timeoutMs, ...requestOptions } = options;
+  const abort = () => controller.abort();
+  options.signal?.addEventListener('abort', abort, { once: true });
+  if (options.signal?.aborted) controller.abort();
+  const { missingEndpointMessage: _missingEndpointMessage, timeoutMs: _timeoutMs, transport, allowRedirects, ...requestOptions } = options;
 
   try {
-    const response = await fetch(input, {
+    const response = await (transport ?? fetch)(input, {
       ...requestOptions,
       headers: {
         Accept: 'application/json',
@@ -97,6 +107,7 @@ async function fetchWithRedirects(
     });
 
     if (isRedirect(response.status)) {
+      if (allowRedirects === false) throw new NetaClientError('UNTRUSTED_ORIGIN', 'Dosya yüklemesi başka adrese yönlendirilemez.');
       if (redirectCount >= MAX_REDIRECTS) {
         throw new NetaClientError('INVALID_DISCOVERY', 'Çok fazla yönlendirme alındı.');
       }
@@ -109,6 +120,10 @@ async function fetchWithRedirects(
 
       const nextUrl = new URL(location, input).toString();
 
+      if (new URL(nextUrl).origin !== new URL(input).origin) {
+        throw new NetaClientError('UNTRUSTED_ORIGIN', 'Yönlendirme seçilen sunucunun dışına çıkamaz.');
+      }
+
       if (new URL(input).protocol === 'https:' && new URL(nextUrl).protocol === 'http:') {
         throw new NetaClientError('UNTRUSTED_ORIGIN', 'HTTPS bağlantı HTTP adresine düşürülemez.');
       }
@@ -119,6 +134,7 @@ async function fetchWithRedirects(
     return response;
   } finally {
     clearTimeout(timeout);
+    options.signal?.removeEventListener('abort', abort);
   }
 }
 

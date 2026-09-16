@@ -1,7 +1,5 @@
-import Constants from 'expo-constants';
 import { fetch as expoFetch } from 'expo/fetch';
 import { File } from 'expo-file-system';
-import { Platform } from 'react-native';
 
 import {
   isAiSettings,
@@ -11,6 +9,7 @@ import {
   isDeleteResult,
   isGeneralSettings,
   isDeviceSessionInfo,
+  createIdempotencyKey,
   type AiSettings,
   type AiSettingsMutationPayload,
   type AppearanceAsset,
@@ -27,11 +26,13 @@ import {
 } from '@neta/api-contracts';
 
 import { NetaClientError } from '@/lib/api/errors';
-import { createApiUrl, unwrapEnvelope } from '@/lib/api/http';
-import { getNativeAuthHeaders, normalizeMeProfile } from '@/lib/auth/native-auth-client';
+import { createApiUrl } from '@/lib/api/http';
+import { authenticatedJsonRequest, bindNativeActor, normalizeMeProfile } from '@/lib/auth/native-auth-client';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
 import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
+import { mutationRequests } from '@/lib/resource/mutation-coordinator';
+import { clearResourceCacheForResource } from '@/lib/resource/resource-cache';
 
 export function updateMeProfile(instance: StoredInstance, user: MeProfile, payload: MeProfileMutationPayload): Promise<ResourceResult<MeProfile>> {
   return requestResource(instance, user, { body: payload, invalidates: ['me'], method: 'PATCH', parser: parseMe, path: 'me/profile', resource: 'me' });
@@ -66,21 +67,27 @@ export function updateAiSettings(instance: StoredInstance, user: MeProfile, payl
 
 export async function uploadAppearanceAsset(instance: StoredInstance, user: MeProfile, kind: AppearanceAssetKind, uri: string): Promise<AppearanceAsset> {
   requireInstanceCapability(instance, 'freelancer.settings.v1');
+  const auth = await bindNativeActor(instance, user);
   const file = new File(uri);
   if (!file.exists || file.size > 5 * 1024 * 1024) throw new NetaClientError('SERVER_ERROR', 'Görsel 5 MB veya daha küçük olmalıdır.');
-  const form = new FormData(); form.append('kind', kind); form.append('file', file);
-  const response = await expoFetch(createApiUrl(instance.apiBaseUrl, 'settings/appearance/assets'), { body: form, credentials: 'include', headers: await nativeHeaders(instance, user), method: 'POST' });
-  const parsed = await readResponse(response);
-  if (!isAppearanceAsset(parsed) || parsed.kind !== kind || !isInstanceBoundUrl(instance, parsed.url)) throw contractError('Appearance asset');
-  return parsed;
+  return mutationRequests.run(`${instance.instanceId}\n${user.id}\nsettings/appearance/assets`,
+    { kind, uri, size: file.size, modificationTime: file.modificationTime }, createIdempotencyKey('appearance-upload'), async (key) => {
+      const form = new FormData(); form.append('kind', kind); form.append('file', file);
+      const { data: parsed } = await authenticatedJsonRequest<unknown>(instance, createApiUrl(instance.apiBaseUrl, 'settings/appearance/assets'), {
+        body: form, headers: { 'Accept-Language': user.preferences?.locale ?? instance.defaultLocale, 'Idempotency-Key': key },
+        method: 'POST', transport: expoFetch, allowRedirects: false, timeoutMs: 60_000,
+      }, auth.generation);
+      auth.assertCurrent();
+      if (!isAppearanceAsset(parsed) || parsed.kind !== kind || !isInstanceBoundUrl(instance, parsed.url)) throw contractError('Appearance asset');
+      await auth.commit(() => clearResourceCacheForResource(instance.instanceId, 'settings'));
+      return parsed;
+    });
 }
 
 export function deleteAppearanceAsset(instance: StoredInstance, user: MeProfile, kind: AppearanceAssetKind): Promise<ResourceResult<DeleteResult>> {
   return requestResource(instance, user, { method: 'DELETE', parser: parseDelete, path: `settings/appearance/assets/${kind}`, resource: 'settings' });
 }
 
-async function nativeHeaders(instance: StoredInstance, user: MeProfile): Promise<Record<string, string>> { return { Accept: 'application/json', 'Accept-Language': user.preferences?.locale ?? instance.defaultLocale, 'X-Neta-Client': 'mobile', 'X-Neta-Client-Version': Constants.expoConfig?.version ?? '0.0.0', 'X-Neta-Platform': Platform.OS, ...await getNativeAuthHeaders(instance) }; }
-async function readResponse(response: Response): Promise<unknown> { const body = await response.json() as unknown; if (!response.ok) throw new NetaClientError('SERVER_ERROR', `Asset yükleme ${response.status} ile başarısız oldu.`, response.status); return unwrapEnvelope(body); }
 function parseMe(value: unknown): MeProfile { return normalizeMeProfile(value); }
 function parseSessions(value: unknown): AuthSessionInfo[] { if (!Array.isArray(value) || !value.every(isAuthSessionInfo)) throw contractError('Sessions'); return value; }
 function parseDeviceSessions(value: unknown): DeviceSessionInfo[] { if (!Array.isArray(value) || !value.every(isDeviceSessionInfo)) throw contractError('Device sessions'); return value; }

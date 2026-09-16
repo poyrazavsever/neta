@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { FinanceAnalysis, MultiCurrencyFinanceSummary, FinanceTransactionKind, FinanceTransactionListItem } from '@neta/api-contracts';
 
 import { Badge, Button, Card, EmptyState, InfoBox, Screen, Skeleton } from '@/components/ui';
-import { getFinanceSummary, listFinanceTransactions, requestFinanceAnalysis } from '@/features/finance/api';
+import { getFinanceSummary, listAllFinanceTransactions as listFinanceTransactions, requestFinanceAnalysis } from '@/features/finance/api';
 import { toLocalCalendarKey } from '@/features/calendar/date';
 import { toClientError } from '@/lib/api/errors'; import { formatMoney } from '@/lib/resource/format'; import { useSession } from '@/providers/session-provider'; import { useTheme } from '@/providers/theme-provider'; import { radius, spacing } from '@/theme/tokens';
 

@@ -18,6 +18,11 @@ import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
 import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
+import { collectResourcePages } from '@/lib/resource/pagination';
+
+export function listAllTasks(instance: StoredInstance, user: MeProfile, filters: TaskListFilters = {}) {
+  return collectResourcePages((cursor) => listTasks(instance, user, { ...filters, ...(cursor ? { cursor } : {}) }));
+}
 
 export type TaskListFilters = {
   clientId?: string;

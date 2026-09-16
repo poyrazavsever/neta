@@ -12,7 +12,7 @@ export type FilePolicy = {
 };
 
 export function filePolicy(kind: FileAssetKind): FilePolicy {
-  if (kind === 'branding_icon') return { allowedMimeTypes: IMAGE_MIMES, maxBytes: 1024 * 1024, visibility: 'public_branding' };
+  if (kind === 'branding_icon') return { allowedMimeTypes: ['image/png'], maxBytes: 1024 * 1024, visibility: 'public_branding' };
   if (kind === 'branding_logo') return { allowedMimeTypes: IMAGE_MIMES, maxBytes: 5 * 1024 * 1024, visibility: 'public_branding' };
   if (kind === 'avatar') return { allowedMimeTypes: IMAGE_MIMES, maxBytes: 5 * 1024 * 1024, visibility: 'private' };
   return { allowedMimeTypes: PROJECT_MIMES, maxBytes: 10 * 1024 * 1024, visibility: 'portal' };

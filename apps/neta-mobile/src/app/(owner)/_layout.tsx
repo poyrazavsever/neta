@@ -14,7 +14,7 @@ export default function OwnerLayout() {
   }
 
   if (session.status !== 'authenticated' || session.role !== 'freelancer') {
-    return <Redirect href="/" />;
+    return <Redirect href={session.status === 'authenticated' ? '/(portal)' : '/login'} />;
   }
 
   return (

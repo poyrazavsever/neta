@@ -5,14 +5,15 @@ import { Platform } from 'react-native';
 import type { CachePolicy, RequestMetadata, ResourceName } from '@neta/api-contracts';
 
 import { NetaClientError, toClientError } from '@/lib/api/errors';
-import { createApiUrl, fetchJson } from '@/lib/api/http';
-import { getNativeAuthHeaders } from '@/lib/auth/native-auth-client';
+import { createApiUrl } from '@/lib/api/http';
+import { authenticatedJsonRequest, bindNativeActor } from '@/lib/auth/native-auth-client';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
 import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { recordPerformanceSample } from '@/lib/performance/metrics';
 
 import { createQueryKey, type QueryFilters, type QueryKey } from './query-key';
 import { effectiveCachePolicy } from './cache-policy';
+import { mutationRequests } from './mutation-coordinator';
 import {
   clearResourceCacheForResource,
   readResourceCache,
@@ -46,12 +47,24 @@ export async function requestResource<T>(
   user: MeProfile,
   options: ResourceRequestOptions<T>,
 ): Promise<ResourceResult<T>> {
+  if (options.idempotencyKey && (options.method === 'POST' || options.method === 'PUT')) {
+    return mutationRequests.run(`${instance.instanceId}\n${user.id}\n${user.role}\n${options.method}\n${options.path}`,
+      options.body, options.idempotencyKey,
+      (key) => performResourceRequest(instance, user, { ...options, idempotencyKey: key }));
+  }
+  return performResourceRequest(instance, user, options);
+}
+
+async function performResourceRequest<T>(instance: StoredInstance, user: MeProfile, options: ResourceRequestOptions<T>): Promise<ResourceResult<T>> {
+  const auth = await bindNativeActor(instance, user);
   const requiredCapability = capabilityFor(options.path);
   if (requiredCapability) requireInstanceCapability(instance, requiredCapability);
   const locale = user.preferences?.locale ?? instance.defaultLocale;
   const cachePolicy = effectiveCachePolicy(options.resource, options.cachePolicy ?? 'none');
   const queryKey = createQueryKey(instance.instanceId, user.id, user.role, locale, options.resource, options.filters);
-  const cached = await readResourceCache<T>(queryKey, cachePolicy);
+  const isRead = !options.method || options.method === 'GET';
+  const cached = isRead ? await readResourceCache<T>(queryKey, cachePolicy) : null;
+  auth.assertCurrent();
 
   if (cached) {
     try {
@@ -62,12 +75,11 @@ export async function requestResource<T>(
   }
 
   const startedAt = Date.now();
-  const authHeaders = await getNativeAuthHeaders(instance);
   const requestOptions: RequestInit = {
     headers: createRequestHeaders(
       createRequestMetadata(user, locale, options.idempotencyKey),
       options.body !== undefined,
-      authHeaders,
+      {},
       options.ifMatch,
     ),
     credentials: 'include',
@@ -84,21 +96,24 @@ export async function requestResource<T>(
   }
 
   let data: unknown;
+  auth.assertCurrent();
   try {
-    ({ data } = await fetchJson<unknown>(createApiUrl(instance.apiBaseUrl, options.path), {
+    ({ data } = await authenticatedJsonRequest<unknown>(instance, createApiUrl(instance.apiBaseUrl, options.path), {
       ...requestOptions,
       missingEndpointMessage:
         'Bu Neta sunucusu bu ekran için gereken mobil API endpoint’ini henüz sunmuyor.',
-    }));
+    }, auth.generation));
   } catch (value) {
     const error = toClientError(value);
     if (requestOptions.method === 'GET' && (error.code === 'NETWORK_ERROR' || error.code === 'TIMEOUT')) {
       const stale = await readResourceCache<T>(queryKey, cachePolicy, true);
+      auth.assertCurrent();
       if (stale) return { cachedAt: stale.storedAt, data: options.parser(stale.value), fromCache: true, isStale: true, queryKey, requestDurationMs: Date.now() - startedAt };
     }
     throw error;
   }
   const parsed = options.parser(data);
+  auth.assertCurrent();
   if (options.resource === 'dashboard') recordPerformanceSample('dashboard-data', Date.now() - startedAt);
 
   if (requestOptions.method !== 'GET') {
@@ -110,7 +125,8 @@ export async function requestResource<T>(
     );
   }
 
-  await writeResourceCache(queryKey, cachePolicy, parsed);
+  if (isRead) await auth.commit(() => writeResourceCache(queryKey, cachePolicy, parsed));
+  auth.assertCurrent();
 
   return {
     data: parsed,

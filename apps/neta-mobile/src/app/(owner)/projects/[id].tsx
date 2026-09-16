@@ -2,11 +2,13 @@ import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { type Href, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 
-import type { PlanningSection, ProjectDetail, ProjectRevision, TaskListItem } from '@neta/api-contracts';
+import type { FileAsset, PlanningSection, ProjectDetail, ProjectRevision, TaskListItem } from '@neta/api-contracts';
 
 import { Badge, Button, Card, EmptyState, InfoBox, ListRow, Screen, Skeleton } from '@/components/ui';
 import { getProjectDetail, listPlanningSections, listProjectRevisions } from '@/features/projects/api';
-import { listTasks } from '@/features/tasks/api';
+import { listAllTasks as listTasks } from '@/features/tasks/api';
+import { listProjectAssets } from '@/features/files/api';
+import { AssetDownloadButton } from '@/features/files/asset-download-button';
 import { toClientError } from '@/lib/api/errors';
 import { formatDateTime } from '@/lib/resource/format';
 import { hasInstanceCapability } from '@/lib/instance/capabilities';
@@ -28,6 +30,7 @@ export default function ProjectDetailRoute() {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [plan, setPlan] = useState<PlanningSection[]>([]); const [tasks, setTasks] = useState<TaskListItem[]>([]);
   const [revisions, setRevisions] = useState<ProjectRevision[]>([]);
+  const [assets, setAssets] = useState<FileAsset[]>([]);
   const [mainError, setMainError] = useState<string | null>(null);
   const [sectionErrors, setSectionErrors] = useState<Partial<Record<Exclude<Segment, 'overview'>, string>>>({});
   const [loading, setLoading] = useState(true);
@@ -41,14 +44,14 @@ export default function ProjectDetailRoute() {
         listPlanningSections(session.instance, session.user, id),
         listTasks(session.instance, session.user, { projectId: id }),
         listProjectRevisions(session.instance, session.user, id),
+        listProjectAssets(session.instance, session.user, id),
       ]);
-      const nextErrors: Partial<Record<Exclude<Segment, 'overview'>, string>> = {
-        assets: 'Dosya okuma capability’si bu fazda yayınlanmadı.',
-      };
-      const [planResult, taskResult, revisionResult] = results;
+      const nextErrors: Partial<Record<Exclude<Segment, 'overview'>, string>> = {};
+      const [planResult, taskResult, revisionResult, assetResult] = results;
       if (planResult.status === 'fulfilled') setPlan(planResult.value.data.items); else nextErrors.plan = toClientError(planResult.reason, 'Plan verisi alınamadı.').message;
       if (taskResult.status === 'fulfilled') setTasks(taskResult.value.data.items); else nextErrors.tasks = toClientError(taskResult.reason, 'Görevler alınamadı.').message;
       if (revisionResult.status === 'fulfilled') setRevisions(revisionResult.value.data.items); else nextErrors.revisions = toClientError(revisionResult.reason, 'Revizyonlar alınamadı.').message;
+      if (assetResult.status === 'fulfilled') setAssets(assetResult.value.data.items); else nextErrors.assets = toClientError(assetResult.reason, 'Dosyalar alınamadı.').message;
       setSectionErrors(nextErrors);
     } catch (error) { setMainError(toClientError(error, 'Proje detayı alınamadı.').message); }
     finally { setLoading(false); }
@@ -64,13 +67,14 @@ export default function ProjectDetailRoute() {
     <Card style={styles.hero}><View style={styles.row}><View style={styles.copy}><Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>{project.title}</Text><Text style={[styles.description, { color: colors.textMuted }]}>{project.clientName ?? 'Kişisel proje'} · %{project.progress} tamamlandı</Text></View><Badge tone={project.status === 'completed' ? 'success' : 'primary'}>{project.status}</Badge></View></Card>
     {canMutate ? <View style={styles.actions}><Button onPress={() => router.push({ pathname: '/project', params: { projectId: project.id } } as unknown as Href)}>Projeyi düzenle</Button><Button onPress={() => router.push({ pathname: '/task', params: { clientId: project.clientId ?? undefined, projectId: project.id } } as unknown as Href)} variant="ghost">Görev ekle</Button></View> : null}
     <View accessibilityLabel="Proje bölümleri" accessibilityRole="radiogroup" style={styles.segments}>{segments.map((item) => <SegmentButton key={item.value} label={item.label} onPress={() => setSegment(item.value)} selected={segment === item.value} />)}</View>
-    <SegmentContent errors={sectionErrors} locale={session.instance?.defaultLocale ?? 'tr'} plan={plan} project={project} revisions={revisions} segment={segment} tasks={tasks} />
+    <SegmentContent assets={assets} errors={sectionErrors} locale={session.instance?.defaultLocale ?? 'tr'} plan={plan} project={project} revisions={revisions} segment={segment} tasks={tasks} />
   </View></Screen>;
 }
 
-function SegmentContent({ errors, locale, plan, project, revisions, segment, tasks }: { errors: Partial<Record<Exclude<Segment, 'overview'>, string>>; locale: string; plan: PlanningSection[]; project: ProjectDetail; revisions: ProjectRevision[]; segment: Segment; tasks: TaskListItem[] }) {
+function SegmentContent({ assets, errors, locale, plan, project, revisions, segment, tasks }: { assets: FileAsset[]; errors: Partial<Record<Exclude<Segment, 'overview'>, string>>; locale: string; plan: PlanningSection[]; project: ProjectDetail; revisions: ProjectRevision[]; segment: Segment; tasks: TaskListItem[] }) {
   if (segment !== 'overview' && errors[segment]) return <InfoBox description={`${errors[segment]} Bu yüzey sahte veri göstermez; ilgili /api/v1 endpoint’i backend’de teslim edilmelidir.`} title="Bu bölüm kullanılamıyor" tone="warning" />;
   if (segment === 'overview') return <Card><ListRow description={project.type === 'client_project' ? 'Müşteri projesi' : 'Yan proje'} icon={{ ios: 'square.grid.2x2.fill', android: 'dashboard' }} title="Proje türü" /><ListRow description={project.dueDate ?? 'Belirlenmedi'} icon={{ ios: 'calendar', android: 'calendar_month' }} title="Bitiş tarihi" /><ListRow description={`${project.revisionsUsed}/${project.revisionAllowance ?? '∞'}`} icon={{ ios: 'arrow.triangle.2.circlepath', android: 'published_with_changes' }} title="Revizyon kullanımı" /></Card>;
+  if (segment === 'assets') return assets.length ? <Card>{assets.map((asset) => <AssetDownloadButton asset={asset} key={asset.id} />)}</Card> : <EmptyState description="Bu projeye henüz dosya eklenmemiş." title="Dosya yok" />;
   if (segment === 'plan') return plan.length ? <Card>{plan.map((item) => <ListRow description={item.content ?? `Sıra ${item.order}`} icon={{ ios: 'list.bullet.rectangle', android: 'view_list' }} key={item.id} title={item.title} />)}</Card> : <EmptyState description="Bu proje için planlama bölümü oluşturulmamış." title="Plan boş" />;
   if (segment === 'tasks') return tasks.length ? <Card>{tasks.map((task) => <ListRow description={`${task.status} · ${task.priority}`} icon={{ ios: task.status === 'done' ? 'checkmark.circle.fill' : 'circle', android: task.status === 'done' ? 'check_circle' : 'radio_button_unchecked' }} key={task.id} onPress={() => router.push({ pathname: '/(owner)/tasks/[id]', params: { id: task.id } } as unknown as Href)} title={task.title} />)}</Card> : <EmptyState description="Bu projeye bağlı görev bulunmuyor." title="Görev yok" />;
   return revisions.length ? <Card>{revisions.map((revision) => <ListRow description={`${revision.description} · ${formatDateTime(revision.createdAt, locale)}`} icon={{ ios: 'arrow.triangle.2.circlepath', android: 'published_with_changes' }} key={revision.id} title={revision.status} />)}</Card> : <EmptyState description="Bu proje için revizyon kaydı yok." title="Revizyon yok" />;

@@ -7,7 +7,8 @@ import { RelationPickerField } from '@/components/forms';
 import { Badge, Button, Card, EmptyState, Screen, Toast } from '@/components/ui';
 import { deleteProjectAsset, listProjectAssets } from '@/features/files/api';
 import { FileUploadPanel } from '@/features/files/file-upload-panel';
-import { listProjects } from '@/features/projects/api';
+import { AssetDownloadButton } from '@/features/files/asset-download-button';
+import { listAllProjects as listProjects } from '@/features/projects/api';
 import { toClientError, type NetaClientError } from '@/lib/api/errors';
 import { useAppEnvironment } from '@/providers/app-environment-provider';
 import { useSession } from '@/providers/session-provider';
@@ -70,7 +71,7 @@ export default function FilesScreen() {
         <FileUploadPanel kind="project_asset" label="Project asset (görsel veya PDF)" onUploaded={() => void loadAssets()} projectId={projectId.trim() || undefined} />
         <Button disabled={!projectId.trim()} loading={loading} onPress={() => void loadAssets()} variant="secondary">Dosyaları yenile</Button>
         {assets.length === 0 ? <EmptyState description="Proje seçip dosyaları yenile veya yeni dosya yükle." title="Dosya listesi boş" /> : assets.map((asset) => (
-          <View key={asset.id} style={styles.assetRow}><View style={styles.flex}><Text style={{ color: colors.text }}>{asset.name}</Text><Text style={{ color: colors.textMuted }}>{asset.mimeType} · {Math.ceil(asset.sizeBytes / 1024)} KB · {asset.visibility}</Text></View><Button disabled={!isOnline} onPress={() => remove(asset)} variant="ghost">Sil</Button></View>
+          <View key={asset.id} style={styles.assetRow}><View style={styles.flex}><AssetDownloadButton asset={asset} /><Text style={{ color: colors.textMuted }}>{asset.mimeType} · {Math.ceil(asset.sizeBytes / 1024)} KB · {asset.visibility}</Text></View><Button disabled={!isOnline} onPress={() => remove(asset)} variant="ghost">Sil</Button></View>
         ))}
       </Card>
     </Screen>

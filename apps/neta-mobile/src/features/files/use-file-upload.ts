@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { FileAsset, FileAssetKind } from '@neta/api-contracts';
+import { createIdempotencyKey, type FileAsset, type FileAssetKind } from '@neta/api-contracts';
 
 import { toClientError, type NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
@@ -20,26 +20,31 @@ const EMPTY_PROGRESS = { fraction: 0, sentBytes: 0, totalBytes: 0 };
 export function useFileUpload(instance: StoredInstance | null, user: MeProfile | null) {
   const controllerRef = useRef<FileUploadController | null>(null);
   const cancelledRef = useRef(false);
-  const retryRef = useRef<{ file: PickedFile; kind: FileAssetKind; projectId?: string } | null>(null);
+  const busyRef = useRef(false);
+  const retryRef = useRef<{ file: PickedFile; kind: FileAssetKind; projectId?: string; key: string; scope: string } | null>(null);
   const [state, setState] = useState<FileUploadState>({ asset: null, error: null, isUploading: false, progress: EMPTY_PROGRESS });
 
-  const upload = useCallback(async (file: PickedFile, kind: FileAssetKind, projectId?: string) => {
-    if (!instance || !user) return;
+  const upload = useCallback(async (file: PickedFile, kind: FileAssetKind, projectId?: string, key = createIdempotencyKey('file-upload')) => {
+    if (!instance || !user || busyRef.current) return;
+    busyRef.current = true;
     cancelledRef.current = false;
-    retryRef.current = { file, kind, ...(projectId ? { projectId } : {}) };
-    setState((current) => ({ ...current, error: null, isUploading: true, progress: EMPTY_PROGRESS }));
+    retryRef.current = { file, kind, ...(projectId ? { projectId } : {}), key, scope: `${instance.instanceId}:${user.id}` };
+    setState({ asset: null, error: null, isUploading: true, progress: EMPTY_PROGRESS });
     try {
-      const controller = await createFileUploadController(instance, user, file, kind, projectId, (progress) => setState((current) => ({ ...current, progress })));
+      const controller = await createFileUploadController(instance, user, file, kind, projectId, (progress) => setState((current) => ({ ...current, progress })), key);
       controllerRef.current = controller;
+      if (cancelledRef.current) { await controller.cancel(); return; }
       const asset = await controller.start();
+      if (cancelledRef.current) return;
+      retryRef.current = null;
       setState({ asset, error: null, isUploading: false, progress: { fraction: 1, sentBytes: file.size ?? 0, totalBytes: file.size ?? 0 } });
     } catch (value) {
       if (!cancelledRef.current) setState((current) => ({ ...current, error: toClientError(value, 'Dosya yüklenemedi.'), isUploading: false }));
-    } finally { controllerRef.current = null; }
+    } finally { controllerRef.current = null; busyRef.current = false; }
   }, [instance, user]);
 
   const cancel = useCallback(async () => { cancelledRef.current = true; await controllerRef.current?.cancel(); setState((current) => ({ ...current, error: null, isUploading: false })); }, []);
-  const retry = useCallback(async () => { const value = retryRef.current; if (value) await upload(value.file, value.kind, value.projectId); }, [upload]);
+  const retry = useCallback(async () => { const value = retryRef.current; if (value && value.scope === `${instance?.instanceId}:${user?.id}`) await upload(value.file, value.kind, value.projectId, value.key); }, [instance?.instanceId, user?.id, upload]);
   const reset = useCallback(() => { retryRef.current = null; setState({ asset: null, error: null, isUploading: false, progress: EMPTY_PROGRESS }); }, []);
   useEffect(() => () => { cancelledRef.current = true; void controllerRef.current?.cancel(); }, []);
   return { cancel, reset, retry, state, upload };

@@ -6,8 +6,8 @@ import type { ClientListItem, ProjectListItem, TaskDetail, TaskPriority, TaskSta
 
 import { ChoiceChips, FormSheet, NativeDateField, RelationPickerField, useKeyboardForm } from '@/components/forms';
 import { Badge, InfoBox, TextField, useToast } from '@/components/ui';
-import { listClients } from '@/features/clients/api';
-import { listProjects } from '@/features/projects/api';
+import { listAllClients as listClients } from '@/features/clients/api';
+import { listAllProjects as listProjects } from '@/features/projects/api';
 import { createTask, getTaskDetail, updateTask } from '@/features/tasks/api';
 import { buildTaskPayload, type TaskFormErrors, type TaskFormState, validateTaskForm } from '@/features/tasks/form';
 import { toClientError } from '@/lib/api/errors';

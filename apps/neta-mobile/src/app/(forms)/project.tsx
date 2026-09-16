@@ -6,7 +6,7 @@ import type { ClientListItem, ProjectDetail, ProjectStatus, ProjectType } from '
 
 import { ChoiceChips, FormSheet, NativeDateField, RelationPickerField, useKeyboardForm } from '@/components/forms';
 import { InfoBox, TextField, useToast } from '@/components/ui';
-import { listClients } from '@/features/clients/api';
+import { listAllClients as listClients } from '@/features/clients/api';
 import { createProject, getProjectDetail, updateProject } from '@/features/projects/api';
 import { buildProjectPayload, type ProjectFormErrors, type ProjectFormState, validateProjectForm } from '@/features/projects/form';
 import { toClientError } from '@/lib/api/errors';

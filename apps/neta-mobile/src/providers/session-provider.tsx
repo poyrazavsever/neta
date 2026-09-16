@@ -71,6 +71,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const { appState, isOnline } = useAppEnvironment();
   const { setBrandColors, setColorMode } = useTheme();
   const lastSessionCheckAtRef = useRef(0);
+  const sessionOperation = useRef(0);
   const [session, setSession] = useState<SessionState>(createLoadingState());
   const [pendingDiscovery, setPendingDiscovery] = useState<DiscoveryResult | null>(null);
   const pendingPairingSecretRef = useRef<string | null>(null);
@@ -84,20 +85,24 @@ export function SessionProvider({ children }: PropsWithChildren) {
   }, [setColorMode]);
 
   const bootstrap = useCallback(async () => {
+    const operation = ++sessionOperation.current;
     const startedAt = Date.now();
     setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: true, status: 'loading' }));
     let instance = await getActiveInstance();
+    if (operation !== sessionOperation.current) return;
 
     try {
       await purgeLegacyResourceCache();
       const discoveryOrigin = instance?.origin ?? defaultNetaOrigin;
       if (isOnline && discoveryOrigin) {
         const result = await discoverInstance(discoveryOrigin, {
-          onStep: (discoveryStep) => setSession((current) => ({
+          onStep: (discoveryStep) => operation === sessionOperation.current && setSession((current) => ({
             ...toUnauthenticated(current), discoveryStep, error: null, isBusy: true, status: 'loading',
           })),
         });
+        if (operation !== sessionOperation.current) return;
         const saved = await saveDiscoveredInstance(result.instance, result.catalog);
+        if (operation !== sessionOperation.current) return;
         if (saved.instanceIdChanged && saved.previousInstanceId) {
           await clearResourceCacheForInstance(saved.previousInstanceId);
         }
@@ -112,16 +117,20 @@ export function SessionProvider({ children }: PropsWithChildren) {
       }
 
       const user = await createNativeAuthClient(instance).getMe();
+      if (operation !== sessionOperation.current) return;
       applyUserPreferences(user);
       lastSessionCheckAtRef.current = Date.now();
       setSession(authenticatedState(instance, user));
       recordPerformanceSample('warm-shell', Date.now() - startedAt);
     } catch (error) {
+      if (operation !== sessionOperation.current) return;
       const clientError = toClientError(error, 'Neta hazırlanamadı.');
       if (instance && isSessionInvalidatingError(clientError)) {
         await clearResourceCacheForInstance(instance.instanceId);
+        if (operation !== sessionOperation.current) return;
         await clearInstanceSession(instance.instanceId);
       }
+      if (operation !== sessionOperation.current) return;
       setSession({
         ...createUnauthenticatedState(instance),
         error: clientError.code === 'AUTH_REQUIRED' ? null : clientError,
@@ -131,19 +140,22 @@ export function SessionProvider({ children }: PropsWithChildren) {
   }, [applyInstanceBranding, applyUserPreferences, isOnline]);
 
   const connectInstance = useCallback(async (input: string) => {
+    const operation = ++sessionOperation.current;
     setPendingDiscovery(null);
     setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: true }));
     try {
       const parsed = parseInstanceConnectInput(input, { environment: appEnvironment });
       pendingPairingSecretRef.current = parsed.pairingSecret ?? null;
       const result = await discoverInstance(parsed.origin, {
-        onStep: (discoveryStep) => setSession((current) => ({
+        onStep: (discoveryStep) => operation === sessionOperation.current && setSession((current) => ({
           ...toUnauthenticated(current), discoveryStep, error: null, isBusy: true,
         })),
       });
+      if (operation !== sessionOperation.current) return;
       setPendingDiscovery(result);
       setSession((current) => ({ ...toUnauthenticated(current), discoveryStep: 'ready-for-auth', isBusy: false }));
     } catch (error) {
+      if (operation !== sessionOperation.current) return;
       setSession((current) => ({
         ...toUnauthenticated(current),
         error: toClientError(error, 'Neta instance doğrulanamadı.'),
@@ -153,6 +165,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   }, []);
 
   const cancelInstanceConnection = useCallback(() => {
+    sessionOperation.current += 1;
     setPendingDiscovery(null);
     pendingPairingSecretRef.current = null;
     setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: false }));
@@ -160,10 +173,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const confirmInstanceConnection = useCallback(async (pairingCode?: string) => {
     if (!pendingDiscovery) return false;
+    const operation = ++sessionOperation.current;
     const result = pendingDiscovery;
     setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: true }));
     try {
       const saved = await saveDiscoveredInstance(result.instance, result.catalog);
+      if (operation !== sessionOperation.current) return false;
       if (saved.instanceIdChanged && saved.previousInstanceId) {
         await clearResourceCacheForInstance(saved.previousInstanceId);
       }
@@ -175,6 +190,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
       pendingPairingSecretRef.current = null;
       if (credential) {
         const user = await createNativeAuthClient(result.instance).pairDevice(credential);
+        if (operation !== sessionOperation.current) return false;
         applyUserPreferences(user);
         setSession(authenticatedState(result.instance, user));
       } else {
@@ -182,6 +198,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
       }
       return true;
     } catch (error) {
+      if (operation !== sessionOperation.current) return false;
       setSession((current) => ({
         ...toUnauthenticated(current),
         error: toClientError(error, 'Instance kaydedilemedi.'),
@@ -194,9 +211,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const forgetCurrentInstance = useCallback(async () => {
     const instance = session.instance;
     if (!instance) return;
+    const operation = ++sessionOperation.current;
     setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: true }));
     await clearResourceCacheForInstance(instance.instanceId);
     await forgetInstance(instance.instanceId);
+    if (operation !== sessionOperation.current) return;
     setPendingDiscovery(null);
     applyInstanceBranding(null);
     setSession(createUnauthenticatedState(null));
@@ -212,46 +231,57 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const now = Date.now();
     if (now - lastSessionCheckAtRef.current < SESSION_STALE_MS) return;
     lastSessionCheckAtRef.current = now;
+    const operation = sessionOperation.current;
     void createNativeAuthClient(session.instance).getMe().then((user) => {
+      if (operation !== sessionOperation.current) return;
       applyUserPreferences(user);
       setSession(authenticatedState(session.instance, user));
     }).catch(async (error) => {
+      if (operation !== sessionOperation.current) return;
       const clientError = toClientError(error, 'Oturum doğrulanamadı.');
       if (!isSessionInvalidatingError(clientError)) return;
       await clearResourceCacheForInstance(session.instance.instanceId);
+      if (operation !== sessionOperation.current) return;
       await clearInstanceSession(session.instance.instanceId);
+      if (operation !== sessionOperation.current) return;
       setSession({ ...createUnauthenticatedState(session.instance), error: new NetaClientError('AUTH_REQUIRED', 'Oturum süresi doldu. Lütfen tekrar giriş yap.') });
     });
   }, [appState, applyUserPreferences, session]);
 
   const login = useCallback(async (email: string, password: string) => {
     if (session.status === 'authenticated' || !session.instance) return;
+    const operation = ++sessionOperation.current;
     setSession((current) => ({ ...toUnauthenticated(current), error: null, isBusy: true }));
     try {
       const user = await createNativeAuthClient(session.instance).signInEmail(email, password);
+      if (operation !== sessionOperation.current) return;
       applyUserPreferences(user);
       lastSessionCheckAtRef.current = Date.now();
       setSession(authenticatedState(session.instance, user));
     } catch (error) {
+      if (operation !== sessionOperation.current) return;
       setSession({ ...createUnauthenticatedState(session.instance), error: toClientError(error, 'Giriş yapılamadı.') });
     }
   }, [applyUserPreferences, session]);
 
   const logout = useCallback(async () => {
     if (!session.instance) return;
+    const operation = ++sessionOperation.current;
     const instance = session.instance;
     try {
       if (session.status === 'authenticated') await createNativeAuthClient(instance).signOut();
       else await clearInstanceSession(instance.instanceId);
     } finally {
       await clearResourceCacheForInstance(instance.instanceId);
-      setSession(createUnauthenticatedState(instance));
+      if (operation === sessionOperation.current) setSession(createUnauthenticatedState(instance));
     }
   }, [session]);
 
   const refreshSession = useCallback(async () => {
     if (session.status !== 'authenticated') return;
+    const operation = sessionOperation.current;
     const user = await createNativeAuthClient(session.instance).getMe();
+    if (operation !== sessionOperation.current) return;
     applyUserPreferences(user);
     setSession(authenticatedState(session.instance, user));
   }, [applyUserPreferences, session]);

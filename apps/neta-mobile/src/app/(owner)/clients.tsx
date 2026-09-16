@@ -6,6 +6,7 @@ import type { ClientListItem, ClientStatus, PaginatedResponse } from '@neta/api-
 
 import { AppIcon, Badge, Button, Card, EmptyState, InfoBox, Screen, Skeleton, TextField } from '@/components/ui';
 import { listClients, type ClientListFilters } from '@/features/clients/api';
+import { appendResourcePage } from '@/lib/resource/pagination';
 import { toClientError, type NetaClientError } from '@/lib/api/errors';
 import { formatDateTime } from '@/lib/resource/format';
 import { hasInstanceCapability } from '@/lib/instance/capabilities';
@@ -32,17 +33,17 @@ export default function ClientsScreen() {
   const requestRef = useRef(0);
   const canMutate = session.instance ? hasInstanceCapability(session.instance, 'freelancer.core-mutations.v1') : false;
 
-  const loadClients = useCallback(async () => {
+  const loadClients = useCallback(async (cursor?: string) => {
     if (session.status !== 'authenticated' || session.role !== 'freelancer') return;
     const requestId = ++requestRef.current;
     setIsLoading(true);
     setError(null);
     try {
-      const filters: ClientListFilters = {};
+      const filters: ClientListFilters = {}; if (cursor) filters.cursor = cursor;
       if (debouncedSearch.trim()) filters.search = debouncedSearch.trim();
       if (status) filters.status = status;
       const result = await listClients(session.instance, session.user, filters);
-      if (requestId === requestRef.current) setPage(result.data);
+      if (requestId === requestRef.current) setPage((current) => cursor ? appendResourcePage(current, result.data) : result.data);
     } catch (loadError) {
       if (requestId === requestRef.current) setError(toClientError(loadError, 'Müşteriler alınamadı.'));
     } finally {
@@ -86,6 +87,7 @@ export default function ClientsScreen() {
         <View style={styles.list}>
           {page?.items.map((client) => <ClientRow client={client} key={client.id} locale={session.instance?.defaultLocale ?? 'tr'} />)}
         </View>
+        {page?.pageInfo.hasNextPage && page.pageInfo.nextCursor ? <Button loading={isLoading} onPress={() => void loadClients(page.pageInfo.nextCursor ?? undefined)} variant="secondary">Daha fazla yükle</Button> : null}
       </View>
     </Screen>
   );

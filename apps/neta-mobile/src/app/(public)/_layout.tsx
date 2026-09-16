@@ -6,6 +6,6 @@ import { useSession } from '@/providers/session-provider';
 export default function PublicLayout() {
   const session = useSession();
   if (session.status === 'loading') return <LoadingScreen label="Neta hazırlanıyor" />;
-  if (session.status === 'authenticated') return <Redirect href="/" />;
+  if (session.status === 'authenticated') return <Redirect href={session.role === 'freelancer' ? '/(owner)' : '/(portal)'} />;
   return <Stack screenOptions={{ headerShown: false }} />;
 }

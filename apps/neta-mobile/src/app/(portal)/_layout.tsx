@@ -14,7 +14,7 @@ export default function PortalLayout() {
   }
 
   if (session.status !== 'authenticated' || session.role !== 'client') {
-    return <Redirect href="/" />;
+    return <Redirect href={session.status === 'authenticated' ? '/(owner)' : '/login'} />;
   }
 
   return <AppShell role="portal"><Tabs tabBar={() => <AppBottomBar role="portal" />} screenOptions={{ animation: reduceMotion ? 'none' : 'fade', headerShown: false }}>

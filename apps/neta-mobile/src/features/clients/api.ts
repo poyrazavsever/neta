@@ -19,8 +19,14 @@ import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
 import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
+import { collectResourcePages } from '@/lib/resource/pagination';
+
+export function listAllClients(instance: StoredInstance, user: MeProfile, filters: ClientListFilters = {}) {
+  return collectResourcePages((cursor) => listClients(instance, user, { ...filters, ...(cursor ? { cursor } : {}) }));
+}
 
 export type ClientListFilters = {
+  cursor?: string;
   search?: string;
   status?: 'active' | 'paused' | 'archived';
 };
@@ -32,6 +38,7 @@ export async function listClients(
 ): Promise<ResourceResult<PaginatedResponse<ClientListItem>>> {
   requireInstanceCapability(instance, 'freelancer.clients.v1');
   const params = new URLSearchParams();
+  if (filters.cursor) params.set('cursor', filters.cursor);
 
   if (filters.search) {
     params.set('search', filters.search);
@@ -79,13 +86,13 @@ export function listClientActivities(
   user: MeProfile,
   clientId: string,
 ): Promise<ResourceResult<PaginatedResponse<ClientActivity>>> {
-  return requestResource(instance, user, {
+  return collectResourcePages((cursor) => requestResource(instance, user, {
     cachePolicy: 'short',
-    filters: { clientId },
+    filters: { clientId, cursor },
     parser: parseClientActivityPage,
-    path: `clients/${encodeURIComponent(clientId)}/activities`,
+    path: `clients/${encodeURIComponent(clientId)}/activities${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
     resource: 'clients',
-  });
+  }));
 }
 
 export function createClientActivity(

@@ -6,6 +6,7 @@ import type { PaginatedResponse, TaskListItem, TaskStatus } from '@neta/api-cont
 
 import { Badge, Button, Card, EmptyState, Screen, Skeleton, TextField, Toast } from '@/components/ui';
 import { completeTask, listTasks, updateTaskStatus, type TaskListFilters } from '@/features/tasks/api';
+import { appendResourcePage } from '@/lib/resource/pagination';
 import { toClientError, type NetaClientError } from '@/lib/api/errors';
 import { formatDateTime } from '@/lib/resource/format';
 import { useSession } from '@/providers/session-provider';
@@ -39,7 +40,7 @@ export default function TasksScreen() {
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(null);
   const listRequestRef = useRef(0);
 
-  const loadTasks = useCallback(async () => {
+  const loadTasks = useCallback(async (cursor?: string) => {
     if (session.status !== 'authenticated' || session.role !== 'freelancer') {
       return;
     }
@@ -49,11 +50,11 @@ export default function TasksScreen() {
     setError(null);
 
     try {
-      const filters: TaskListFilters = {};
+      const filters: TaskListFilters = {}; if (cursor) filters.cursor = cursor;
       if (debouncedSearch) filters.search = debouncedSearch;
       if (status) filters.status = status;
       const result = await listTasks(session.instance, session.user, filters);
-      if (requestId === listRequestRef.current) setPage(result.data);
+      if (requestId === listRequestRef.current) setPage((current) => cursor ? appendResourcePage(current, result.data) : result.data);
     } catch (loadError) {
       if (requestId === listRequestRef.current) {
         setError(toClientError(loadError, 'Görevler alınamadı.'));
@@ -177,6 +178,7 @@ export default function TasksScreen() {
           );
         })}
 
+        {page?.pageInfo.hasNextPage && page.pageInfo.nextCursor ? <Button loading={isLoading} onPress={() => void loadTasks(page.pageInfo.nextCursor ?? undefined)} variant="secondary">Daha fazla yükle</Button> : null}
       </View>
     </Screen>
   );

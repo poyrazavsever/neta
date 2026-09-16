@@ -19,8 +19,14 @@ import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
 import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
+import { collectResourcePages } from '@/lib/resource/pagination';
+
+export function listAllProjects(instance: StoredInstance, user: MeProfile, filters: ProjectListFilters = {}) {
+  return collectResourcePages((cursor) => listProjects(instance, user, { ...filters, ...(cursor ? { cursor } : {}) }));
+}
 
 export type ProjectListFilters = {
+  cursor?: string;
   clientId?: string;
   search?: string;
   status?: 'planning' | 'active' | 'paused' | 'completed' | 'cancelled';
@@ -33,6 +39,7 @@ export function listProjects(
 ): Promise<ResourceResult<PaginatedResponse<ProjectListItem>>> {
   requireInstanceCapability(instance, 'freelancer.projects.v1');
   const params = new URLSearchParams();
+  if (filters.cursor) params.set('cursor', filters.cursor);
 
   if (filters.search) {
     params.set('search', filters.search);
@@ -78,13 +85,13 @@ export function listPlanningSections(
   projectId: string,
 ): Promise<ResourceResult<PaginatedResponse<PlanningSection>>> {
   requireInstanceCapability(instance, 'freelancer.projects.v1');
-  return requestResource(instance, user, {
+  return collectResourcePages((cursor) => requestResource(instance, user, {
     cachePolicy: 'medium',
-    filters: { projectId },
+    filters: { projectId, cursor },
     parser: parsePlanningSections,
-    path: `projects/${encodeURIComponent(projectId)}/planning-sections`,
+    path: `projects/${encodeURIComponent(projectId)}/planning-sections${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
     resource: 'projects',
-  });
+  }));
 }
 
 export function listProjectRevisions(
@@ -93,13 +100,13 @@ export function listProjectRevisions(
   projectId: string,
 ): Promise<ResourceResult<PaginatedResponse<ProjectRevision>>> {
   requireInstanceCapability(instance, 'freelancer.projects.v1');
-  return requestResource(instance, user, {
+  return collectResourcePages((cursor) => requestResource(instance, user, {
     cachePolicy: 'short',
-    filters: { projectId },
+    filters: { projectId, cursor },
     parser: parseProjectRevisions,
-    path: `projects/${encodeURIComponent(projectId)}/revisions`,
+    path: `projects/${encodeURIComponent(projectId)}/revisions${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
     resource: 'projects',
-  });
+  }));
 }
 
 export function listProjectAssets(

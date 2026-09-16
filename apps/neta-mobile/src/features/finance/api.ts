@@ -21,6 +21,11 @@ import { NetaClientError } from '@/lib/api/errors';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
 import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
+import { collectResourcePages } from '@/lib/resource/pagination';
+
+export function listAllFinanceTransactions(instance: StoredInstance, user: MeProfile, filters: FinanceTransactionFilters) {
+  return collectResourcePages((cursor) => listFinanceTransactions(instance, user, { ...filters, ...(cursor ? { cursor } : {}) }));
+}
 
 export type FinanceTransactionFilters = {
   clientId?: string;

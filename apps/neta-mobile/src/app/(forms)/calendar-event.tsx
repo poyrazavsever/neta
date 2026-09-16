@@ -8,7 +8,7 @@ import { ChoiceChips, FormSheet, NativeDateTimeField, RelationPickerField, useKe
 import { Button, InfoBox, TextField, useToast } from '@/components/ui';
 import { createCalendarEvent, deleteCalendarEvent, getCalendarEventDetail, updateCalendarEvent } from '@/features/calendar/api';
 import { buildCalendarEventPayload, type CalendarEventFormErrors, type CalendarEventFormState, validateCalendarEventForm } from '@/features/calendar/form';
-import { listClients } from '@/features/clients/api'; import { listProjects } from '@/features/projects/api'; import { listTasks } from '@/features/tasks/api';
+import { listAllClients as listClients } from '@/features/clients/api'; import { listAllProjects as listProjects } from '@/features/projects/api'; import { listAllTasks as listTasks } from '@/features/tasks/api';
 import { toClientError } from '@/lib/api/errors'; import { useSession } from '@/providers/session-provider'; import { useTheme } from '@/providers/theme-provider';
 
 type Field = 'title' | 'description';

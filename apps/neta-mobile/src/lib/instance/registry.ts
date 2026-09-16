@@ -1,6 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { secureStorage } from '@/lib/storage/secure-storage';
+import { clearNativeAuthSession } from '@/lib/auth/native-auth-client';
+import { clearResourceCacheForInstance } from '@/lib/resource/resource-cache';
+import { didInstanceIdentityChange } from './identity-policy';
 
 import type { PublicCatalog, StoredInstance } from './types';
 
@@ -47,13 +50,16 @@ export async function saveDiscoveredInstance(
   catalog: PublicCatalog | null,
 ): Promise<SaveInstanceResult> {
   const previous = await getActiveInstance();
-  const instanceIdChanged = Boolean(previous && previous.origin === instance.origin && previous.instanceId !== instance.instanceId);
+  const stored = await getStoredInstance(instance.instanceId);
+  const changed = [previous, stored].filter((value): value is StoredInstance => value !== null && didInstanceIdentityChange(value, instance));
+  const instanceIdChanged = changed.length > 0;
 
-  if (instanceIdChanged && previous) {
-    await clearInstanceSession(previous.instanceId);
+  for (const instanceId of new Set(changed.map((value) => value.instanceId))) {
+    await clearInstanceSession(instanceId);
+    await clearResourceCacheForInstance(instanceId);
     await AsyncStorage.multiRemove([
-      createInstanceKey(previous.instanceId),
-      createCatalogKey(previous.instanceId),
+      createInstanceKey(instanceId),
+      createCatalogKey(instanceId),
     ]);
   }
 
@@ -82,6 +88,7 @@ export async function forgetInstance(instanceId: string): Promise<void> {
 }
 
 export async function clearInstanceSession(instanceId: string): Promise<void> {
+  await clearNativeAuthSession(instanceId);
   await Promise.all([
     secureStorage.remove(instanceId, 'auth.session'),
     secureStorage.remove(instanceId, 'auth.cookie'),

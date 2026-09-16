@@ -1,15 +1,17 @@
-import { Stack, type ErrorBoundaryProps } from 'expo-router';
+import { Stack, router, usePathname, useSegments, type ErrorBoundaryProps, type Href } from 'expo-router';
+import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppEnvironmentProvider } from '@/providers/app-environment-provider';
 import { redactErrorMessage } from '@/lib/api/errors';
-import { SessionProvider } from '@/providers/session-provider';
+import { SessionProvider, useSession } from '@/providers/session-provider';
 import { LocalizationProvider } from '@/providers/localization-provider';
 import { ThemeProvider, useTheme } from '@/providers/theme-provider';
 import { OnboardingProvider } from '@/providers/onboarding-provider';
 import { createThemeTokens, spacing } from '@/theme/tokens';
+import { parseUiCaptureRoute } from '@/lib/instance/ui-capture-route';
 import { ToastProvider } from '@/components/ui';
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
@@ -50,6 +52,20 @@ export default function RootLayout() {
 
 function RootNavigator() {
   const { resolvedColorMode } = useTheme();
+  const session = useSession();
+  const pathname = usePathname(); const segments = useSegments();
+  useEffect(() => {
+    if (__DEV__ && process.env.EXPO_PUBLIC_NETA_UI_CAPTURE === '1') {
+      (globalThis as typeof globalThis & { __NETA_UI_CAPTURE_STATE__?: unknown }).__NETA_UI_CAPTURE_STATE__ = {
+        pathname, group: segments[0] ?? null, status: session.status, role: session.role, theme: resolvedColorMode,
+      };
+      (globalThis as typeof globalThis & { __NETA_UI_CAPTURE_NAVIGATE__?: (route: string) => boolean }).__NETA_UI_CAPTURE_NAVIGATE__ = (route) => {
+        const safe = parseUiCaptureRoute(`neta://ui-capture?route=${encodeURIComponent(route)}`);
+        if (!safe) return false;
+        if (router.canDismiss()) router.dismissAll(); router.replace(safe as Href); return true;
+      };
+    }
+  }, [pathname, segments, session.status, session.role, resolvedColorMode]);
 
   return (
     <>

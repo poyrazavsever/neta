@@ -6,6 +6,7 @@ import { useSession } from '@/providers/session-provider';
 export default function FormsLayout() {
   const session = useSession();
   if (session.status === 'loading') return <LoadingScreen label="Oturum doğrulanıyor" />;
-  if (session.status !== 'authenticated' || session.role !== 'freelancer') return <Redirect href="/" />;
+  if (session.status !== 'authenticated') return <Redirect href="/login" />;
+  if (session.role !== 'freelancer') return <Redirect href="/(portal)" />;
   return <Stack screenOptions={{ headerShown: false }} />;
 }

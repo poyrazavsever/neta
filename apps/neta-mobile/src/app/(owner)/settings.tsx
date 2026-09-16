@@ -1,7 +1,9 @@
 import { type Href, router } from 'expo-router';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Badge, Card, InfoBox, ListRow, Screen } from '@/components/ui';
+import { Badge, Button, Card, InfoBox, ListRow, Screen } from '@/components/ui';
+import { toClientError } from '@/lib/api/errors';
 import { useLocalization } from '@/providers/localization-provider';
 import { useSession } from '@/providers/session-provider';
 import { useTheme } from '@/providers/theme-provider';
@@ -11,6 +13,15 @@ const go = (href: string) => router.push(href as Href);
 
 export default function SettingsScreen() {
   const session = useSession(); const { rtlRestartRequired, t } = useLocalization(); const { colors } = useTheme();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const logout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true); setLogoutError(null);
+    try { await session.logout(); }
+    catch (error) { setLogoutError(toClientError(error, 'Çıkış yapılamadı.').message); }
+    finally { setLoggingOut(false); }
+  };
   return <Screen scroll contentStyle={styles.screen}><View style={styles.content}>
     <Badge tone="primary">Owner</Badge>
     <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>{t('mobile-settings.title')}</Text>
@@ -30,6 +41,8 @@ export default function SettingsScreen() {
       <ListRow description="Aktif diller ve çeviri katalogları" icon={{ ios: 'globe', android: 'language' }} onPress={() => go('/(owner)/locales')} title="Dil yönetimi" />
       <ListRow description="Marka ve proje dosyaları" icon={{ ios: 'folder.fill', android: 'folder' }} onPress={() => go('/(owner)/files')} title="Dosya ve medya" />
     </SettingsSection>
+    {logoutError ? <InfoBox description={logoutError} title="Oturum" tone="danger" /> : null}
+    <Button loading={loggingOut} onPress={() => void logout()} variant="secondary">Çıkış yap</Button>
   </View></Screen>;
 }
 
