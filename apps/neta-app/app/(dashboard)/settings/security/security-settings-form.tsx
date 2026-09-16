@@ -16,13 +16,16 @@ export function SecuritySettingsForm() {
   const [devices, setDevices] = useState<DeviceSessionInfo[]>([]);
   const [pairingPassword, setPairingPassword] = useState("");
 
-  async function loadDevices() {
-    const response = await fetch("/api/v1/device-sessions", { headers: { Accept: "application/json" } });
-    const payload = await response.json() as { data?: DeviceSessionInfo[] };
-    if (response.ok && Array.isArray(payload.data)) setDevices(payload.data);
-  }
-
-  useEffect(() => { void loadDevices(); }, []);
+  useEffect(() => {
+    let active = true;
+    void fetch("/api/v1/device-sessions", { headers: { Accept: "application/json" } })
+      .then(async (response) => {
+        const payload = await response.json() as { data?: DeviceSessionInfo[] };
+        if (active && response.ok && Array.isArray(payload.data)) setDevices(payload.data);
+      })
+      .catch(() => { if (active) toast.error("Mobil cihazlar yüklenemedi."); });
+    return () => { active = false; };
+  }, []);
 
   async function createPairing() {
     const response = await fetch("/api/v1/pairing/challenges", {

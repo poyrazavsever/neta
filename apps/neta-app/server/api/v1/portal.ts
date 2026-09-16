@@ -65,7 +65,7 @@ export function getPortalProject(context: SessionContext, request: Request, proj
     publicTasks: service.listTasks(actor, project.id).map((row) => toTask(row, projectNames.get(row.projectId ?? "") ?? project.name)),
     assets: dbFiles.map((row) => ({
       id: row.id, name: row.originalName, mimeType: row.mimeType, sizeBytes: row.byteSize,
-      url: new URL(`/api/files/${row.id}`, request.url).toString(), visibility: "portal" as const,
+        url: new URL(`/api/v1/files/${row.id}`, getServerConfig().appUrl).toString(), visibility: "portal" as const,
     })),
     revisions,
     revisionAllowance: { allowed: allowance.quota, used: allowance.used, remaining: allowance.remaining, canRequest: allowance.canRequest },

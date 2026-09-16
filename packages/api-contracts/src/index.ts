@@ -91,7 +91,7 @@ export const NETA_CAPABILITY_ROUTE_REQUIREMENTS = {
   'freelancer.journal.v1': ['GET /api/v1/journal/entries', 'PUT /api/v1/journal/entries/:date', 'PATCH /api/v1/journal/entries/:id', 'DELETE /api/v1/journal/entries/:id'],
   'freelancer.settings.v1': ['PATCH /api/v1/me/profile', 'POST /api/v1/me/password', 'GET /api/v1/me/sessions', 'DELETE /api/v1/me/sessions/:id', 'DELETE /api/v1/me/sessions', 'GET /api/v1/settings/general', 'PATCH /api/v1/settings/general', 'GET /api/v1/settings/appearance', 'PATCH /api/v1/settings/appearance', 'GET /api/v1/settings/ai', 'PATCH /api/v1/settings/ai'],
   'instance.locales.admin.v1': ['GET /api/v1/settings/locales', 'POST /api/v1/settings/locales', 'PATCH /api/v1/settings/locales/:code', 'GET /api/v1/settings/locales/:code/translations', 'PUT /api/v1/settings/locales/:code/translations', 'POST /api/v1/settings/locales/import', 'GET /api/v1/settings/locales/export'],
-  'files.v1': ['POST /api/v1/files', 'GET /api/v1/projects/:id/assets', 'DELETE /api/v1/projects/:id/assets/:assetId', 'POST /api/v1/settings/appearance/assets', 'DELETE /api/v1/settings/appearance/assets/:kind'],
+  'files.v1': ['POST /api/v1/files', 'GET /api/v1/files/:id', 'GET /api/v1/projects/:id/assets', 'DELETE /api/v1/projects/:id/assets/:assetId', 'POST /api/v1/settings/appearance/assets', 'DELETE /api/v1/settings/appearance/assets/:kind'],
   'portal.client.v1': [
     'GET /api/v1/portal/dashboard', 'GET /api/v1/portal/projects',
     'GET /api/v1/portal/projects/:id', 'GET /api/v1/portal/tasks',

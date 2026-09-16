@@ -6,7 +6,7 @@ export function fileResponse(
   return new Response(bytes as BodyInit, {
     headers: {
       "Cache-Control": cacheControl,
-      "Content-Disposition": `inline; filename*=UTF-8''${encodeURIComponent(metadata.originalName)}`,
+      "Content-Disposition": `${metadata.mimeType === "application/pdf" ? "attachment" : "inline"}; filename*=UTF-8''${encodeURIComponent(metadata.originalName)}`,
       "Content-Length": String(bytes.byteLength),
       "Content-Type": metadata.mimeType,
       ETag: `"${metadata.sha256}"`,

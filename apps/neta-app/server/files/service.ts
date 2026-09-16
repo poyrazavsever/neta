@@ -194,6 +194,8 @@ export class FileService {
   }
 
   private assertCanDelete(actor: DomainActor, file: StoredFile): void {
+    // A forbidden delete must not reveal that an unreadable foreign file exists.
+    this.assertCanRead(actor, file);
     if (actor.role === "freelancer" && file.ownerUserId === actor.authUserId) return;
     if (actor.role === "client" && file.kind === "avatar" && file.authUserId === actor.authUserId) return;
     throw new DomainError("FORBIDDEN", "Bu dosyayı silme yetkiniz yok.");

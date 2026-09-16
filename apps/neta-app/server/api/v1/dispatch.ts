@@ -3,6 +3,7 @@ import "server-only";
 import { z } from "zod";
 import { createPortalInvitation, derivePortalInvitationToken, PortalInvitationError } from "@/server/auth/invitations";
 import { requireApiV1Role } from "./auth";
+import { deviceScopesForRoute } from "./device-scopes";
 import { parseApiV1Json } from "./input";
 import {
   completeOwnerTask,
@@ -14,6 +15,7 @@ import { paginate } from "./pagination";
 import { apiV1Error, apiV1MethodNotAllowed, apiV1NotFound, apiV1Success } from "./responses";
 import { runIdempotentMutation } from "./mutations";
 import { DomainError } from "@/server/domain/errors";
+import { getServerConfig } from "@/server/config";
 import {
   createFinance,
   deleteFinance,
@@ -78,7 +80,11 @@ export async function dispatchApiV1(request: Request, path: readonly string[]): 
       }
       return apiV1NotFound();
     }
-    const context = await requireApiV1Role(new Headers(request.headers), ["freelancer"]);
+    // Account self-service is shared by owner and portal users. Every operation
+    // below is scoped to context.user.id; workspace settings remain owner-only.
+    const accountRoute = path.join("/") === "me/profile" || path.join("/") === "me/password" ||
+      path.join("/") === "me/sessions" || path.length === 3 && path[0] === "me" && path[1] === "sessions";
+    const context = await requireApiV1Role(new Headers(request.headers), accountRoute ? ["freelancer", "client"] : ["freelancer"], deviceScopesForRoute(path, request.method));
     if (path.join("/") === "pairing/challenges") {
       if (request.method !== "POST") return apiV1MethodNotAllowed(["POST"]);
       return apiV1Success(await createPairingChallenge(context, request, await parseApiV1Json(request, z.unknown())), { status: 201 });
@@ -227,7 +233,7 @@ export async function dispatchApiV1(request: Request, path: readonly string[]): 
           throw error;
         }
       });
-      return apiV1Success({ ...result, invitationUrl: `${new URL(request.url).origin}/invite/${rawToken}` }, { status: 201 });
+      return apiV1Success({ ...result, invitationUrl: `${getServerConfig().appUrl}/invite/${rawToken}` }, { status: 201 });
     }
 
     if (path.length === 3 && path[0] === "tasks" && path[2] === "complete") {

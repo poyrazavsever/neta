@@ -1,25 +1,33 @@
 import "server-only";
 
 import { and, eq, ne } from "drizzle-orm";
-import { verifyPassword } from "better-auth/crypto";
+import { hashPassword, verifyPassword } from "better-auth/crypto";
 import type { AiSettings, AppearanceSettings, AuthSessionInfo, DeleteResult, GeneralSettings, NetaMeProfile } from "@neta/api-contracts";
 import { auth } from "@/server/auth/auth";
 import { domainActorFromSession } from "@/server/auth/domain-actor";
 import type { SessionContext } from "@/server/auth/session";
 import { getBrandingService } from "@/server/branding/runtime";
 import { getSqliteConnection } from "@/server/db/client";
-import { account, appProfiles, session } from "@/server/db/schema";
+import { account, appProfiles, authAuditEvents, deviceSessions, session, user } from "@/server/db/schema";
 import { DomainError, notFound } from "@/server/domain/errors";
 import { getApiMeProfile } from "./me-profile";
 import { getPublicAiSettings, updateAiSettings } from "@/server/settings/ai";
-import { revokeAllDeviceSessions } from "@/server/auth/device-pairing";
+import { getDeviceSessionContext, revokeAllDeviceSessions } from "@/server/auth/device-pairing";
+import { getServerConfig } from "@/server/config";
 
 export async function updateProfile(context: SessionContext, request: Request, body: unknown): Promise<NetaMeProfile> {
   const name = record(body).name;
   if (typeof name !== "string" || !name.trim() || name.trim().length > 200) invalid("name");
   const displayName = name.trim();
-  await auth.api.updateUser({ headers: request.headers, body: { name: displayName } });
-  getSqliteConnection().db.update(appProfiles).set({ displayName, updatedAt: new Date() }).where(eq(appProfiles.authUserId, context.user.id)).run();
+  if (context.device) {
+    getSqliteConnection().db.transaction((tx) => {
+      tx.update(user).set({ name: displayName, updatedAt: new Date() }).where(eq(user.id, context.user.id)).run();
+      tx.update(appProfiles).set({ displayName, updatedAt: new Date() }).where(eq(appProfiles.authUserId, context.user.id)).run();
+    });
+  } else {
+    await auth.api.updateUser({ headers: request.headers, body: { name: displayName } });
+    getSqliteConnection().db.update(appProfiles).set({ displayName, updatedAt: new Date() }).where(eq(appProfiles.authUserId, context.user.id)).run();
+  }
   const current = getApiMeProfile(context, request);
   return { ...current, user: { ...current.user, name: displayName } };
 }
@@ -27,6 +35,33 @@ export async function updateProfile(context: SessionContext, request: Request, b
 export async function changePassword(context: SessionContext, request: Request, body: unknown): Promise<DeleteResult> {
   const value = record(body); const currentPassword = value.currentPassword; const newPassword = value.newPassword;
   if (typeof currentPassword !== "string" || typeof newPassword !== "string" || newPassword.length < 8 || newPassword.length > 128) invalid("password");
+  if (context.device) {
+    const { db } = getSqliteConnection();
+    const credential = db.select().from(account)
+      .where(and(eq(account.userId, context.user.id), eq(account.providerId, "credential"))).get();
+    if (!credential?.password || !await verifyPassword({ hash: credential.password, password: currentPassword })) {
+      throw new DomainError("UNAUTHENTICATED", "Mevcut parola doğrulanamadı.");
+    }
+    const currentDigest = credential.password;
+    const deviceId = context.device.id;
+    const password = await hashPassword(newPassword);
+    db.transaction((tx) => {
+      // Hashing yields to other requests. A device revoked during step-up must
+      // not finish changing the password with its stale access token.
+      if (getDeviceSessionContext(request.headers)?.device?.id !== deviceId) {
+        throw new DomainError("UNAUTHENTICATED", "Cihaz oturumu geçersiz.");
+      }
+      const updated = tx.update(account).set({ password, updatedAt: new Date() })
+        .where(and(eq(account.id, credential.id), eq(account.password, currentDigest)))
+        .returning({ id: account.id }).get();
+      if (!updated) throw new DomainError("CONFLICT", "Parola değişti; işlemi yeniden deneyin.");
+      if (value.revokeOtherSessions !== false) tx.delete(session).where(eq(session.userId, context.user.id)).run();
+      tx.update(deviceSessions).set({ status: "revoked", revokedAt: new Date() })
+        .where(and(eq(deviceSessions.ownerUserId, context.user.id), eq(deviceSessions.status, "active"))).run();
+      tx.insert(authAuditEvents).values({ type: "device_session_revoked", authUserId: context.user.id, metadata: { reason: "password_changed", all: true } }).run();
+    }, { behavior: "immediate" });
+    return { deleted: true, id: context.session.id };
+  }
   await auth.api.changePassword({ headers: request.headers, body: { currentPassword, newPassword, revokeOtherSessions: value.revokeOtherSessions !== false } });
   revokeAllDeviceSessions(context.user.id);
   return { deleted: true, id: context.session.id };
@@ -102,5 +137,5 @@ export async function updateAi(context: SessionContext, body: unknown): Promise<
 function record(value: unknown): Record<string, unknown> { if (!value || typeof value !== "object" || Array.isArray(value)) invalid("body"); return value as Record<string, unknown>; }
 function invalid(field: string): never { throw new DomainError("VALIDATION_ERROR", "Ayar payload geçersiz.", { field }); }
 function nullableText(value: unknown): string | null { return typeof value === "string" && value.trim() ? value.trim() : null; }
-function absolute(request: Request, value: string | null): string | null { return value ? new URL(value, request.url).toString() : null; }
+function absolute(_request: Request, value: string | null): string | null { return value ? new URL(value, getServerConfig().appUrl).toString() : null; }
 function deviceLabel(userAgent: string | null): string { if (!userAgent) return "Bilinmeyen cihaz"; return userAgent.replace(/[\r\n]/g, " ").slice(0, 120); }

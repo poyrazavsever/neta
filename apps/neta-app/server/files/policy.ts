@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { DomainError } from "../domain/errors";
 import type { FileKind } from "../domain/types";
 
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const MAX_IMAGE_UPLOAD_BYTES = 5 * 1024 * 1024;
 
 const allowedImages = {
   "image/jpeg": { extension: "jpg", matches: isJpeg },
@@ -11,7 +12,7 @@ const allowedImages = {
   "image/gif": { extension: "gif", matches: isGif },
 } as const;
 
-export type AllowedMimeType = keyof typeof allowedImages;
+export type AllowedMimeType = keyof typeof allowedImages | "application/pdf";
 
 export type ValidatedUpload = {
   bytes: Uint8Array;
@@ -32,18 +33,21 @@ export function validateUpload(input: {
   if (byteSize === 0) {
     throw new DomainError("VALIDATION_ERROR", "Boş dosya yüklenemez.");
   }
-  if (byteSize > MAX_UPLOAD_BYTES) {
-    throw new DomainError("VALIDATION_ERROR", "Dosya boyutu 5 MB sınırını aşıyor.", {
-      maximumBytes: MAX_UPLOAD_BYTES,
+  const maximumBytes = input.kind === "project_asset" ? MAX_UPLOAD_BYTES : MAX_IMAGE_UPLOAD_BYTES;
+  if (byteSize > maximumBytes) {
+    throw new DomainError("VALIDATION_ERROR", "Dosya boyutu sınırını aşıyor.", {
+      maximumBytes,
     });
   }
 
   const mimeType = input.claimedMimeType.toLowerCase() as AllowedMimeType;
-  const policy = allowedImages[mimeType];
+  const policy = mimeType === "application/pdf"
+    ? (input.kind === "project_asset" ? { extension: "pdf", matches: isPdf } : undefined)
+    : allowedImages[mimeType];
   if (!policy || (input.kind === "branding_icon" && mimeType !== "image/png")) {
     throw new DomainError(
       "VALIDATION_ERROR",
-      "Yalnızca JPEG, PNG, WebP ve desteklenen alanlarda GIF görselleri kabul edilir; uygulama ikonu PNG olmalı ve SVG desteklenmez.",
+      "JPEG, PNG, WebP, desteklenen alanlarda GIF ve proje dosyalarında PDF kabul edilir; uygulama ikonu PNG olmalı ve SVG desteklenmez.",
     );
   }
   if (!policy.matches(input.bytes)) {
@@ -72,6 +76,11 @@ export function normalizeOriginalName(value: string): string {
 
 function isJpeg(bytes: Uint8Array) {
   return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+}
+
+function isPdf(bytes: Uint8Array) {
+  return /^%PDF-1\.[0-9]|^%PDF-2\.0/.test(ascii(bytes, 0, 8)) &&
+    ascii(bytes, Math.max(0, bytes.length - 1024), bytes.length).trimEnd().endsWith("%%EOF");
 }
 
 function isPng(bytes: Uint8Array) {

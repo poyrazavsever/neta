@@ -16,11 +16,10 @@ const envSchema = z.object({
   DATABASE_PATH: z.string().trim().optional(),
   OLLAMA_BASE_URL: z.string().url().optional(),
   AI_REQUEST_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(120_000).optional(),
-  NETA_MINIMUM_MOBILE_VERSION: z
-    .string()
-    .trim()
-    .regex(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/)
-    .optional(),
+  NETA_MINIMUM_MOBILE_VERSION: z.preprocess(
+    (value) => typeof value === "string" && value.trim() === "" ? undefined : value,
+    z.string().trim().regex(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/).optional(),
+  ),
 });
 
 export type ServerConfig = {

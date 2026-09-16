@@ -68,6 +68,8 @@ try {
   assert.deepEqual(fileService.read(ownerOne, ownerAvatar.id).bytes, Buffer.from(png));
   assertDomainError(() => fileService.read(clientOne, ownerAvatar.id), "NOT_FOUND");
   assertDomainError(() => fileService.read(ownerTwo, ownerAvatar.id), "NOT_FOUND");
+  assertDomainError(() => fileService.delete(ownerTwo, ownerAvatar.id), "NOT_FOUND");
+  assertDomainError(() => fileService.delete(clientOne, ownerAvatar.id), "NOT_FOUND");
 
   const lightLogo = fileService.upload(ownerOne, imageInput("branding_logo", "light-logo.png"));
   const darkLogo = fileService.upload(ownerOne, imageInput("branding_logo", "dark-logo.png"));
@@ -145,6 +147,7 @@ try {
   }
 
   const outsidePath = path.join(dataDir, "outside.png");
+  if (!process.argv.includes("--authorization-only")) {
   fs.writeFileSync(outsidePath, png);
   const symlinkPath = path.join(uploadsDir, "project-assets", "symlink.png");
   fs.symlinkSync(outsidePath, symlinkPath);
@@ -164,6 +167,7 @@ try {
   assertDomainError(() => fileService.read(ownerOne, "symlink-file"), "NOT_FOUND");
   fileService.delete(ownerOne, "symlink-file");
   assert.equal(fs.readFileSync(outsidePath).byteLength, png.byteLength, "Deleting symlink metadata must not delete target");
+  }
 
   assert.throws(
     () => sqlite.prepare("insert into files (id, owner_user_id, uploaded_by_user_id, project_id, kind, visibility, storage_path, original_name, mime_type, byte_size, sha256) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").run("invalid-path", ownerOne.authUserId, ownerOne.authUserId, "project-1", "project_asset", "private", "../escape.png", "escape.png", "image/png", 1, "0".repeat(64)),
@@ -173,6 +177,8 @@ try {
   const avatarPath = resolveStoragePath(uploadsDir, ownerAvatar.storagePath);
   assert.ok(fs.existsSync(avatarPath));
   fileService.delete(ownerOne, ownerAvatar.id);
+  fileService.delete(clientOne, clientAvatar.id);
+  assertDomainError(() => fileService.read(clientOne, clientAvatar.id), "NOT_FOUND");
   assert.equal(fs.existsSync(avatarPath), false);
   assert.equal(db.select({ image: schema.user.image }).from(schema.user).where(eq(schema.user.id, ownerOne.authUserId)).get()?.image, null);
 
@@ -186,7 +192,9 @@ try {
     "Missing light logo must safely fall back to the configured dark logo",
   );
 
-  console.log("Phase 3 storage smoke passed: uploads, authorization, path safety, branding and deletion verified.");
+  console.log(process.argv.includes("--authorization-only")
+    ? "Phase 3 storage authorization smoke passed; privileged symlink scenario excluded explicitly."
+    : "Phase 3 storage smoke passed: uploads, authorization, path safety, branding and deletion verified.");
 } finally {
   sqlite.close();
 }

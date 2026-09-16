@@ -1,6 +1,7 @@
 import "server-only";
 
 import sharp from "sharp";
+import { createHash } from "node:crypto";
 import type { AppearanceAsset, AppearanceAssetKind, DeleteResult, FileAsset, PaginatedResponse } from "@neta/api-contracts";
 import type { SessionContext } from "@/server/auth/session";
 import { domainActorFromSession } from "@/server/auth/domain-actor";
@@ -9,6 +10,8 @@ import { getFileService } from "@/server/files/runtime";
 import { MAX_UPLOAD_BYTES } from "@/server/files/policy";
 import { getBrandingService } from "@/server/branding/runtime";
 import { paginate } from "./pagination";
+import { runIdempotentMutation } from "./mutations";
+import { getServerConfig } from "@/server/config";
 
 const KINDS = ["avatar", "branding_logo", "branding_icon", "project_asset"] as const;
 
@@ -19,9 +22,17 @@ export async function uploadFile(context: SessionContext, request: Request): Pro
   const projectId = text(form.get("projectId")); const visibility = text(form.get("visibility"));
   const expected = kind === "project_asset" ? (visibility === "portal" ? "portal" : "private") : kind === "avatar" ? "private" : "public_branding";
   if (visibility && visibility !== expected) throw new DomainError("INVARIANT_VIOLATION", "Dosya görünürlüğü kind ile uyumlu değil.");
-  const sanitized = await sanitizeImage(new Uint8Array(await file.arrayBuffer()), file.type);
-  const stored = getFileService().upload(domainActorFromSession(context), { bytes: sanitized, claimedMimeType: file.type, kind: kind as typeof KINDS[number], metadataSanitized: true, originalName: text(form.get("originalName")) ?? file.name, portalVisible: expected === "portal", projectId: projectId ?? undefined });
-  return presentFile(request, stored);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const sanitized = file.type === "application/pdf" ? bytes : await sanitizeImage(bytes, file.type);
+  const originalName = text(form.get("originalName")) ?? file.name;
+  return runIdempotentMutation(request, context, {
+    contentDigest: createHash("sha256").update(bytes).digest("hex"), kind, mimeType: file.type,
+    originalName, projectId, visibility: expected,
+  }, () => presentFile(request, getFileService().upload(domainActorFromSession(context), {
+    bytes: sanitized, claimedMimeType: file.type, kind: kind as typeof KINDS[number],
+    metadataSanitized: file.type.startsWith("image/"), originalName,
+    portalVisible: expected === "portal", projectId: projectId ?? undefined,
+  })));
 }
 
 export async function uploadAppearanceFile(context: SessionContext, request: Request): Promise<AppearanceAsset> {
@@ -29,13 +40,18 @@ export async function uploadAppearanceFile(context: SessionContext, request: Req
   if (!(file instanceof File) || (kind !== "lightLogo" && kind !== "darkLogo" && kind !== "favicon")) invalid("file");
   if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) invalid("file.size");
   const fileKind = kind === "favicon" ? "branding_icon" : "branding_logo";
-  const sanitized = await sanitizeImage(new Uint8Array(await file.arrayBuffer()), file.type);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const sanitized = await sanitizeImage(bytes, file.type);
   const actor = domainActorFromSession(context);
-  const stored = getFileService().upload(actor, { bytes: sanitized, claimedMimeType: file.type, kind: fileKind, metadataSanitized: true, originalName: file.name });
-  const field = kind === "lightLogo" ? "lightLogoFileId" : kind === "darkLogo" ? "darkLogoFileId" : "iconFileId";
-  try { getBrandingService().update(actor, { [field]: stored.id }); }
-  catch (error) { getFileService().delete(actor, stored.id); throw error; }
-  return { kind: kind as AppearanceAssetKind, mimeType: stored.mimeType as AppearanceAsset["mimeType"], url: new URL(`/api/files/${stored.id}`, request.url).toString() };
+  return runIdempotentMutation(request, context, {
+    contentDigest: createHash("sha256").update(bytes).digest("hex"), kind, mimeType: file.type, name: file.name,
+  }, () => {
+    const stored = getFileService().upload(actor, { bytes: sanitized, claimedMimeType: file.type, kind: fileKind, metadataSanitized: true, originalName: file.name });
+    const field = kind === "lightLogo" ? "lightLogoFileId" : kind === "darkLogo" ? "darkLogoFileId" : "iconFileId";
+    try { getBrandingService().update(actor, { [field]: stored.id }); }
+    catch (error) { getFileService().delete(actor, stored.id); throw error; }
+    return { kind: kind as AppearanceAssetKind, mimeType: stored.mimeType as AppearanceAsset["mimeType"], url: new URL(`/api/branding/assets/${stored.id}`, getServerConfig().appUrl).toString() };
+  });
 }
 
 export function deleteAppearanceFile(context: SessionContext, kind: AppearanceAssetKind): DeleteResult {
@@ -57,8 +73,9 @@ export function deleteProjectFile(context: SessionContext, request: Request, pro
   if (!file) throw new DomainError("NOT_FOUND", "Dosya bulunamadı."); getFileService().delete(actor, id); return { deleted: true, id };
 }
 
-export function presentFile(request: Request, file: ReturnType<ReturnType<typeof getFileService>["list"]>[number]): FileAsset {
-  return { createdAt: file.createdAt.toISOString(), id: file.id, kind: file.kind, metadataSanitized: file.metadataSanitized, mimeType: file.mimeType, name: file.originalName, projectId: file.projectId, sizeBytes: file.byteSize, url: new URL(`/api/files/${file.id}`, request.url).toString(), visibility: file.visibility };
+export function presentFile(_request: Request, file: ReturnType<ReturnType<typeof getFileService>["list"]>[number]): FileAsset {
+  // Next standalone's internal request URL can be localhost behind a proxy.
+  return { createdAt: file.createdAt.toISOString(), id: file.id, kind: file.kind, metadataSanitized: file.metadataSanitized, mimeType: file.mimeType, name: file.originalName, projectId: file.projectId, sizeBytes: file.byteSize, url: new URL(`/api/v1/files/${file.id}`, getServerConfig().appUrl).toString(), visibility: file.visibility };
 }
 
 async function sanitizeImage(bytes: Uint8Array, mimeType: string): Promise<Uint8Array> {
