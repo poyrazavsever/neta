@@ -12,7 +12,7 @@ owners:
 
 # Neta platform master planı
 
-> 2026-09-16: MOB-6/7 otomatik güvenlik kabulü historical refresh reuse, Bearer/scope, profil/parola lifecycle, izole DB restore ve iki client HTTP/file negatiflerini doğrular. [Kanıt sınırı ve açık tasarım farkları](../mobile/mobile-security-acceptance.md) signed iki-instance/native kabulden ayrıdır; mağaza kabulü tamamlanmamıştır.
+> 2026-09-16: MOB-6/7 otomatik güvenlik kabulü historical refresh reuse, nonce-bound 30 saniyelik şifreli replay, challenge başına beş yanlış secret kilidi, Bearer/scope, profil/parola lifecycle, expiry/idle/retention-cascade, ikinci loopback restore backend'inde eski token reddi/yeniden pairing ve iki client negatiflerini doğrular. [Kanıt sınırı](../mobile/mobile-security-acceptance.md) signed iki-instance/native kabulden ayrıdır; mağaza kabulü tamamlanmamıştır.
 
 ## 1. Ürün kararı
 

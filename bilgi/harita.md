@@ -146,7 +146,7 @@ Bu harita **100** kalıcı Markdown notunu listeler. Tek satırlık özet yönle
 
 - [[09-yol-haritasi/mevcut-oncelikler|Mevcut öncelikler]] — Aşağıdaki sıra mobil uygulama planının ilk kritik yoludur. _(yol-haritasi · planlanan)_
 - [[09-yol-haritasi/mobil-uygulama-plani|Neta Mobile uygulama planı]] — Neta Mobile'ı build-time tek instance istemcisinden güvenli evrensel uygulamaya taşıyan, backend API ve release kapılarıyla birlikte yürütülen uygulama planı. _(yol-haritasi · mevcut)_
-- [[09-yol-haritasi/planlanan-yetenekler|Planlanan yetenekler]] — Bu liste store-ready mobile-v1 ilanı değildir. docs/mobile/mobile-security-acceptance otomasyon ile açık native/tasarım kabulünü ayırır. _(yol-haritasi · planlanan)_
+- [[09-yol-haritasi/planlanan-yetenekler|Planlanan yetenekler]] — Bu liste store-ready mobile-v1 ilanı değildir. docs/mobile/mobile-security-acceptance otomasyon ile açık native/release kabulünü ayırır. _(yol-haritasi · planlanan)_
 - [[09-yol-haritasi/teknik-borc|Teknik borç]] — Tenant izolasyonu, secret/token lifecycle ve backup bütünlüğü; görsel parity veya yeni feature sayısından önce gelir. Contract drift, yeni mobil endpoint eklenmeden önce kapatılmalıdır. _(yol-haritasi · mevcut)_
 - [[09-yol-haritasi/yol-haritasi|Yol haritası sentezi]] — Web self-hosted runtime'ı canonical backend olarak koruyup landing, web app ve resmî evrensel mobile'ı aynı monorepo/contract disiplini altında birleştirmek. Mobil için ikinci backend veya… _(yol-haritasi · planlanan)_
 

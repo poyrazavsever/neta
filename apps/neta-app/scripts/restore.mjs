@@ -100,6 +100,8 @@ function rotateDeviceTokenEpoch(databasePath) {
       sqlite.prepare("INSERT INTO device_security_state (key, token_epoch, updated_at) VALUES ('default', ?, ?) ON CONFLICT(key) DO UPDATE SET token_epoch = excluded.token_epoch, updated_at = excluded.updated_at").run(epoch, Date.now());
       const table = sqlite.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'device_sessions'").get();
       if (table) sqlite.prepare("UPDATE device_sessions SET status = 'revoked', revoked_at = ? WHERE status = 'active'").run(Date.now());
+      const replays = sqlite.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'device_refresh_replays'").get();
+      if (replays) sqlite.prepare("DELETE FROM device_refresh_replays").run();
     })();
   } finally {
     sqlite.close();

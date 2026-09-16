@@ -66,7 +66,7 @@ export default function OnboardingScreen() {
               editable={!session.isBusy}
               label="Owner pairing kodu (isteğe bağlı)"
               onChangeText={setPairingCode}
-              placeholder="10 karakterli kod"
+              placeholder="ABCDEFGH-JKMNPQRSTV"
               value={pairingCode}
             />
             <Button loading={session.isBusy} onPress={() => void confirm()}>Bu instance’a bağlan</Button>

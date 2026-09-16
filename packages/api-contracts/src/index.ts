@@ -736,6 +736,12 @@ export type DeviceTokenPair = {
   tokenType: 'Bearer';
 };
 
+export type DeviceRefreshPayload = {
+  refreshToken: string;
+  /** Stable unpredictable ID for retries of one rotation. Omission uses strict legacy reuse semantics. */
+  requestId?: string;
+};
+
 export type GeneralSettings = {
   companyName: string | null;
   portalFooter: string | null;

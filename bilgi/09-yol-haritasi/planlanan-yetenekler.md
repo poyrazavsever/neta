@@ -24,16 +24,17 @@ etiketler:
 - Capability/JSON v1 fallback, shared contract/presenters/consumer CI ve runtime domain/QR bootstrap.
 - Owner read/mutation, pagination/validation/idempotency/concurrency; finance/journal/settings/locales/files parity yüzeyleri.
 - Owner pairing/refresh history/reuse/scopes/revoke/restore epoch ve portal read/revision/profile transport'u.
+- Nonce-bound 30 saniyelik şifreli refresh replay; public locator üzerinden challenge başına beş yanlış QR/manual secret kilidi ve kalıcı SQLite negatif kabulü.
 - MOB-6/7 otomatik HTTP güvenlik kabulü; signed/native ve iki canlı HTTPS instance kanıtı ayrı kalır.
+- Startup/saatlik cihaz expiry/idle/retention/cascade temizliği; ikinci sentetik loopback restore backend'ine eski token HTTP negatifleri ve yeniden pairing kabulü.
 
-Bu liste store-ready `mobile-v1` ilanı değildir. [[docs/mobile/mobile-security-acceptance]] otomasyon ile açık native/tasarım kabulünü ayırır.
+Bu liste store-ready `mobile-v1` ilanı değildir. [[docs/mobile/mobile-security-acceptance]] otomasyon ile açık native/release kabulünü ayırır.
 
 ## Yakın
 
 - Signed gerçek cihazda connect/pairing/cookie login/refresh/logout/revoke/parola/restore.
 - Aynı binary ile iki canlı HTTPS instance credential/cache/deep-link izolasyonu.
-- Restore edilmiş backend'e eski token HTTP/native negatifleri.
-- ADR-008 hedef refresh grace/replay, challenge'a bağlı yanlış kod denemesi ve expired session/history cleanup.
+- Restore edilmiş backend'e signed/native eski token negatifleri ve canlı HTTPS migration/restore matrisi.
 - Native versioned bearer dosya download/share kabulü.
 
 ## Orta

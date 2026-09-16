@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { fetch as expoFetch } from 'expo/fetch';
+import { randomUUID } from 'expo-crypto';
 import type { DeviceTokenPair, PairingExchangePayload } from '@neta/api-contracts';
 import { isDeviceTokenPair } from '@neta/api-contracts';
 
@@ -14,6 +15,7 @@ import { normalizeMeProfile } from './me-contract';
 import { createSessionCoordinator, StaleAuthSessionError } from './session-coordinator';
 import { mutationRequests } from '../resource/mutation-coordinator';
 import { matchesNativeActor } from './actor-binding';
+import { isRefreshSessionInvalidatingError, rotateDeviceTokens } from './device-refresh-operation';
 
 export { normalizeMeProfile } from './me-contract';
 
@@ -30,6 +32,7 @@ const SESSION_NAME = 'auth.session';
 const COOKIE_NAME = 'auth.cookie';
 const BEARER_NAME = 'auth.bearer';
 const INSTALL_ID_NAME = 'device.install-id';
+const REFRESH_REQUEST_NAME = 'auth.refresh-request';
 const sessions = createSessionCoordinator<DeviceTokenPair>();
 
 export function createNativeAuthClient(instance: StoredInstance): NativeAuthClient {
@@ -53,6 +56,7 @@ async function resetAuthSession(instanceId: string): Promise<number> {
       secureStorage.remove(instanceId, SESSION_NAME),
       secureStorage.remove(instanceId, COOKIE_NAME),
       secureStorage.remove(instanceId, BEARER_NAME),
+      secureStorage.remove(instanceId, REFRESH_REQUEST_NAME),
     ]);
   });
   return generation;
@@ -271,21 +275,20 @@ async function refreshDeviceTokens(instance: StoredInstance, current: DeviceToke
       if (!stored || !sessions.current(instance.instanceId, generation)) throw new StaleAuthSessionError();
       // A caller may have read its token before another refresh completed.
       if (stored.refreshToken !== current.refreshToken) return stored;
-      const { data } = await fetchJson<unknown>(createApiUrl(instance.apiBaseUrl, 'device-sessions/refresh'), {
-        body: JSON.stringify({ refreshToken: current.refreshToken }),
-        headers: mobileHeaders(instance),
-        method: 'POST',
-        credentials: 'omit', transport: expoFetch,
+      return await rotateDeviceTokens(current, {
+        readPending: () => secureStorage.get(instance.instanceId, REFRESH_REQUEST_NAME),
+        createRequestId: randomUUID,
+        savePending: (request) => secureStorage.set(instance.instanceId, REFRESH_REQUEST_NAME, JSON.stringify(request)),
+        exchange: async (request) => (await fetchJson<unknown>(createApiUrl(instance.apiBaseUrl, 'device-sessions/refresh'), {
+          body: JSON.stringify(request), headers: mobileHeaders(instance), method: 'POST',
+          credentials: 'omit', transport: expoFetch,
+        })).data,
+        saveTokens: (next) => secureStorage.set(instance.instanceId, BEARER_NAME, JSON.stringify(next)),
+        clearPending: () => secureStorage.remove(instance.instanceId, REFRESH_REQUEST_NAME),
+        commit: (write) => commitAuth(instance.instanceId, generation, write),
       });
-      if (!isDeviceTokenPair(data)) throw new NetaClientError('SERVER_ERROR', 'Refresh token yanıtı geçersiz.');
-      const next: DeviceTokenPair = {
-        ...data,
-        ...(current.deviceSessionId ? { deviceSessionId: current.deviceSessionId } : {}),
-      };
-      await commitAuth(instance.instanceId, generation, () => secureStorage.set(instance.instanceId, BEARER_NAME, JSON.stringify(next)));
-      return next;
     } catch (error) {
-      if (sessions.current(instance.instanceId, generation)) await clearNativeAuthSession(instance.instanceId);
+      if (sessions.current(instance.instanceId, generation) && isRefreshSessionInvalidatingError(error)) await clearNativeAuthSession(instance.instanceId);
       if (error instanceof StaleAuthSessionError) throw authChanged();
       throw error;
     }
@@ -312,8 +315,5 @@ function mobileHeaders(instance: StoredInstance): Record<string, string> {
 }
 
 function createInstallId(): string {
-  const cryptoApi = globalThis.crypto;
-  return typeof cryptoApi?.randomUUID === 'function'
-    ? cryptoApi.randomUUID()
-    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+  return randomUUID();
 }

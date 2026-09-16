@@ -28,5 +28,6 @@ export type AuthAuditEventType =
   | "pairing_failed"
   | "pairing_consumed"
   | "device_session_refreshed"
+  | "device_session_refresh_replayed"
   | "device_session_revoked"
   | "device_token_reuse_detected";

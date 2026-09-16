@@ -51,7 +51,7 @@ Client, project, task ve calendar mutation'ları persistent idempotency, optimis
 
 ## 6 — MOB-6/7 güvenlik kabulü ← aktif faz
 
-Owner pairing ve portal transport'u kodda mevcuttur. `pnpm mobile:security:check` historical reuse, Bearer/scope, native profil/parola, revoke/logout-all, izole DB restore ve iki gerçek client HTTP/file negatiflerini doğrular. 0016 sonrası eski aktif cihazlar yeniden eşleştirilir. Signed cihaz/two-HTTPS-instance/restore-runtime kabulü ve ADR-008'in grace/replay, challenge deneme bağlama ve cleanup tasarım farkları [[docs/mobile/mobile-security-acceptance]] doğrultusunda açık kalır.
+Owner pairing ve portal transport'u kodda mevcuttur. `pnpm mobile:security:check` historical reuse, Bearer/scope, native profil/parola, revoke/logout-all, restore edilmiş ikinci loopback backend'e eski token HTTP negatifleri/yeniden pairing ve iki gerçek client HTTP/file negatiflerini doğrular. Startup/saatlik expiry/idle/retention/cascade temizliği uygulanmıştır. 0016 sonrası eski aktif cihazlar yeniden eşleştirilir. Nonce-bound 30 saniyelik şifreli replay ve challenge başına beş yanlış QR/manual secret kilidi otomatik kabul ile kapandı. 0017 yalnız eski pending kodları kapatır; mevcut cihaz/web oturumları korunur. Signed cihaz/iki canlı HTTPS instance/native restore kabulü [[docs/mobile/mobile-security-acceptance]] doğrultusunda açık kalır. Sıradaki uygulama dilimi MOB-8 AI taşımasıdır.
 
 ## 7 — MOB-8 AI taşıması
 

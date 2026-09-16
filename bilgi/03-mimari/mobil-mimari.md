@@ -84,6 +84,10 @@ MOB-2–5 denetiminde native auth taşıması Expo fetch + `credentials: omit` i
 
 Versioned file, appearance, portal asset ve davet URL'leri canonical `APP_URL` kaynağından üretilir; Next standalone'ın proxy arkasındaki iç `request.url` origin'i dış adres authority'si değildir. Cookie sign-out JSON başlığıyla boş JSON nesnesi gönderir; lokal credential/cache temizliği finally'dedir.
 
+2026-09-16 lifecycle devamı: canonical backend Node instrumentation başlangıcında ve saatlik timer ile `device-maintenance.ts` çalıştırır. Expiry/30 gün idle doğrulaması access/refresh request'inde anında yapılır; toplu cleanup request path'inde değildir. Kapalı session 30 gün sonra history cascade ile, challenge expiry'den bir gün sonra silinir; aktif family geçmişi korunur. Restore HTTP kabulü ikinci sentetik loopback backend'de eski token reddi ve fresh pairing'i doğrular. Signed/native ve canlı HTTPS kabulü açık kalır.
+
+2026-09-16 replay devamı: mobil `device-refresh-operation.ts`, Expo Crypto requestId'sini istekten önce instance-scoped SecureStore'a yazar; transient hatada aynı işlem korunur, logout'ta silinir. Backend aynı token/nonce için 30 saniyelik AES-256-GCM şifreli yanıtı yalnız successor güncelse tekrar verir. AAD cihaz/epoch/digest/nonce/expiry'yi bağlar; farklı nonce veya grace dışı reuse family'yi kapatır. Public locator QR/manual yanlış secret denemelerini aynı persistent counter'da birleştirir, beşte kilitler. 0017 eski pending kodları yeniden üretmeyi gerektirir; mevcut oturumları korur. Replay kullanım expiry'si anındadır; fiziksel cleanup startup/saatlik bounded iştedir. Yeni native kripto bağımlılığı development client rebuild gerektirir. Signed/native ve iki canlı HTTPS instance kabulü bu otomasyondan ayrıdır.
+
 ## Kaynaklar
 
 - `apps/neta-mobile/README.md`

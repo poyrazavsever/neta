@@ -3,6 +3,8 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
+import { randomUUID } from "node:crypto";
+import { withRestoredSecurityRuntime } from "./restored-security-runtime.mjs";
 
 // Invoked by the isolated auth smoke runtime; never uses the developer's DB.
 export async function runDeviceSecurityAcceptance({ request, db, ownerCookie, ownerPassword, ownerUserId, env, dataDir, databasePath, serverOutput }) {
@@ -15,7 +17,8 @@ export async function runDeviceSecurityAcceptance({ request, db, ownerCookie, ow
     if (expected >= 400) assert.equal(result.payload.ok, false, label);
     assert.equal(result.response.headers.get("x-neta-api-version"), "1", label);
   };
-  const refresh = (tokens) => post("/api/v1/device-sessions/refresh", { refreshToken: tokens.refreshToken });
+  const refresh = (tokens, requestId) => post("/api/v1/device-sessions/refresh", { refreshToken: tokens.refreshToken, ...(requestId ? { requestId } : {}) });
+  const nonce = () => { const value = randomUUID(); secrets.push(value); return value; };
   const me = (tokens, cookie) => request("/api/v1/me", { headers: bearer(tokens), cookie });
   async function challenge() {
     const result = await post("/api/v1/pairing/challenges", { currentPassword: ownerPassword }, {
@@ -23,6 +26,7 @@ export async function runDeviceSecurityAcceptance({ request, db, ownerCookie, ow
     });
     status(result, 201, "Create challenge with password step-up");
     secrets.push(new URL(result.payload.data.qrPayload).searchParams.get("secret"), result.payload.data.manualCode);
+    secrets.push(new URL(result.payload.data.qrPayload).searchParams.get("secret").split(".").at(-1), result.payload.data.manualCode.replace(/[\s-]/g, "").slice(8));
     return result.payload.data;
   }
   function exchangeBody(value, manual = false) {
@@ -56,6 +60,24 @@ export async function runDeviceSecurityAcceptance({ request, db, ownerCookie, ow
     status(await post("/api/v1/pairing/exchange", invalidCode, { headers: { "x-forwarded-for": "127.0.2.1" } }), 401, "Unknown pairing code");
   }
   status(await post("/api/v1/pairing/exchange", invalidCode, { headers: { "x-forwarded-for": "127.0.2.1" } }), 503, "Pairing source rate limit");
+
+  const locked = await challenge();
+  const unaffected = await challenge();
+  const manualWrong = exchangeBody(locked, true);
+  manualWrong.code = locked.manualCode.slice(0, -1) + (locked.manualCode.at(-1) === "Z" ? "Y" : "Z");
+  const secretWrong = exchangeBody(locked);
+  secretWrong.secret = secretWrong.secret.slice(0, -1) + (secretWrong.secret.at(-1) === "A" ? "B" : "A");
+  const wrongAttempts = await Promise.all(Array.from({ length: 6 }, (_, index) => post("/api/v1/pairing/exchange", index % 2 ? manualWrong : secretWrong, {
+    headers: { "x-forwarded-for": `127.0.3.${index + 1}` },
+  })));
+  for (const result of wrongAttempts) status(result, 401, "Wrong credential shares challenge counter across QR/manual/IP");
+  assert.deepEqual(db.prepare("SELECT status, attempt_count FROM pairing_challenges WHERE id = ?").get(locked.challengeId), { status: "locked", attempt_count: 5 });
+  const correctLocked = await post("/api/v1/pairing/exchange", exchangeBody(locked), { headers: { "x-forwarded-for": "127.0.3.100" } });
+  status(correctLocked, 401, "Correct secret cannot consume locked challenge");
+  assert.deepEqual(correctLocked.payload, wrongAttempts[0].payload, "Failure response does not expose challenge existence or state");
+  assert.equal(db.prepare("SELECT attempt_count FROM pairing_challenges WHERE id = ?").get(unaffected.challengeId).attempt_count, 0);
+  await exchange(unaffected, true);
+  console.log("Mobile security: persistent challenge-bound five-attempt lock across QR/manual and distinct sources passed.");
 
   const atomic = await challenge();
   const exchanges = await Promise.all([false, true].map((manual) => post("/api/v1/pairing/exchange", exchangeBody(atomic, manual))));
@@ -142,7 +164,50 @@ export async function runDeviceSecurityAcceptance({ request, db, ownerCookie, ow
   const raceWinner = refreshRace.find((result) => result.response.status === 200).payload.data;
   remember(raceWinner);
   status(await me(raceWinner), 401, "Duplicate refresh compromises even the race winner");
+  const closedFamily = session(racing);
+  status(await refresh(racing), 401, "Repeated historical token cannot reopen a closed family");
+  assert.equal(session(racing).revoked_at, closedFamily.revoked_at, "Historical replay cannot postpone closed-session retention");
   console.log("Mobile security: multi-generation reuse and concurrent refresh passed.");
+
+  const grace = await pair();
+  const graceId = nonce();
+  const duplicateRefresh = await Promise.all([refresh(grace, graceId), refresh(grace, graceId)]);
+  assert.deepEqual(duplicateRefresh.map((result) => result.response.status), [200, 200], "Same-operation race replays one rotation");
+  assert.deepEqual(duplicateRefresh[0].payload, duplicateRefresh[1].payload, "Replay returns the exact successor tokens and expiry");
+  remember(duplicateRefresh[0].payload.data);
+  assert.equal(session(grace).status, "active");
+  assert.equal(db.prepare("SELECT count(*) AS n FROM device_refresh_history WHERE device_session_id = ?").get(grace.deviceSessionId).n, 1);
+  assert.equal(db.prepare("SELECT count(*) AS n FROM auth_audit_events WHERE type = 'device_session_refreshed' AND json_extract(metadata, '$.deviceSessionId') = ?").get(grace.deviceSessionId).n, 1);
+  status(await me(duplicateRefresh[0].payload.data), 200, "Replay winner remains active");
+  db.prepare("UPDATE device_refresh_replays SET expires_at = ? WHERE device_session_id = ?").run(Date.now() - 1, grace.deviceSessionId);
+  status(await refresh(grace, graceId), 401, "Same-operation old token after grace closes family");
+  assert.equal(session(grace).status, "compromised");
+  assert.equal(db.prepare("SELECT count(*) AS n FROM device_refresh_replays WHERE device_session_id = ?").get(grace.deviceSessionId).n, 0);
+
+  const foreignOperation = await pair();
+  const foreignRace = await Promise.all([refresh(foreignOperation, nonce()), refresh(foreignOperation, nonce())]);
+  assert.deepEqual(foreignRace.map((result) => result.response.status).sort(), [200, 401], "A different operation ID is reuse, even inside grace");
+  remember(foreignRace.find((result) => result.response.status === 200).payload.data);
+  assert.equal(session(foreignOperation).status, "compromised");
+
+  const advanced = await pair();
+  const advancedId = nonce();
+  const successor = await refresh(advanced, advancedId);
+  status(successor, 200, "First nonce-bound rotation"); remember(successor.payload.data);
+  const secondSuccessor = await refresh(successor.payload.data, nonce());
+  status(secondSuccessor, 200, "Successor rotates again"); remember(secondSuccessor.payload.data);
+  status(await refresh(advanced, advancedId), 401, "Superseded replay cannot return an obsolete successor");
+  assert.equal(session(advanced).status, "compromised");
+
+  const corrupt = await pair();
+  const corruptId = nonce();
+  const corruptRotation = await refresh(corrupt, corruptId);
+  status(corruptRotation, 200, "Rotation before corrupt ciphertext fixture"); remember(corruptRotation.payload.data);
+  db.prepare("UPDATE device_refresh_replays SET encrypted_response = 'v1.invalid.invalid.invalid' WHERE device_session_id = ?").run(corrupt.deviceSessionId);
+  status(await refresh(corrupt, corruptId), 401, "Corrupt replay fails closed without exposing ciphertext details");
+  assert.equal(session(corrupt).status, "compromised");
+  status(await me(manual), 200, "Replay negatives preserve independent family");
+  console.log("Mobile security: nonce-bound encrypted refresh replay, grace expiry, foreign operation, supersession and corruption negatives passed.");
 
   const expired = await pair();
   db.prepare("UPDATE device_sessions SET access_expires_at = ? WHERE id = ?").run(Date.now() - 1000, expired.deviceSessionId);
@@ -152,12 +217,21 @@ export async function runDeviceSecurityAcceptance({ request, db, ownerCookie, ow
   remember(recovered.payload.data);
   status(await me(recovered.payload.data), 200, "Recovered access");
   db.prepare("UPDATE device_sessions SET refresh_expires_at = ? WHERE id = ?").run(Date.now() - 1000, expired.deviceSessionId);
+  status(await me(recovered.payload.data), 401, "Expired refresh lifetime also invalidates access before maintenance");
   status(await refresh(recovered.payload.data), 401, "Expired refresh");
 
+  const idle = await pair();
+  db.prepare("UPDATE device_sessions SET last_used_at = ? WHERE id = ?").run(Date.now() - 30 * 24 * 60 * 60_000, idle.deviceSessionId);
+  status(await me(idle), 401, "Thirty-day idle access is rejected before maintenance");
+  status(await refresh(idle), 401, "Thirty-day idle refresh cannot revive the device");
+
   const disabled = await pair();
+  const disabledId = nonce();
+  const disabledRotated = await refresh(disabled, disabledId);
+  status(disabledRotated, 200, "Rotation before disable"); remember(disabledRotated.payload.data);
   db.prepare("UPDATE app_profiles SET disabled = 1 WHERE auth_user_id = ?").run(ownerUserId);
   try {
-    status(await refresh(disabled), 401, "Disabled owner cannot rotate refresh");
+    status(await refresh(disabled, disabledId), 401, "Disabled owner cannot replay refresh within grace");
     status(await me(disabled), 401, "Disabled owner access");
   } finally {
     db.prepare("UPDATE app_profiles SET disabled = 0 WHERE auth_user_id = ?").run(ownerUserId);
@@ -181,6 +255,10 @@ export async function runDeviceSecurityAcceptance({ request, db, ownerCookie, ow
   console.log("Mobile security: expiry, disabled owner, epoch and single-device revoke passed.");
 
   // Real backup/restore commands, into a new disposable target (no --force).
+  const sourceControlBefore = await pair();
+  const sourceRotated = await refresh(sourceControlBefore, nonce());
+  status(sourceRotated, 200, "Source control rotation before backup"); remember(sourceRotated.payload.data);
+  const sourceControl = { ...sourceRotated.payload.data, deviceSessionId: sourceControlBefore.deviceSessionId };
   execFileSync(process.execPath, ["scripts/backup.mjs"], { env: { ...env, BACKUP_RETENTION_COUNT: "" }, stdio: "pipe" });
   const backupRoot = path.join(dataDir, "backups");
   const backup = fs.readdirSync(backupRoot).sort().at(-1);
@@ -194,12 +272,50 @@ export async function runDeviceSecurityAcceptance({ request, db, ownerCookie, ow
     assert.equal(restored.prepare("SELECT count(*) AS value FROM device_sessions WHERE status = 'active'").get().value, 0, "Restore must revoke all active device sessions");
     assert.equal(restored.prepare("SELECT status FROM device_sessions WHERE id = ?").get(surviving.deviceSessionId).status, "revoked");
     assert.equal(restored.prepare("SELECT count(*) AS value FROM device_refresh_history").get().value, db.prepare("SELECT count(*) AS value FROM device_refresh_history").get().value, "Restore preserves consumed digest evidence");
+    assert.equal(restored.prepare("SELECT count(*) AS n FROM device_refresh_replays").get().n, 0, "Restore erases encrypted replay credentials");
   } finally { restored.close(); }
-  status(await me(surviving), 200, "Restore fixture must not alter source runtime");
+  await withRestoredSecurityRuntime({ env, restoredDir }, async (runtime) => {
+    // Reuse the exact tokens from the source, including a token revoked AFTER backup.
+    status(await request(`/api/v1/device-sessions/${surviving.deviceSessionId}`, { method: "DELETE", cookie: ownerCookie }), 200, "Revoke device after taking backup");
+    for (const tokens of [surviving, sourceControl, sourceControlBefore, revoked, latest, manual]) {
+      status(await runtime.request("/api/v1/me", { headers: bearer(tokens) }), 401, "Restored backend rejects pre-restore access");
+      status(await runtime.request("/api/v1/device-sessions/refresh", {
+        method: "POST", body: { refreshToken: tokens.refreshToken },
+      }), 401, "Restored backend rejects pre-restore refresh");
+    }
+    const ownerEmail = db.prepare("SELECT email FROM user WHERE id = ?").get(ownerUserId).email;
+    const login = await runtime.request("/api/auth/sign-in/email", { method: "POST", body: { email: ownerEmail, password: ownerPassword } });
+    assert.equal(login.response.status, 200, "Restored owner can still sign in");
+    const restoredCookie = responseCookie(login.response);
+    assert.ok(restoredCookie);
+    status(await runtime.request("/api/v1/me", { cookie: restoredCookie }), 200, "Restored cookie identity works");
+    status(await runtime.request("/api/v1/me", { cookie: restoredCookie, headers: bearer(surviving) }), 401, "Restored invalid bearer cannot use a valid cookie");
+    const newChallenge = await runtime.request("/api/v1/pairing/challenges", {
+      method: "POST", cookie: restoredCookie, body: { currentPassword: ownerPassword },
+    });
+    status(newChallenge, 201, "Restored owner can re-pair");
+    const value = newChallenge.payload.data;
+    assert.equal(new URL(value.qrPayload).searchParams.get("origin"), runtime.baseUrl);
+    secrets.push(new URL(value.qrPayload).searchParams.get("secret"), value.manualCode);
+    const exchanged = await runtime.request("/api/v1/pairing/exchange", { method: "POST", body: exchangeBody(value) });
+    status(exchanged, 201, "Restored runtime accepts fresh pairing");
+    remember(exchanged.payload.data);
+    status(await runtime.request("/api/v1/me", { headers: bearer(exchanged.payload.data) }), 200, "Fresh post-restore device works");
+    status(await me(exchanged.payload.data), 401, "Restored device token cannot authenticate against source runtime");
+    for (const secret of secrets.filter(Boolean)) assert.ok(!runtime.log().includes(secret), "Restore runtime log must not contain raw device credentials");
+    for (const filename of [path.join(restoredDir, "neta.db"), path.join(restoredDir, "neta.db-wal")]) {
+      if (!fs.existsSync(filename)) continue;
+      const bytes = fs.readFileSync(filename);
+      for (const secret of secrets.filter(Boolean)) assert.ok(!bytes.includes(Buffer.from(secret)), "Restored DB/WAL must not contain raw device credentials");
+    }
+  });
+  // A separate still-active source family proves the restore target never changed its DB.
+  status(await me(sourceControl), 200, "Source runtime remains usable after restore acceptance");
   status(await request("/api/v1/me/sessions", { method: "DELETE", cookie: ownerCookie }), 200, "Logout-all");
   status(await me(surviving), 401, "Logout-all device access");
   status(await refresh(surviving), 401, "Logout-all device refresh");
-  console.log("Mobile security: backup/restore epoch and logout-all passed (isolated DB evidence).");
+  status(await me(sourceControl), 401, "Logout-all revokes active source control device");
+  console.log("Mobile security: restored backend HTTP rejects old tokens, fresh re-pairing and logout-all passed (loopback runtime evidence).");
 
   const passwordDevice = await pair();
   const temporaryPassword = "Mobile-Acceptance-New-Password-123";
@@ -220,7 +336,7 @@ export async function runDeviceSecurityAcceptance({ request, db, ownerCookie, ow
   }
 
   const auditTypes = new Set(db.prepare("SELECT DISTINCT type FROM auth_audit_events").all().map((row) => row.type));
-  for (const type of ["pairing_created", "pairing_consumed", "pairing_failed", "device_session_refreshed", "device_token_reuse_detected", "device_session_revoked"]) {
+  for (const type of ["pairing_created", "pairing_consumed", "pairing_failed", "device_session_refreshed", "device_session_refresh_replayed", "device_token_reuse_detected", "device_session_revoked"]) {
     assert.ok(auditTypes.has(type), `Missing mobile security audit: ${type}`);
   }
   console.log("Mobile security: cookie password invalidation and audit passed.");

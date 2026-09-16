@@ -31,8 +31,7 @@ DELETE /api/v1/device-sessions/:id
 
 - Yalnızca aktif freelancer session'ı pairing oluşturabilir.
 - Browser owner'dan güncel şifre veya eşdeğer step-up doğrulaması istenir.
-- QR modu 256-bit rastgele secret taşır.
-- Manuel giriş modu 10 karakter Crockford Base32 kod kullanır; benzer karakterler kullanılmaz.
+- QR credential'ı `LOCATOR.<256-bit-secret>`, manuel kod `LOCATOR-<10-karakter-secret>` biçimindedir. Locator sekiz rastgele Crockford Base32 karakterden oluşan public challenge kimliğidir; secret değildir. Manuel secret'ın 10 karakterlik gücü korunur; kod toplam 19 karakter gösterilir.
 - DB'de yalnızca HMAC/SHA-256 digest saklanır; raw secret yalnızca bir kez gösterilir.
 - Challenge en fazla 5 dakika geçerlidir ve tek kullanımlıdır.
 - Challenge; creator, expiry, attempt count, requested scopes ve durum içerir.
@@ -51,19 +50,21 @@ Mobil istemci şu bilgileri gönderir:
 - App version
 - OS version'ın hassas olmayan major bilgisi
 
-Server challenge'ı `BEGIN IMMEDIATE` transaction içinde doğrular ve tüketir. Aynı transaction device session/token family kaydını oluşturur. Başarısız exchange challenge'ı tüketmez; attempt sayısını artırır.
+Server challenge'ı locator digest'iyle bulur ve credential digest'ini timing-safe karşılaştırmayla `BEGIN IMMEDIATE` transaction içinde doğrular ve tüketir. Aynı transaction device session/token family kaydını oluşturur. Geçerli pending challenge için yanlış QR/manual secret aynı kalıcı sayacı artırır; farklı IP'lerden eşzamanlı denemeler de beşte kilitlenir. Bilinmeyen locator kaynak rate limit'ine tabidir. Expired/consumed/locked/unknown ve yanlış secret aynı `401` envelope'unu döndürür.
 
 Owner role/scopeları server tarafından atanır. İstemci owner/user ID veya scope seçemez.
 
 ### Token modeli
 
 - Tokenlar JWT değil, 256-bit opaque random bearer değerleridir.
-- DB'de yalnızca keyed digest saklanır.
+- Kalıcı doğrulama kayıtları keyed digest'tir. Grace için cihaz başına en fazla bir token-pair yanıtı AES-256-GCM ile şifrelenmiş olarak ayrıca saklanır; plaintext token DB/log/audit'e yazılmaz.
 - Access token varsayılan 15 dakika geçerlidir.
 - Refresh token varsayılan 30 gün geçerlidir.
 - Her refresh işleminde access ve refresh token birlikte rotate edilir.
 - Eski refresh token yeniden kullanılırsa token family `compromised` olur ve family içindeki tüm tokenlar atomik revoke edilir.
-- Aynı cihaz için eşzamanlı refresh yarışı kısa grace/replay kaydıyla açıkça yönetilir; iki aktif refresh token bırakılmaz.
+- Mobil, kriptografik rastgele `requestId` değerini istekten önce instance-scoped SecureStore'a yazar. Aynı tüketilmiş token + aynı requestId, rotasyondan itibaren 30 saniye içinde ve successor hâlâ güncelse birebir aynı yanıtı alır; ikinci rotation/history kaydı oluşmaz. Ağ hatasında pending işlem korunur, logout'ta silinir. 30 saniye sonrasındaki tekrar yeniden pairing gerektirebilir.
+- Şifreli replay; cihaz, epoch, consumed digest, request digest, successor digest ve expiry'ye authenticated additional data ile bağlıdır. Kapalı/disabled/expired/epoch-invalid session replay alamaz. Farklı requestId, requestId'siz legacy tekrar, grace expiry, superseded successor veya bozuk ciphertext aktif family'yi atomik `compromised` yapar. RequestId device-bound proof değildir; ilk sürüm bearer modeli olarak kalır.
+- Replay expiry request sırasında anında uygulanır. Rotasyon/revoke/restore kaydı siler; startup/saatlik bounded maintenance expired/kapalı replay'leri temizler. Ciphertext, cleanup backlog'u varsa sonraki turlara kadar DB'de kalabilir; expiry sonrasında kullanılamaz.
 - Bearer token yalnızca `Authorization: Bearer` header'ında kabul edilir; query, URL veya log'a yazılmaz.
 - Raw tokenlar API response dışında hiçbir log/audit kaydına girmez.
 - React Native tokenları iOS Keychain/Android Keystore destekli secure storage'da tutar.
@@ -112,6 +113,7 @@ Kurallar:
 - 30 gün kullanılmayan device session expire edilir.
 - Son kullanım zamanı en fazla beş dakikada bir coalesce edilerek yazılır.
 - Token cleanup job'u uygulama başlangıcında ve kontrollü periyotta expired kayıtları temizler; aktif request path'i toplu cleanup yapmaz.
+- 2026-09-16 retention ayrıntısı: Node startup ve saatlik iş, her tabloda 500 kayıt sınırıyla expiry/30 gün idle session'ları `expired` işaretler. Kapalı session'lar kapanışından 30 gün, challenge'lar expiry'den bir gün sonra silinir. Aktif family'nin bütün tüketilmiş digest'leri korunur; kapalı session silinince cascade olur. Kapanış zamanı olmayan legacy session korunur; audit retention bu işin kapsamı dışındadır. Auth süresi/idle sınırı request doğrulamasında saatlik işi beklemeden uygulanır.
 
 ## Backup ve restore güvenliği
 
@@ -122,6 +124,8 @@ Eski DB backup'ı revoke edilmiş token kayıtlarını yeniden aktif hale getire
 3. `db:restore` başarılı atomik swap sonrasında epoch'u yeni random değerle rotate eder.
 4. Böylece restore tüm eski device tokenları otomatik geçersiz kılar.
 5. Owner restore sonrasında cihazları yeniden pair eder.
+
+Epoch rotation aynı transaction'da şifreli replay kayıtlarını da siler; tüketilmiş digest geçmişi korunur. `0017_device-pairing-replay.sql` replay tablosu ve locator digest'ini ekler, yalnız locator'sız eski pending challenge'ları iptal eder. Mevcut cihaz/web oturumları ve history korunur; eski pending kodlar yeniden oluşturulur.
 
 Bu mekanizma uygulanmadan device token endpoint'leri yayınlanamaz.
 
@@ -141,6 +145,7 @@ Audit event'leri:
 - `pairing_failed`
 - `pairing_consumed`
 - `device_session_refreshed`
+- `device_session_refresh_replayed`
 - `device_session_revoked`
 - `device_token_reuse_detected`
 
@@ -165,4 +170,4 @@ Kodda `auth.device-pairing.v1` capability'si `available`, pairing/device-session
 
 2026-09-16 otomasyonunda `device_refresh_history` ile her tüketilmiş keyed digest aynı rotation transaction'ında tutulur. 0016 migration önceki digest'i backfill eder ve daha eski geçmişi geri üretilemeyen mevcut aktif cihaz oturumlarını revoke ederek yeniden pairing gerektirir. Explicit device scope ve geçersiz Authorization header'ında cookie fallback reddi API sınırındadır. Disabled owner gözlendiğinde family'ler iptal edilir; Bearer profil/parola parity'si web cookie'sinden bağımsızdır. Native auth generation/write serialization, geç ağ sonucunun logout/new-login sonrası credential diriltmesini engeller.
 
-`pnpm mobile:security:check` challenge/concurrent exchange, historical reuse, revoke/logout-all/password, izole restore epoch ve iki gerçek client session'ının karşılıklı HTTP/file negatiflerini doğrular. [Kabul matrisi](../mobile/mobile-security-acceptance.md) restore DB kanıtını signed/live runtime kanıtından ayırır. Tasarımdaki refresh grace/replay, challenge'a bağlı yanlış kod denemesi ve cleanup henüz tamamlanmış değildir; mevcut duplicate refresh katı family compromise ile sonuçlanır. Signed gerçek cihaz ve iki canlı HTTPS instance kabulü açıktır.
+`pnpm mobile:security:check` challenge başına yanlış secret kilidi/concurrent exchange, nonce-bound grace ve strict reuse negatifleri, revoke/logout-all/password, maintenance expiry/retention/cascade ve iki gerçek client session'ının karşılıklı HTTP/file negatiflerini doğrular. Gerçek backup'tan geri yüklenen ikinci loopback backend eski access/refresh'i reddeder; replay kayıtları temizlenir, yeni owner login/pairing çalışır ve kaynak family korunur. SQLite reopen ve ciphertext/AAD/key tamper unit testleri kalıcı replay sınırını doğrular. [Kabul matrisi](../mobile/mobile-security-acceptance.md) sentetik HTTP runtime kanıtını signed/live kanıttan ayırır. Grace/replay ve challenge deneme bağlama kod farkları kapandı. Signed gerçek cihaz ve iki canlı HTTPS instance kabulü açıktır.

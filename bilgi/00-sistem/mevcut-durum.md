@@ -62,7 +62,7 @@ Self-host release teknik olarak Supabase'sizdir. Gerçek production cutover, DNS
 
 Ana veritabanı SQLite'tır. Production varsayılanı `/app/data/neta.db`; upload, backup ve geçici alanlar aynı persistent data kökü altındadır. WAL, foreign key, `synchronous=NORMAL` ve 5 saniye busy timeout uygulanır. Aynı veritabanına yazan birden fazla app replica desteklenmez.
 
-Dosyalar DB metadata + local filesystem olarak saklanır. Şu an upload politikası 5 MB ile sınırlı JPEG/PNG/WebP/GIF görsellerdir; ikon yalnız PNG'dir. Dosya içeriği magic bytes ile doğrulanır, SHA-256 kaydedilir ve private/portal/public-branding erişim ayrımı uygulanır.
+Dosyalar DB metadata + local filesystem olarak saklanır. Proje asset'i görsel/PDF ve 10 MiB; diğer türler JPEG/PNG/WebP/GIF ve 5 MiB sınırındadır; ikon yalnız PNG'dir. Dosya içeriği magic bytes/PDF doğrulamasıyla kontrol edilir, SHA-256 kaydedilir ve private/portal/public-branding erişim ayrımı uygulanır. Yeni native görseller sanitize edilir; legacy dosyanın gerçek metadata durumu korunur.
 
 ## Deployment, backup ve restore
 
@@ -96,6 +96,8 @@ Backend'de çalışan mobil v1 yüzeyi şunları kapsar:
 Owner read/mutation/parity dilimi strict query, opaque cursor, session-derived owner scope, explicit DTO, persistent idempotency ve optimistic concurrency kullanır. Contract/type/build kapıları ile core mutation canlı smoke'u geçer. Backend'de owner pairing challenge/exchange/refresh/revoke ve client portal v1 route'ları; mobilde pairing token transport'u ve portal istemcisi kodda bulunur. Bunların gerçek cihaz, restore ve tenant izolasyonu kabul kanıtı henüz tamamlanmamıştır. AI assistant'ın native taşıma yüzeyi planlanandır. Mağaza yayını signed native ve iki canlı HTTPS instance kanıtına kadar blokludur.
 
 2026-09-16'da MOB-6/7 otomatik güvenlik kabulü geçti: historical token reuse, Bearer/scope sınırı, native profil/parola, expiry/disable/revoke/logout-all, izole DB restore epoch ve iki gerçek client session'ının karşılıklı HTTP/file negatifleri doğrulandı. 0016 migration geçmişi eksik mevcut aktif cihaz oturumlarını kapatır; yeniden eşleştirme gerekir. Mobilde logout/new-login sonrası geç refresh/storage write koruması eklendi. [[docs/mobile/mobile-security-acceptance]] signed/native kanıt ve açık ADR tasarım farklarını ayrı listeler.
+
+2026-09-16 devamında cihaz expiry/30 gün idle ve startup/saatlik bounded retention/cascade temizliği uygulandı. Aktif family'nin refresh digest geçmişi korunur; kapalı session kapanışından 30 gün, challenge expiry'den bir gün sonra silinir. Restore edilen ikinci sentetik loopback backend eski access/refresh tokenlarını reddeder, fresh pairing çalışır ve kaynak family korunur. Nonce-bound 30 saniyelik şifreli refresh replay ve challenge başına beş yanlış QR/manual secret kilidi de uygulandı ve otomatik kabulü geçti. 0017 yalnız locator'sız pending kodları iptal eder; mevcut cihaz/web oturumlarını korur. Bu otomatik kanıt signed/native veya iki canlı HTTPS instance kabulü değildir.
 
 ## AI'nin bugünkü gerçekliği
 

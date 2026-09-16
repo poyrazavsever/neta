@@ -9,6 +9,8 @@ ozet: "Owner mobil erişimi one-use challenge ve rotasyonlu opaque token family 
 kaynaklar:
   - docs/self-hosted-redesign/adr-0018-device-pairing.md
   - apps/neta-app/server/auth/device-pairing.ts
+  - apps/neta-app/server/auth/device-maintenance.ts
+  - apps/neta-app/instrumentation.ts
   - apps/neta-app/scripts/restore.mjs
   - apps/neta-mobile/src/lib/auth/native-auth-client.ts
   - docs/mobile/mobile-security-acceptance.md
@@ -71,7 +73,9 @@ Better Auth cookie yaklaşımının dynamic-origin native lifecycle için yeterl
 
 2026-09-16 otomatik kabulü historical refresh reuse, explicit Bearer/scope sınırı, expiry/disable/revoke/logout-all/parola ve izole restore epoch negatiflerini doğrular. `device_refresh_history` 0016 migration ile eklenir; geri üretilemeyen eski digest geçmişi nedeniyle mevcut aktif cihaz oturumları iptal edilip yeniden pair edilir. Mobil generation/write serialization, geç refresh'in logout veya yeni login sonrasında credential diriltmesini engeller. Native Bearer profil/parola işlemleri web cookie'si gerektirmez; parola değişimi cihaz family'lerini iptal eder.
 
-[[docs/mobile/mobile-security-acceptance]] otomasyonun kanıt sınırını ve açık tasarım farklarını listeler. Mevcut duplicate refresh davranışı katı family compromise'dır; ADR'nin hedef grace/replay'i, challenge'a bağlı yanlış kod denemesi ve cleanup işi tamamlanmış sayılmaz. Signed gerçek cihaz ve iki canlı HTTPS instance kabulü açıktır.
+Başlangıç/saatlik maintenance, expiry/30 gün idle sınırı ve bounded retention/cascade ile uygulanmıştır. Kapalı session kapanışından 30 gün, challenge expiry'den bir gün sonra silinir; aktif family geçmişi korunur. Access ve refresh doğrulaması expiry/idle sınırını cleanup saatini beklemeden uygular. Yeni migration gerekmez. Gerçek backup'tan restore edilen ikinci loopback backend eski tokenları reddeder; backup sonrası iptal edilmiş token geri açılmaz ve fresh pairing çalışır.
+
+[[docs/mobile/mobile-security-acceptance]] otomasyonun kanıt sınırını listeler. Nonce-bound 30 saniyelik AES-256-GCM şifreli replay ve public locator üzerinden challenge başına beş yanlış QR/manual secret sınırı uygulandı; HTTP/SQLite testleri geçer. Grace dışı veya farklı nonce'lı reuse family compromise olur. 0017 yalnız locator'sız eski pending challenge'ları kapatır; cihaz/web oturumları ve history korunur. Signed gerçek cihaz ve iki canlı HTTPS instance kabulü açıktır.
 
 ## Yeniden değerlendirme koşulları
 

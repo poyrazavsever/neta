@@ -334,7 +334,7 @@ Owner'ın teklif/sözleşme/fatura/abonelik dışındaki kararlaştırılmış m
 
 **Kod durumu:** Challenge/exchange/refresh/revoke, SQLite token family, mobil bearer transport'u ve restore epoch rotation'ı uygulanmıştır. 0016 migration tüketilmiş refresh digest geçmişini ekler; geçmişi eksik mevcut cihazlar yeniden eşleştirilir. API explicit scope ve geçersiz Bearer için cookie fallback reddini uygular. Bearer profil/parola parity'si ve logout sonrası geç refresh/storage write koruması kodda mevcuttur.
 
-**Otomatik kabul:** `pnpm mobile:security:check` challenge/rate-limit/concurrent exchange, çok kuşaklı reuse, expiry/disable/revoke/logout-all/parola, raw secret/audit ve izole DB restore kanıtını çalıştırır. Ayrıntılı kanıt sınırı ve ADR tasarım farkları [[docs/mobile/mobile-security-acceptance]] sayfasındadır. Signed cihaz, restore runtime'ına eski tokenla HTTP/native ve iki canlı HTTPS instance kabulü açıktır.
+**Otomatik kabul:** `pnpm mobile:security:check` challenge/rate-limit/concurrent exchange, çok kuşaklı reuse, expiry/idle/disable/revoke/logout-all/parola, raw secret/audit, maintenance retention/cascade ve restore edilmiş ikinci loopback backend'e eski token HTTP negatifleri/yeniden pairing kabulünü çalıştırır. Startup ve saatlik bounded temizlik uygulanmıştır; aktif family geçmişi korunur. Nonce-bound 30 saniyelik şifreli replay ve challenge başına beş yanlış QR/manual secret kilidi de otomatik kabulü geçti. 0017 yalnız locator'sız eski pending kodları kapatır; mevcut cihaz/web oturumları korunur. Ayrıntılı kanıt sınırı [[docs/mobile/mobile-security-acceptance]] sayfasındadır. Signed cihaz, native/canlı HTTPS restore matrisi ve iki canlı HTTPS instance kabulü açıktır.
 
 ### Ön koşul
 

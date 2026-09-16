@@ -1,13 +1,14 @@
 ---
 tur: yol-haritasi
 durum: mevcut
-guncellendi: 2026-09-04
+guncellendi: 2026-09-16
 guven: yuksek
 kaynaklar:
   - docs/neta-backend-mobile-api-master-plan.md
   - docs/roadmaps/platform-master-plan.md
   - apps/neta-app
   - apps/neta-mobile
+  - docs/mobile/mobile-security-acceptance.md
 ilgili:
   - "[[07-guvenlik/bilinen-riskler|Bilinen riskler]]"
   - "[[00-sistem/celiskiler|Çelişkiler]]"
@@ -22,7 +23,7 @@ etiketler:
 ## API ve contract
 
 - Owner write, finance/journal/settings/files ve portal v1 route'ları kodda yer alır; AI assistant native transport'u eksiktir.
-- Mutation idempotency/concurrency persistence kodda yer alır; pairing/portal negatif E2E kabulü açıktır.
+- Mutation idempotency/concurrency persistence ve otomatik pairing/iki client HTTP negatifleri tamamdır; signed/native ve iki canlı HTTPS instance kabulü açıktır.
 
 ## Mobil
 
@@ -32,8 +33,9 @@ etiketler:
 ## Güvenlik ve operasyon
 
 - App-level backup encryption/signature ve standard RPO/RTO yok.
-- Restore device token epoch'unu rotate eder; eski token reddinin negatif kabul testi açıktır.
-- Upload image metadata stripping/re-encoding doğrulanmamış.
+- Restore device token epoch'unu rotate eder; sentetik restore backend'ine eski token HTTP negatifleri ve yeniden pairing otomasyonda yer alır. Signed/native ve canlı HTTPS restore matrisi açıktır.
+- Device session expiry/idle ve startup/saatlik retention/cascade uygulanmıştır. Nonce-bound 30 saniyelik şifreli replay ve challenge başına beş yanlış secret kilidi otomatik kabul ile kapandı. Signed/native ve iki canlı HTTPS instance kabulü açıktır.
+- Yeni native görsel upload sanitize/re-encoding HTTP kabulünde doğrulanır; legacy dosyanın metadata durumu korunur. Signed iOS/Android picker/share/cancel/timeout ve tam Windows/Linux symlink storage kabulü açıktır.
 - Readiness beklenen son migration version'ını ayrıntılı doğrulamıyor.
 - AI encryption key rotasyon runbook/tooling'i yok.
 

@@ -171,6 +171,7 @@ export const pairingChallenges = sqliteTable(
     ownerUserId: text("owner_user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
     secretDigest: text("secret_digest").notNull(),
     manualCodeDigest: text("manual_code_digest").notNull(),
+    locatorDigest: text("locator_digest"),
     status: text("status").$type<"pending" | "consumed" | "locked" | "revoked">().default("pending").notNull(),
     attemptCount: integer("attempt_count").default(0).notNull(),
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
@@ -180,6 +181,7 @@ export const pairingChallenges = sqliteTable(
   (table) => [
     uniqueIndex("pairing_challenges_secret_digest_unique").on(table.secretDigest),
     uniqueIndex("pairing_challenges_manual_code_digest_unique").on(table.manualCodeDigest),
+    uniqueIndex("pairing_challenges_locator_digest_unique").on(table.locatorDigest),
     index("pairing_challenges_owner_status_idx").on(table.ownerUserId, table.status),
   ],
 );
@@ -202,7 +204,7 @@ export const deviceSessions = sqliteTable(
     refreshDigest: text("refresh_digest").notNull(),
     previousRefreshDigest: text("previous_refresh_digest"),
     refreshExpiresAt: integer("refresh_expires_at", { mode: "timestamp_ms" }).notNull(),
-    status: text("status").$type<"active" | "revoked" | "compromised">().default("active").notNull(),
+    status: text("status").$type<"active" | "expired" | "revoked" | "compromised">().default("active").notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).default(nowMs).notNull(),
     lastUsedAt: integer("last_used_at", { mode: "timestamp_ms" }).default(nowMs).notNull(),
     revokedAt: integer("revoked_at", { mode: "timestamp_ms" }),
@@ -226,4 +228,19 @@ export const deviceRefreshHistory = sqliteTable(
     consumedAt: integer("consumed_at", { mode: "timestamp_ms" }).default(nowMs).notNull(),
   },
   (table) => [index("device_refresh_history_session_idx").on(table.deviceSessionId)],
+);
+
+/** One short-lived encrypted retry result per device; consumed history remains digest-only. */
+export const deviceRefreshReplays = sqliteTable(
+  "device_refresh_replays",
+  {
+    deviceSessionId: text("device_session_id").primaryKey()
+      .references(() => deviceSessions.id, { onDelete: "cascade" }),
+    consumedDigest: text("consumed_digest").notNull(),
+    requestDigest: text("request_digest").notNull(),
+    successorRefreshDigest: text("successor_refresh_digest").notNull(),
+    encryptedResponse: text("encrypted_response").notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [index("device_refresh_replays_expiry_idx").on(table.expiresAt)],
 );

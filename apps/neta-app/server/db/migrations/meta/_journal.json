@@ -120,6 +120,13 @@
       "when": 1789544470544,
       "tag": "0016_device-refresh-history",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1789559858414,
+      "tag": "0017_device-pairing-replay",
+      "breakpoints": true
     }
   ]
 }

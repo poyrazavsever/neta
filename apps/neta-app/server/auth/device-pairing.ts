@@ -1,7 +1,7 @@
 import "server-only";
 
-import { createHmac, randomBytes, randomUUID } from "node:crypto";
-import { and, count, eq, lt, or } from "drizzle-orm";
+import { createHmac, randomBytes, randomInt, randomUUID, timingSafeEqual } from "node:crypto";
+import { and, count, eq, inArray, lt, or } from "drizzle-orm";
 import { verifyPassword } from "better-auth/crypto";
 import type { DeviceSessionInfo } from "@neta/api-contracts";
 import { getServerConfig } from "@/server/config";
@@ -11,6 +11,7 @@ import {
   appProfiles,
   authAuditEvents,
   deviceRefreshHistory,
+  deviceRefreshReplays,
   deviceSecurityState,
   deviceSessions,
   pairingChallenges,
@@ -18,6 +19,8 @@ import {
 } from "@/server/db/schema";
 import { DomainError, notFound } from "@/server/domain/errors";
 import type { SessionContext } from "./session";
+import { DEVICE_IDLE_TTL_MS } from "./device-maintenance";
+import { openRefreshReplay, REFRESH_REPLAY_TTL_MS, sealRefreshReplay } from "./device-replay-crypto";
 
 const CHALLENGE_TTL_MS = 5 * 60_000;
 const ACCESS_TTL_MS = 15 * 60_000;
@@ -68,12 +71,13 @@ export async function createPairingChallenge(
     throw new DomainError("CONFLICT", "En fazla üç aktif eşleştirme kodu olabilir.");
   }
   const id = randomUUID();
-  const secret = randomBytes(32).toString("base64url");
-  const manualCode = randomManualCode();
+  const locator = randomManualCode(8);
+  const secret = `${locator}.${randomBytes(32).toString("base64url")}`;
+  const manualCode = `${locator}-${randomManualCode(10)}`;
   const expiresAt = new Date(now.getTime() + CHALLENGE_TTL_MS);
   db.insert(pairingChallenges).values({
     id, ownerUserId: context.user.id, secretDigest: digest(secret),
-    manualCodeDigest: digest(normalizeManualCode(manualCode)), expiresAt,
+    manualCodeDigest: digest(normalizeManualCode(manualCode)), locatorDigest: digest(locator), expiresAt,
   }).run();
   audit("pairing_created", context.user.id, { challengeId: id });
   const origin = getServerConfig().appUrl;
@@ -89,9 +93,11 @@ export function exchangePairingChallenge(request: Request, body: unknown): Token
   assertSecureTransport(request);
   rateLimit(request, "exchange", 30, 60_000);
   const value = asRecord(body);
-  const supplied = typeof value.secret === "string" && value.secret
-    ? value.secret
+  const isSecret = typeof value.secret === "string" && Boolean(value.secret);
+  const supplied = isSecret
+    ? readString(body, "secret", 1024)
     : normalizeManualCode(readString(body, "code", 32));
+  const locator = isSecret ? supplied.split(".")[0].toUpperCase() : supplied.slice(0, 8);
   const suppliedDigest = digest(supplied);
   const installId = readString(body, "installId", 200);
   const deviceName = safeLabel(readString(body, "deviceName", 100));
@@ -103,15 +109,21 @@ export function exchangePairingChallenge(request: Request, body: unknown): Token
 
   const result = db.transaction((tx) => {
     const challenge = tx.select().from(pairingChallenges)
-      .where(or(eq(pairingChallenges.secretDigest, suppliedDigest), eq(pairingChallenges.manualCodeDigest, suppliedDigest)))
+      .where(eq(pairingChallenges.locatorDigest, digest(locator)))
       .get();
     if (!challenge || challenge.status !== "pending" || challenge.expiresAt <= now) {
       if (challenge?.status === "pending") {
-        const attempts = challenge.attemptCount + 1;
-        tx.update(pairingChallenges).set({ attemptCount: attempts, status: attempts >= MAX_ATTEMPTS ? "locked" : "pending" })
-          .where(eq(pairingChallenges.id, challenge.id)).run();
+        tx.update(pairingChallenges).set({ status: "revoked" }).where(eq(pairingChallenges.id, challenge.id)).run();
         auditIn(tx, "pairing_failed", challenge.ownerUserId, { challengeId: challenge.id, reason: "invalid_or_expired" });
       }
+      return { ok: false as const };
+    }
+    const expectedDigest = isSecret ? challenge.secretDigest : challenge.manualCodeDigest;
+    if (!timingSafeEqual(Buffer.from(expectedDigest, "hex"), Buffer.from(suppliedDigest, "hex"))) {
+      const attempts = challenge.attemptCount + 1;
+      tx.update(pairingChallenges).set({ attemptCount: attempts, status: attempts >= MAX_ATTEMPTS ? "locked" : "pending" })
+        .where(eq(pairingChallenges.id, challenge.id)).run();
+      auditIn(tx, "pairing_failed", challenge.ownerUserId, { challengeId: challenge.id, reason: "incorrect_credential" });
       return { ok: false as const };
     }
     const profile = tx.select().from(appProfiles)
@@ -143,6 +155,11 @@ export function refreshDeviceSession(request: Request, body: unknown): TokenPair
   rateLimit(request, "refresh", 60, 60_000);
   const refreshToken = readString(body, "refreshToken", 1024);
   const tokenDigest = digest(refreshToken);
+  const requestId = asRecord(body).requestId === undefined ? null : readString(body, "requestId", 128);
+  if (requestId && !/^[A-Za-z0-9_-]{16,128}$/.test(requestId)) {
+    throw new DomainError("VALIDATION_ERROR", "Refresh istek kimliği geçersiz.", { field: "requestId" });
+  }
+  const requestDigest = requestId ? digest(`refresh-request:${requestId}`) : null;
   const now = new Date();
   const pair = newTokenPair(now);
   const { db } = getSqliteConnection();
@@ -154,12 +171,9 @@ export function refreshDeviceSession(request: Request, body: unknown): TokenPair
       : tx.select().from(deviceSessions)
       .where(or(eq(deviceSessions.refreshDigest, tokenDigest), eq(deviceSessions.previousRefreshDigest, tokenDigest))).get();
     if (!row) throw new DomainError("UNAUTHENTICATED", "Refresh token geçersiz.");
-    if (consumed || row.previousRefreshDigest === tokenDigest) {
-      tx.update(deviceSessions).set({ status: "compromised", revokedAt: now }).where(eq(deviceSessions.familyId, row.familyId)).run();
-      auditIn(tx, "device_token_reuse_detected", row.ownerUserId, { deviceSessionId: row.id });
-      return { ok: false as const, reason: "reuse" as const };
-    }
-    if (row.status !== "active" || row.refreshExpiresAt <= now || row.tokenEpoch !== ensureEpoch(tx)) {
+    if (row.status !== "active" || row.refreshExpiresAt <= now ||
+        row.lastUsedAt.getTime() + DEVICE_IDLE_TTL_MS <= now.getTime() || row.tokenEpoch !== ensureEpoch(tx)) {
+      tx.delete(deviceRefreshReplays).where(eq(deviceRefreshReplays.deviceSessionId, row.id)).run();
       return { ok: false as const, reason: "invalid" as const };
     }
     const activeOwner = tx.select({ id: appProfiles.id }).from(appProfiles)
@@ -167,7 +181,27 @@ export function refreshDeviceSession(request: Request, body: unknown): TokenPair
     if (!activeOwner) {
       tx.update(deviceSessions).set({ status: "revoked", revokedAt: now })
         .where(and(eq(deviceSessions.ownerUserId, row.ownerUserId), eq(deviceSessions.status, "active"))).run();
+      tx.delete(deviceRefreshReplays).where(inArray(deviceRefreshReplays.deviceSessionId,
+        tx.select({ id: deviceSessions.id }).from(deviceSessions).where(eq(deviceSessions.ownerUserId, row.ownerUserId)))).run();
       return { ok: false as const, reason: "invalid" as const };
+    }
+    if (consumed || row.previousRefreshDigest === tokenDigest) {
+      const replay = requestDigest ? tx.select().from(deviceRefreshReplays)
+        .where(and(eq(deviceRefreshReplays.deviceSessionId, row.id), eq(deviceRefreshReplays.consumedDigest, tokenDigest),
+          eq(deviceRefreshReplays.requestDigest, requestDigest), eq(deviceRefreshReplays.successorRefreshDigest, row.refreshDigest))).get() : null;
+      const retried = replay ? openRefreshReplay(replay.encryptedResponse, deviceSecret(), {
+        ...replay, tokenEpoch: row.tokenEpoch, expiresAt: replay.expiresAt.getTime(),
+      }, now.getTime()) : null;
+      if (retried && digest(retried.refreshToken) === row.refreshDigest && digest(retried.accessToken) === row.accessDigest &&
+          retried.accessExpiresAt === row.accessExpiresAt.toISOString() && retried.refreshExpiresAt === row.refreshExpiresAt.toISOString()) {
+        auditIn(tx, "device_session_refresh_replayed", row.ownerUserId, { deviceSessionId: row.id });
+        return { ok: true as const, value: retried };
+      }
+      tx.update(deviceSessions).set({ status: "compromised", revokedAt: now })
+        .where(and(eq(deviceSessions.familyId, row.familyId), eq(deviceSessions.status, "active"))).run();
+      tx.delete(deviceRefreshReplays).where(eq(deviceRefreshReplays.deviceSessionId, row.id)).run();
+      auditIn(tx, "device_token_reuse_detected", row.ownerUserId, { deviceSessionId: row.id });
+      return { ok: false as const, reason: "reuse" as const };
     }
     tx.insert(deviceRefreshHistory).values({
       digest: row.refreshDigest, deviceSessionId: row.id, consumedAt: now,
@@ -177,6 +211,18 @@ export function refreshDeviceSession(request: Request, body: unknown): TokenPair
       previousRefreshDigest: row.refreshDigest, refreshDigest: digest(pair.refreshToken),
       refreshExpiresAt: new Date(pair.refreshExpiresAt), lastUsedAt: now,
     }).where(and(eq(deviceSessions.id, row.id), eq(deviceSessions.refreshDigest, tokenDigest))).run();
+    tx.delete(deviceRefreshReplays).where(eq(deviceRefreshReplays.deviceSessionId, row.id)).run();
+    if (requestDigest) {
+      const binding = {
+        deviceSessionId: row.id, tokenEpoch: row.tokenEpoch, consumedDigest: tokenDigest,
+        requestDigest, successorRefreshDigest: digest(pair.refreshToken), expiresAt: now.getTime() + REFRESH_REPLAY_TTL_MS,
+      };
+      tx.insert(deviceRefreshReplays).values({
+        deviceSessionId: binding.deviceSessionId, consumedDigest: binding.consumedDigest,
+        requestDigest: binding.requestDigest, successorRefreshDigest: binding.successorRefreshDigest,
+        expiresAt: new Date(binding.expiresAt), encryptedResponse: sealRefreshReplay(pair, deviceSecret(), binding),
+      }).run();
+    }
     auditIn(tx, "device_session_refreshed", row.ownerUserId, { deviceSessionId: row.id });
     return { ok: true as const, value: pair };
   }, { behavior: "immediate" });
@@ -196,7 +242,8 @@ export function getDeviceSessionContext(requestHeaders: Headers): SessionContext
   const { db } = getSqliteConnection();
   const now = new Date();
   const row = db.select().from(deviceSessions).where(eq(deviceSessions.accessDigest, digest(raw))).get();
-  if (!row || row.status !== "active" || row.accessExpiresAt <= now || row.tokenEpoch !== ensureEpoch(db)) return null;
+  if (!row || row.status !== "active" || row.accessExpiresAt <= now || row.refreshExpiresAt <= now ||
+      row.lastUsedAt.getTime() + DEVICE_IDLE_TTL_MS <= now.getTime() || row.tokenEpoch !== ensureEpoch(db)) return null;
   const profile = db.select().from(appProfiles)
     .where(and(eq(appProfiles.authUserId, row.ownerUserId), eq(appProfiles.role, "freelancer"), eq(appProfiles.disabled, false))).get();
   const authUser = db.select().from(user).where(eq(user.id, row.ownerUserId)).get();
@@ -231,18 +278,25 @@ export function listDeviceSessions(context: SessionContext): DeviceSessionInfo[]
 
 export function revokeDeviceSession(context: SessionContext, id: string) {
   const now = new Date();
-  const changed = getSqliteConnection().db.update(deviceSessions).set({ status: "revoked", revokedAt: now })
-    .where(and(eq(deviceSessions.id, id), eq(deviceSessions.ownerUserId, context.user.id), eq(deviceSessions.status, "active")))
-    .returning({ id: deviceSessions.id }).get();
-  if (!changed) throw notFound("Cihaz oturumu");
-  audit("device_session_revoked", context.user.id, { deviceSessionId: id });
+  getSqliteConnection().db.transaction((tx) => {
+    const changed = tx.update(deviceSessions).set({ status: "revoked", revokedAt: now })
+      .where(and(eq(deviceSessions.id, id), eq(deviceSessions.ownerUserId, context.user.id), eq(deviceSessions.status, "active")))
+      .returning({ id: deviceSessions.id }).get();
+    if (!changed) throw notFound("Cihaz oturumu");
+    tx.delete(deviceRefreshReplays).where(eq(deviceRefreshReplays.deviceSessionId, id)).run();
+    auditIn(tx, "device_session_revoked", context.user.id, { deviceSessionId: id });
+  }, { behavior: "immediate" });
   return { deleted: true, id };
 }
 
 export function revokeAllDeviceSessions(ownerUserId: string): void {
   const now = new Date();
-  getSqliteConnection().db.update(deviceSessions).set({ status: "revoked", revokedAt: now })
-    .where(and(eq(deviceSessions.ownerUserId, ownerUserId), eq(deviceSessions.status, "active"))).run();
+  getSqliteConnection().db.transaction((tx) => {
+    tx.update(deviceSessions).set({ status: "revoked", revokedAt: now })
+      .where(and(eq(deviceSessions.ownerUserId, ownerUserId), eq(deviceSessions.status, "active"))).run();
+    tx.delete(deviceRefreshReplays).where(inArray(deviceRefreshReplays.deviceSessionId,
+      tx.select({ id: deviceSessions.id }).from(deviceSessions).where(eq(deviceSessions.ownerUserId, ownerUserId)))).run();
+  }, { behavior: "immediate" });
 }
 
 function newTokenPair(now: Date): TokenPair {
@@ -264,18 +318,20 @@ function ensureEpoch(db: ReturnType<typeof getSqliteConnection>["db"]): string {
 }
 
 function digest(value: string): string {
-  const config = getServerConfig();
-  const key = config.betterAuthSecret ?? `neta-development-device-key:${config.databasePath}`;
-  return createHmac("sha256", key).update(value).digest("hex");
+  return createHmac("sha256", deviceSecret()).update(value).digest("hex");
 }
 
-function randomManualCode(): string {
-  const bytes = randomBytes(10);
-  return Array.from(bytes, (byte) => CROCKFORD[byte % CROCKFORD.length]).join("");
+function deviceSecret(): string {
+  const config = getServerConfig();
+  return config.betterAuthSecret ?? `neta-development-device-key:${config.databasePath}`;
+}
+
+function randomManualCode(length: number): string {
+  return Array.from({ length }, () => CROCKFORD[randomInt(CROCKFORD.length)]).join("");
 }
 
 function normalizeManualCode(value: string): string {
-  return value.toUpperCase().replace(/[\s-]/g, "").replace(/[ILO]/g, "");
+  return value.toUpperCase().replace(/[\s-]/g, "");
 }
 
 function parsePlatform(value: unknown): Platform {
