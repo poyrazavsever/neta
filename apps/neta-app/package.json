@@ -16,6 +16,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "mobile:contract:test": "node --test server/api/v1/presenters.test.mjs",
+    "mobile:security:check": "node --test scripts/device-refresh-migration.test.mjs && node scripts/phase1-auth-smoke.mjs --mobile-security-only",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.mjs",
     "db:backup": "node scripts/backup.mjs",

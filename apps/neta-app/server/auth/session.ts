@@ -12,6 +12,7 @@ import { appProfiles, clients } from "@/server/db/schema";
 type BetterAuthSession = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>;
 
 export type SessionContext = {
+  device?: { id: string; scopes: readonly string[] };
   session: BetterAuthSession["session"];
   user: BetterAuthSession["user"];
   profile: {

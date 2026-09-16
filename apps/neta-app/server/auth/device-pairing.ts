@@ -10,6 +10,7 @@ import {
   account,
   appProfiles,
   authAuditEvents,
+  deviceRefreshHistory,
   deviceSecurityState,
   deviceSessions,
   pairingChallenges,
@@ -146,10 +147,14 @@ export function refreshDeviceSession(request: Request, body: unknown): TokenPair
   const pair = newTokenPair(now);
   const { db } = getSqliteConnection();
   const result = db.transaction((tx) => {
-    const row = tx.select().from(deviceSessions)
+    const consumed = tx.select().from(deviceRefreshHistory)
+      .where(eq(deviceRefreshHistory.digest, tokenDigest)).get();
+    const row = consumed
+      ? tx.select().from(deviceSessions).where(eq(deviceSessions.id, consumed.deviceSessionId)).get()
+      : tx.select().from(deviceSessions)
       .where(or(eq(deviceSessions.refreshDigest, tokenDigest), eq(deviceSessions.previousRefreshDigest, tokenDigest))).get();
     if (!row) throw new DomainError("UNAUTHENTICATED", "Refresh token geçersiz.");
-    if (row.previousRefreshDigest === tokenDigest) {
+    if (consumed || row.previousRefreshDigest === tokenDigest) {
       tx.update(deviceSessions).set({ status: "compromised", revokedAt: now }).where(eq(deviceSessions.familyId, row.familyId)).run();
       auditIn(tx, "device_token_reuse_detected", row.ownerUserId, { deviceSessionId: row.id });
       return { ok: false as const, reason: "reuse" as const };
@@ -157,6 +162,16 @@ export function refreshDeviceSession(request: Request, body: unknown): TokenPair
     if (row.status !== "active" || row.refreshExpiresAt <= now || row.tokenEpoch !== ensureEpoch(tx)) {
       return { ok: false as const, reason: "invalid" as const };
     }
+    const activeOwner = tx.select({ id: appProfiles.id }).from(appProfiles)
+      .where(and(eq(appProfiles.authUserId, row.ownerUserId), eq(appProfiles.role, "freelancer"), eq(appProfiles.disabled, false))).get();
+    if (!activeOwner) {
+      tx.update(deviceSessions).set({ status: "revoked", revokedAt: now })
+        .where(and(eq(deviceSessions.ownerUserId, row.ownerUserId), eq(deviceSessions.status, "active"))).run();
+      return { ok: false as const, reason: "invalid" as const };
+    }
+    tx.insert(deviceRefreshHistory).values({
+      digest: row.refreshDigest, deviceSessionId: row.id, consumedAt: now,
+    }).run();
     tx.update(deviceSessions).set({
       accessDigest: digest(pair.accessToken), accessExpiresAt: new Date(pair.accessExpiresAt),
       previousRefreshDigest: row.refreshDigest, refreshDigest: digest(pair.refreshToken),
@@ -185,12 +200,16 @@ export function getDeviceSessionContext(requestHeaders: Headers): SessionContext
   const profile = db.select().from(appProfiles)
     .where(and(eq(appProfiles.authUserId, row.ownerUserId), eq(appProfiles.role, "freelancer"), eq(appProfiles.disabled, false))).get();
   const authUser = db.select().from(user).where(eq(user.id, row.ownerUserId)).get();
-  if (!profile || !authUser) return null;
+  if (!profile || !authUser) {
+    revokeAllDeviceSessions(row.ownerUserId);
+    return null;
+  }
   if (now.getTime() - row.lastUsedAt.getTime() >= 5 * 60_000) {
     db.update(deviceSessions).set({ lastUsedAt: now }).where(eq(deviceSessions.id, row.id)).run();
   }
   return {
     profile,
+    device: { id: row.id, scopes: row.scopes },
     user: authUser as SessionContext["user"],
     session: {
       id: `device:${row.id}`, userId: row.ownerUserId, token: "",

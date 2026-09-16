@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
-    const context = await requireApiV1Session(new Headers(request.headers));
+    const context = await requireApiV1Session(new Headers(request.headers), ["profile:read"]);
     return apiV1Success(getApiMeProfile(context, request));
   } catch (error) {
     return apiV1Error(error);

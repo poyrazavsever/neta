@@ -214,3 +214,16 @@ export const deviceSessions = sqliteTable(
     index("device_sessions_family_idx").on(table.familyId),
   ],
 );
+
+// Keep every consumed digest until its session is deleted: older refresh tokens
+// must still identify the family after more than one rotation.
+export const deviceRefreshHistory = sqliteTable(
+  "device_refresh_history",
+  {
+    digest: text("digest").primaryKey(),
+    deviceSessionId: text("device_session_id").notNull()
+      .references(() => deviceSessions.id, { onDelete: "cascade" }),
+    consumedAt: integer("consumed_at", { mode: "timestamp_ms" }).default(nowMs).notNull(),
+  },
+  (table) => [index("device_refresh_history_session_idx").on(table.deviceSessionId)],
+);

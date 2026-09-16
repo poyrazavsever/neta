@@ -37,7 +37,7 @@ const inputSchema = z.object({
 
 export async function PATCH(request: Request) {
   try {
-    const context = await requireApiV1Session(new Headers(request.headers));
+    const context = await requireApiV1Session(new Headers(request.headers), ["settings:write"]);
     const input = await parseApiV1Json(request, inputSchema);
     updateUserPreferences(domainActorFromSession(context), {
       colorMode: input.colorMode,

@@ -1,3 +1,5 @@
+import { runDeviceSecurityAcceptance } from "./lib/device-security-acceptance.mjs";
+import { runPortalSecurityAcceptance } from "./lib/portal-security-acceptance.mjs";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
@@ -65,10 +67,13 @@ const server = spawn(
 );
 
 let serverOutput = "";
+let serverLog = "";
 server.stdout.on("data", (chunk) => {
+  serverLog += chunk;
   serverOutput = `${serverOutput}${chunk}`.slice(-12000);
 });
 server.stderr.on("data", (chunk) => {
+  serverLog += chunk;
   serverOutput = `${serverOutput}${chunk}`.slice(-12000);
 });
 
@@ -336,38 +341,13 @@ try {
     const ownerPassword = ownerEmail.startsWith("owner-one")
       ? "OwnerOne-Password-123"
       : "OwnerTwo-Password-123";
-    const pairing = await jsonRequest("/api/v1/pairing/challenges", {
-      method: "POST", cookie: ownerCookie, body: { currentPassword: ownerPassword },
+    ownerCookie = await runDeviceSecurityAcceptance({
+      request: jsonRequest, db, ownerCookie, ownerPassword, ownerUserId,
+      env, dataDir, databasePath, serverOutput: () => serverLog,
     });
-    assert.equal(pairing.response.status, 201, JSON.stringify(pairing.payload));
-    const pairingUrl = new URL(pairing.payload.data.qrPayload);
-    const pairingSecret = pairingUrl.searchParams.get("secret");
-    assert.ok(pairingSecret);
-    const exchangeBody = {
-      secret: pairingSecret, installId: "phase1-smoke-install", deviceName: "Smoke iPhone",
-      platform: "ios", appVersion: "0.1.0", osMajor: "18",
-    };
-    const paired = await jsonRequest("/api/v1/pairing/exchange", { method: "POST", body: exchangeBody });
-    assert.equal(paired.response.status, 201, JSON.stringify(paired.payload));
-    const doubleExchange = await jsonRequest("/api/v1/pairing/exchange", { method: "POST", body: exchangeBody });
-    assert.equal(doubleExchange.response.status, 401, "Pairing challenge must be one-use");
-    const pairedMe = await jsonRequest("/api/v1/me", { headers: { authorization: `Bearer ${paired.payload.data.accessToken}` } });
-    assert.equal(pairedMe.response.status, 200);
-    assert.equal(pairedMe.payload.data.user.role, "freelancer");
-    const rotated = await jsonRequest("/api/v1/device-sessions/refresh", {
-      method: "POST", body: { refreshToken: paired.payload.data.refreshToken },
-    });
-    assert.equal(rotated.response.status, 200);
-    const reuse = await jsonRequest("/api/v1/device-sessions/refresh", {
-      method: "POST", body: { refreshToken: paired.payload.data.refreshToken },
-    });
-    assert.equal(reuse.response.status, 401, "Refresh reuse must compromise the token family");
-    const compromisedMe = await jsonRequest("/api/v1/me", { headers: { authorization: `Bearer ${rotated.payload.data.accessToken}` } });
-    assert.equal(compromisedMe.response.status, 401);
-    const serializedDb = fs.readFileSync(databasePath);
-    assert.equal(serializedDb.includes(Buffer.from(pairingSecret)), false, "Raw pairing secret must not be stored");
-    assert.equal(serializedDb.includes(Buffer.from(paired.payload.data.refreshToken)), false, "Raw refresh token must not be stored");
-
+    if (process.argv.includes("--mobile-security-only")) {
+      await runFocusedPortalSecurity();
+    } else {
     const dashboardV1 = await jsonRequest("/api/v1/dashboard/overview?range=this_month", { cookie: ownerCookie });
     assert.equal(dashboardV1.response.status, 200);
     assert.equal(dashboardV1.payload.data.dashboard.range, "this_month");
@@ -788,6 +768,11 @@ try {
     });
     assert.equal(portalQuotaConflict.response.status, 409);
 
+    await runPortalSecurityAcceptance({
+      request: jsonRequest, db, ownerCookie, ownerUserId, clientCookie, uploadFile,
+      portalAssetFileId, privateAssetFileId, baseUrl,
+    });
+
     for (const [pathname, body] of [
       ["/api/finance-analysis", undefined],
       ["/api/project-risk", { projectId: "project-alpha" }],
@@ -970,11 +955,14 @@ try {
       headers: { cookie: ownerCookie },
     });
     assert.equal(await ownerSessionAfterLogout.json(), null, "Logout must revoke owner session");
+    }
   } finally {
     db.close();
   }
 
-  console.log("Phase 1 auth and invitation smoke passed.");
+  console.log(process.argv.includes("--mobile-security-only")
+    ? "MOB-6/7 automated security acceptance passed; signed/live-device acceptance remains open."
+    : "Phase 1 auth and invitation smoke passed.");
 } catch (error) {
   console.error(serverOutput);
   throw error;
@@ -983,6 +971,10 @@ try {
     try {
       process.kill(-server.pid, "SIGTERM");
     } catch {}
+  } else if (server.pid) {
+    try {
+      execFileSync("taskkill", ["/PID", String(server.pid), "/T", "/F"], { stdio: "pipe" });
+    } catch { server.kill("SIGTERM"); }
   } else {
     server.kill("SIGTERM");
   }
@@ -994,6 +986,40 @@ try {
   for (const snapshot of nextGeneratedConfigFiles) {
     fs.writeFileSync(path.join(process.cwd(), snapshot.file), snapshot.content);
   }
+}
+
+async function runFocusedPortalSecurity() {
+  const db = new Database(databasePath);
+  try {
+    const ownerUserId = db.prepare("SELECT auth_user_id FROM app_profiles WHERE role = 'freelancer'").get().auth_user_id;
+    const email = db.prepare("SELECT email FROM user WHERE id = ?").get(ownerUserId).email;
+    const login = await authPost("/api/auth/sign-in/email", {
+      email, password: email.startsWith("owner-one") ? "OwnerOne-Password-123" : "OwnerTwo-Password-123",
+    });
+    assert.equal(login.response.status, 200);
+    const ownerCookie = cookieHeader(login.response);
+    const invitation = await jsonRequest("/api/v1/clients/client-alpha/portal-invitations", {
+      method: "POST", cookie: ownerCookie, body: { email: "alpha-client@example.test", defaultLocale: "tr" },
+      headers: { "idempotency-key": "portal-alpha-focused-invitation" },
+    });
+    assert.equal(invitation.response.status, 201);
+    const accepted = await acceptInvite(tokenFromUrl(invitation.payload.data.invitationUrl));
+    assert.equal(accepted.response.status, 201);
+    const clientLogin = await authPost("/api/auth/sign-in/email", { email: "alpha-client@example.test", password: "Client-Password-123" });
+    assert.equal(clientLogin.response.status, 200);
+    const clientCookie = cookieHeader(clientLogin.response);
+    const clientUser = db.prepare("SELECT auth_user_id FROM clients WHERE id = 'client-alpha'").get().auth_user_id;
+    db.prepare("INSERT INTO project_revisions (id, owner_user_id, project_id, client_id, requested_by_user_id, description, status) VALUES (?, ?, ?, ?, ?, ?, ?)")
+      .run("revision-portal", ownerUserId, "project-alpha", "client-alpha", clientUser, "Alpha Confidential Revision", "pending");
+    const portalFile = await uploadFile("project_asset", { cookie: ownerCookie, projectId: "project-alpha", portalVisible: true, fileName: "alpha-portal.png" });
+    const privateFile = await uploadFile("project_asset", { cookie: ownerCookie, projectId: "project-alpha", portalVisible: false, fileName: "alpha-private.png" });
+    assert.equal(portalFile.response.status, 201);
+    assert.equal(privateFile.response.status, 201);
+    await runPortalSecurityAcceptance({
+      request: jsonRequest, db, ownerCookie, ownerUserId, clientCookie, uploadFile,
+      portalAssetFileId: portalFile.payload.data.id, privateAssetFileId: privateFile.payload.data.id, baseUrl,
+    });
+  } finally { db.close(); }
 }
 
 async function acceptInvite(token) {
