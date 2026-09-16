@@ -1,13 +1,14 @@
 ---
 tur: yol-haritasi
 durum: mevcut
-guncellendi: 2026-09-15
+guncellendi: 2026-09-16
 guven: yuksek
 ozet: "Neta Mobile'ı build-time tek instance istemcisinden güvenli evrensel uygulamaya taşıyan, backend API ve release kapılarıyla birlikte yürütülen uygulama planı."
 kaynaklar:
   - docs/roadmaps/platform-master-plan.md
   - docs/neta-backend-mobile-api-master-plan.md
   - docs/mobile/neta-mobile-redesign-master-plan.md
+  - docs/mobile/mobile-security-acceptance.md
   - apps/neta-mobile/README.md
   - apps/neta-mobile/src
   - apps/neta-app/app/api/v1
@@ -28,7 +29,7 @@ etiketler:
 
 # Neta Mobile uygulama planı
 
-> Son güncelleme: **2026-09-15** — MOB-6 pairing ve MOB-7 portal transport'u kodda yer alıyor. Signed cihaz, iki canlı HTTPS instance, restore/revoke ve tenant izolasyonu kabul turu release kapısı olarak açık.
+> Son güncelleme: **2026-09-16** — MOB-6/MOB-7 otomatik güvenlik kabulü geçti: historical refresh reuse, Bearer/scope sınırı, hesap lifecycle'ı, izole restore ve iki client negatifleri doğrulandı. Signed gerçek cihaz ve iki canlı HTTPS instance kabulü release kapısı olarak açık.
 
 ## Planın rolü
 
@@ -203,6 +204,8 @@ Backend ile mobilin aynı wire gerçeğini derleme ve test sırasında paylaşma
 
 **Durum:** 2026-09-04'te kod, unit ve config gate kapsamı tamamlandı. Signed iOS/Android ile iki gerçek HTTPS instance izolasyon E2E'si release kanıtı olarak açıktır.
 
+2026-09-16 tamamlama denetimi: aktif ve kayıtlı hedefin origin/instanceId kimliği birlikte doğrulanır; değişimde native generation/session/cache temizlenir. JSON/binary auth client cross-origin redirect'i reddeder. Production native cookie giriş/çıkışında doğrulanmış Origin başlığı gönderilir. Auth layout'ları login veya açık rol-grubu hedefine gider; logout redirect döngüsü giderildi. Ayrıntı [[docs/mobile/mobile-phase-2-5-audit]].
+
 ### Amaç
 
 Tek production binary'nin rebuild olmadan kullanıcının self-hosted domain'ine bağlanması.
@@ -231,6 +234,8 @@ Tek production binary'nin rebuild olmadan kullanıcının self-hosted domain'ine
 - İki bağımsız HTTPS instance'a aynı binary ile bağlanma ve cache/credential izolasyonu E2E geçer.
 
 ## MOB-3 — Owner minimum read vertical slice
+
+2026-09-16 istemci tamamlama: clients/projects/tasks listelerinde cursor + “Daha fazla yükle” ve overlap dedup vardır. Relation picker'lar, project plan/revizyon/görev/dosya ve client activity alt listeleri cursor ile bütün sayfaları toplar; ilerlemeyen cursor hata verir. Project detail gerçek asset listesini gösterir. Calendar/journal range DTO'su cursor zarfı değildir; seçili aralık tek response'dur.
 
 **Durum:** 2026-09-04'te route, contract, owner/role scope, cursor, capability ve canlı auth smoke kapsamı tamamlandı. Gerçek cihaz görsel/kullanım kanıtı release kapısında açıktır.
 
@@ -269,6 +274,8 @@ Tek production binary'nin rebuild olmadan kullanıcının self-hosted domain'ine
 
 ## MOB-4 — Core mutations ve ağ güvenilirliği
 
+2026-09-16 retry/cache düzeltmesi: instance/actor/role/method/path/payload kapsamlı transient coordinator aynı başarısız operasyonun key'ini korur ve eşzamanlı submit'i birleştirir. Başarı/logout temizler. Resource cache yalnız GET için okunur/yazılır; mutation yanıtı liste-cache'e girmez. Resource JSON ve binary dosya isteği reaktif 401/single-flight refresh ve generation guard'ını paylaşır.
+
 **Durum:** 2026-09-04'te uygulandı. Client/project/task/calendar mutation route'ları, persistent idempotency, optimistic concurrency, scope doğrulaması ve targeted cache invalidation teslim edildi. Idempotency replay/farklı payload ve stale write canlı smoke ile doğrulandı; tam gerçek cihaz etkileşim turu release kanıtında açıktır.
 
 ### Sıra
@@ -294,6 +301,10 @@ Tek production binary'nin rebuild olmadan kullanıcının self-hosted domain'ine
 - Network retry duplicate kayıt üretmez.
 
 ## MOB-5 — Owner parity
+
+2026-09-16 file parity tamamlama: owner Bearer/cookie ve scoped portal cookie için `/api/v1/files/:id`; native authenticated download/cache/share/cleanup; gerçek owner project asset UI; project PDF/10 MiB, diğer türler 5 MiB, icon PNG-only. File/appearance upload raw hash dahil persistent idempotency uygular; native busy/cancel/retry key korunur. Owner settings logout vardır; aylık finance ve relation seçenekleri ilk sayfayla sınırlı değildir. Production HTTP/Android debug kanıtı signed kabulün yerine geçmez.
+
+Native file/appearance upload File + FormData + Expo fetch ile scoped credential, actor/generation ve redirect reddi kullanır; gerçek dosya boyutu doğrulanır, iptal AbortController'dan gider. Byte acknowledgement olmadığı için yükleme belirsiz ilerleme göstergesiyle sunulur. Eski web image metadataSanitized=false dosyalar okunabilir; yeni native image sanitation yanıtı zorunludur. Portal ayar/parola/oturum self-service uçları owner/client için kendi user ID'sinde ortaktır ve iki gerçek client HTTP izolasyonu test edilmiştir; portal logout yükleme hatasında da vardır. Native auth implicit cookie jar'ı kullanmaz; sign-in ID eşleşmesi ve provider operasyon epoch'u account switch/logout yarışını engeller.
 
 **Durum:** 2026-09-04'te uygulandı. Finance, journal, hesap/session, general/appearance/locale/AI settings ve file/project asset v1 yüzeyleri shared contract ve capability gate ile teslim edildi. Contract/type/build kapıları geçer; signed cihazda bütünleşik kabul turu release kanıtında açıktır.
 
@@ -321,7 +332,9 @@ Owner'ın teklif/sözleşme/fatura/abonelik dışındaki kararlaştırılmış m
 
 ## MOB-6 — Owner device pairing ve cihaz lifecycle'ı
 
-**Kod durumu:** Challenge/exchange/refresh/revoke, SQLite token family, mobil bearer transport'u ve restore epoch rotation'ı uygulanmıştır. Gerçek cihaz reuse/revoke/restore kabulü açıktır.
+**Kod durumu:** Challenge/exchange/refresh/revoke, SQLite token family, mobil bearer transport'u ve restore epoch rotation'ı uygulanmıştır. 0016 migration tüketilmiş refresh digest geçmişini ekler; geçmişi eksik mevcut cihazlar yeniden eşleştirilir. API explicit scope ve geçersiz Bearer için cookie fallback reddini uygular. Bearer profil/parola parity'si ve logout sonrası geç refresh/storage write koruması kodda mevcuttur.
+
+**Otomatik kabul:** `pnpm mobile:security:check` challenge/rate-limit/concurrent exchange, çok kuşaklı reuse, expiry/disable/revoke/logout-all/parola, raw secret/audit ve izole DB restore kanıtını çalıştırır. Ayrıntılı kanıt sınırı ve ADR tasarım farkları [[docs/mobile/mobile-security-acceptance]] sayfasındadır. Signed cihaz, restore runtime'ına eski tokenla HTTP/native ve iki canlı HTTPS instance kabulü açıktır.
 
 ### Ön koşul
 
@@ -364,7 +377,7 @@ Web owner step-up
 
 ## MOB-7 — Client portal
 
-**Kod durumu:** Portal dashboard/project/task/revision/profile v1 route'ları ve mobil portal istemcisi mevcuttur. Cross-client negatif E2E ve portal file kabulü açıktır.
+**Kod durumu:** Portal dashboard/project/task/revision/profile v1 route'ları ve mobil portal istemcisi mevcuttur. İki gerçek davetli client session'ıyla karşılıklı ID/filter/revision/profile/owner-route ve portal/private/foreign dosya negatifleri otomatik HTTP kabulünde geçti. Yabancı dosya delete'i, olmayan ID gibi `404` döner; yan etki üretmez. Signed native portal/file ve iki canlı instance kabulü açıktır.
 
 ### Ön koşul
 

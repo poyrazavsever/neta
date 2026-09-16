@@ -1,7 +1,7 @@
 ---
 tur: mimari
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-15
 guven: yuksek
 kaynaklar:
   - apps/neta-app/package.json
@@ -45,6 +45,7 @@ container/process başlar
 - `BETTER_AUTH_SECRET`: production'da zorunlu ve en az 32 karakter.
 - `TRUSTED_ORIGINS`: comma-separated explicit origin; wildcard yok.
 - `OLLAMA_BASE_URL`, `AI_REQUEST_TIMEOUT_MS`, `NETA_MINIMUM_MOBILE_VERSION`: opsiyonel.
+- `NETA_MINIMUM_MOBILE_VERSION` boş veya yalnız whitespace ise alt sürüm uygulanmaz; dolu değer geçerli SemVer olmalıdır.
 
 Build sırasında data path temporary olabilir ve placeholder auth secret kabul edilir; bu yalnız Next production build safhasına özel istisnadır, runtime secret'ı değildir.
 

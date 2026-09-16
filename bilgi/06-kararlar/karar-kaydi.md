@@ -1,7 +1,7 @@
 ---
 tur: karar
 durum: mevcut
-guncellendi: 2026-09-03
+guncellendi: 2026-09-16
 guven: yuksek
 ozet: "Neta mimari kararlarının bağımsız ADR notlarına açılan durum ve yönlendirme indeksi."
 kaynaklar:
@@ -47,6 +47,7 @@ Bu sayfa karar metinlerini toplamaz; her kalıcı karar kendi ADR dosyasında ya
 | [[06-kararlar/adr-019-v1-validation-http-statusu\|ADR-019]] | V1 validation HTTP statüsü | Kabul edildi | Mevcut |
 | [[06-kararlar/adr-020-mobil-server-surum-uyumlulugu\|ADR-020]] | Mobil-server sürüm uyumluluğu | Kabul edildi | Mevcut |
 | [[06-kararlar/adr-021-api-mutation-idempotency-kaydi\|ADR-021]] | API mutation idempotency kaydı | Kabul edildi | Mevcut |
+| [[06-kararlar/adr-022-ui-assets-pipeline\|ADR-022]] | Vault içinde UI assets pipeline | Kabul edildi | Envanter ve arşivleme kodda; tasarım/CI diff planlanan |
 
 ## Kayıt kuralları
 
@@ -58,4 +59,4 @@ Bu sayfa karar metinlerini toplamaz; her kalıcı karar kendi ADR dosyasında ya
 
 ## Sıradaki numara
 
-Yeni ve bağımsız bir karar için sıradaki kimlik **ADR-022**'dir.
+Yeni ve bağımsız bir karar için sıradaki kimlik **ADR-023**'dir.

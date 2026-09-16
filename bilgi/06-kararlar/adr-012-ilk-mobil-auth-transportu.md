@@ -2,7 +2,7 @@
 tur: karar
 durum: mevcut
 karar_durumu: kabul-edildi
-guncellendi: 2026-09-03
+guncellendi: 2026-09-16
 guven: yuksek
 ozet: "İlk mobil auth, instance domain'i üzerinde email/password ile oluşturulan Better Auth cookie session'ıdır; parola saklanmaz, pairing daha sonra gelir."
 kaynaklar:
@@ -30,6 +30,8 @@ etiketler:
 ## Karar
 
 İlk mobil giriş yolu, doğrulanmış instance origin'inde email/password ile oluşturulan Better Auth session cookie'sidir. Cookie yalnız aynı `instanceId` ve origin için gönderilir, parola hiçbir zaman saklanmaz. Cihaz pairing'i bu yolu bloke etmez ve ADR-008'in ayrı güvenlik fazında owner için eklenir. Belgelenmemiş bearer header birincil v1 contract sayılmaz.
+
+2026-09-16 implementation doğrulaması: auth JSON/binary ve file/appearance multipart istekleri Expo fetch üzerinden `credentials: omit` ile gider; işletim sisteminin örtük cookie deposu yetki kaynağı değildir. SecureStore'daki scoped Cookie veya ADR-008 Bearer açık header olarak gönderilir. Native sign-in user ID ile `/me` ID eşleşir; selected origin auth `Origin` header'ında kullanılır. Redirect origin'i kontrol edilir; multipart redirect tümden reddedilir. Actor/generation binding ve provider operasyon epoch'u logout/account switch sonrasında geç gelen credential/cache/UI sonucunu uygulamaz. Android debug geçişi signed iOS/Android ve iki canlı HTTPS kabulünün yerine geçmez.
 
 ## Gerekçe
 

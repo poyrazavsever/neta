@@ -2,6 +2,7 @@
 title: ADR-0018 — Mobil Device Pairing ve Token Lifecycle
 status: implementation-pending-security-acceptance
 date: 2026-07-17
+last_updated: 2026-09-16
 ---
 
 # ADR-0018 — Mobil device pairing ve token lifecycle
@@ -161,3 +162,7 @@ Audit metadata raw token, pairing secret, tam IP geçmişi veya gereksiz device 
 ## Sonuç
 
 Kodda `auth.device-pairing.v1` capability'si `available`, pairing/device-session route'ları, DB digest/token epoch ve mobil bearer refresh transport'u mevcuttur. Bu durum signed gerçek cihazda double exchange, reuse/revoke, restore ve tenant negatif kabulünün yerine geçmez. Tasarım ile kodun kalan farkları ve yukarıdaki güvenlik testleri mağaza yayını öncesinde kapatılmalıdır.
+
+2026-09-16 otomasyonunda `device_refresh_history` ile her tüketilmiş keyed digest aynı rotation transaction'ında tutulur. 0016 migration önceki digest'i backfill eder ve daha eski geçmişi geri üretilemeyen mevcut aktif cihaz oturumlarını revoke ederek yeniden pairing gerektirir. Explicit device scope ve geçersiz Authorization header'ında cookie fallback reddi API sınırındadır. Disabled owner gözlendiğinde family'ler iptal edilir; Bearer profil/parola parity'si web cookie'sinden bağımsızdır. Native auth generation/write serialization, geç ağ sonucunun logout/new-login sonrası credential diriltmesini engeller.
+
+`pnpm mobile:security:check` challenge/concurrent exchange, historical reuse, revoke/logout-all/password, izole restore epoch ve iki gerçek client session'ının karşılıklı HTTP/file negatiflerini doğrular. [Kabul matrisi](../mobile/mobile-security-acceptance.md) restore DB kanıtını signed/live runtime kanıtından ayırır. Tasarımdaki refresh grace/replay, challenge'a bağlı yanlış kod denemesi ve cleanup henüz tamamlanmış değildir; mevcut duplicate refresh katı family compromise ile sonuçlanır. Signed gerçek cihaz ve iki canlı HTTPS instance kabulü açıktır.

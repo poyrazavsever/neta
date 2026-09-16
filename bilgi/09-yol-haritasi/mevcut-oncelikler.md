@@ -1,7 +1,7 @@
 ---
 tur: yol-haritasi
 durum: planlanan
-guncellendi: 2026-09-04
+guncellendi: 2026-09-16
 guven: yuksek
 kaynaklar:
   - docs/roadmaps/platform-master-plan.md
@@ -49,14 +49,20 @@ Dashboard, client, project, task ve calendar read route'ları auth/scope/present
 
 Client, project, task ve calendar mutation'ları persistent idempotency, optimistic concurrency ve cache invalidation ile; finance, journal, settings, locales ve files parity'si shared contract ile teslim edildi.
 
-## 6 — Device pairing ve client portal ← sıradaki aktif faz
+## 6 — MOB-6/7 güvenlik kabulü ← aktif faz
 
-ADR-008 doğrultusunda owner pairing/device lifecycle; ardından client portal tenant-isolation v1 dilimi.
+Owner pairing ve portal transport'u kodda mevcuttur. `pnpm mobile:security:check` historical reuse, Bearer/scope, native profil/parola, revoke/logout-all, izole DB restore ve iki gerçek client HTTP/file negatiflerini doğrular. 0016 sonrası eski aktif cihazlar yeniden eşleştirilir. Signed cihaz/two-HTTPS-instance/restore-runtime kabulü ve ADR-008'in grace/replay, challenge deneme bağlama ve cleanup tasarım farkları [[docs/mobile/mobile-security-acceptance]] doğrultusunda açık kalır.
 
-## 7 — Güvenlik ve operasyon
+## 7 — MOB-8 AI taşıması
 
-Portal cross-client negative tests, backup encryption/restore policy, current dependency audit ve pairing gelmeden token epoch hazırlığı.
+Mobil AI UI/parser mevcut; backend versioned chat/risk/finance AI transport'u ve `ai.assistant.v1` capability kabulü planlanandır. Core güvenlik kapılarını geciktirmeden ayrı dikey dilim olarak yürütülür; notification/push ayrı ADR gerektirir.
+
+## 8 — MOB-9 release ve operasyon
+
+Signed iOS/Android, iki canlı HTTPS instance, migration/restore/compatibility matrisi, privacy/support/store ve incident/upgrade/rollback runbook'ları. Otomatik HTTP kabulü store kanıtı yerine geçmez.
 
 ## Release ilkesi
+
+2026-09-16 kullanıcı yönlendirmesiyle MOB-2–5 eksik tamamlama denetimi yapıldı: [[docs/mobile/mobile-phase-2-5-audit]]. [[assets-pipeline/indeks|Assets pipeline]] klasör/asset/screenshot altyapısı hazırlandı. [[assets-pipeline/ui-ux-guncelleme-plani|UI/UX tasarım ve CI diff çalışması]] işlevsel mobil kapılardan sonra, en son yürütülecek.
 
 Store/native UI readiness, backend resource readiness yerine geçmez. Her faz ancak gerçek instance + contract + authorization testleriyle tamamlanır.

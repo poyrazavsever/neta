@@ -2,8 +2,8 @@
 title: Neta Backend Mobil API Ana Uygulama Planı
 description: Neta web/backend ile React Native mobil istemci arasındaki API boşluklarını kapatmak için doğrulanmış, fazlı ve test kapılı uygulama planı.
 status: active
-current_phase: owner-parity-pairing-portal-code
-last_updated: 2026-09-15
+current_phase: pairing-portal-automated-security-native-open
+last_updated: 2026-09-16
 owners:
   - backend-api
   - mobile
@@ -17,7 +17,7 @@ related_documents:
 
 # Neta Backend Mobil API Ana Uygulama Planı
 
-> 2026-09-15 kod durumu: Owner read/mutation/parity, pairing ve client portal v1 transport'u mevcuttur. Signed cihaz, iki canlı HTTPS instance, restore/revoke ve cross-client negatif E2E kabulü açık kalır; `mobile-v1` store hazır oluşu planlanandır.
+> 2026-09-16 kod durumu: Owner parity, pairing ve portal transport'u mevcuttur. `pnpm mobile:security:check` historical reuse, Bearer/scope, native profil/parola, izole restore DB ve iki gerçek client session'ının HTTP/file negatiflerini doğrular. [Açık tasarım ve native kabul maddeleri](mobile/mobile-security-acceptance.md) tamamlanana kadar signed iki HTTPS instance ve `mobile-v1` store hazır oluşu açıktır.
 
 ## 1. Amaç
 

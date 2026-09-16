@@ -1,7 +1,7 @@
 ---
 tur: mimari
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-16
 guven: yuksek
 kaynaklar:
   - apps/neta-app/server/auth/auth.ts
@@ -54,6 +54,8 @@ Mobil sign-in `/api/auth/sign-in/email` çağırır; set-cookie veya auth token'
 ## Owner pairing
 
 ADR-0018 owner için kısa ömürlü one-use challenge, opaque access/refresh token, refresh rotation/reuse detection, scope, revoke ve restore epoch tasarlar. Schema, route ve mobil bearer transport'u kodda yer alır; capability `available`dır. Gerçek cihaz ve restore negatif kabulü açık kalır.
+
+2026-09-16 kodu tüketilmiş keyed digest'lerin bütün geçmişini saklayarak çok kuşaklı reuse'da family'yi compromise eder. Authorization header'ı cookie'ye fallback yapmaz; cihaz scope'ları API sınırında uygulanır. Bearer profil/parola self-service'i cookie gerektirmez; parola değişimi cihazları ve varsayılan olarak web session'larını kapatır. Disabled owner access/refresh kontrolünde gözlendiğinde device family'leri revoke edilir. Mobil generation ve sıralı storage write, eski ağ sonucunun logout/new-login sonrası credential diriltmesini engeller. Otomatik kabul ve gerçek cihaz kanıt sınırı [[docs/mobile/mobile-security-acceptance]] sayfasındadır.
 
 ## Riskler
 

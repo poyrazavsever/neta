@@ -45,12 +45,13 @@ Download sırasında metadata authorization yeniden uygulanır. File descriptor 
 
 ## Dosya politikası
 
-- Maksimum dosya boyutu: 5 MiB.
-- Allowlist: JPEG, PNG, WebP ve avatar/project/logo için GIF.
+- Maksimum dosya boyutu: project asset 10 MiB; avatar/logo/icon 5 MiB (2026-09-16 mobil parity güncellemesi; eski tüm türler için 5 MiB hükmünün yerini alır).
+- Allowlist: JPEG, PNG, WebP ve avatar/project/logo için GIF; PDF yalnız project asset.
 - Branding icon/favicon için yalnızca PNG kabul edilir; manifest MIME sözleşmesi sabit ve güvenli kalır.
 - MIME yalnızca browser beyanından alınmaz; JPEG/PNG/WebP/GIF magic byte imzası içerikten doğrulanır.
 - SVG ilk sürümde kabul edilmez. Böylece SVG script/external reference sanitizasyon bağımlılığı eklenmez.
 - Original filename yalnızca download adı olarak normalize edilir; storage path'e girmez.
+- PDF `%PDF-1.x/2.0` header ve sondaki `%%EOF` ile doğrulanır; `attachment` olarak sunulur. Bu PDF sanitizer/malware scanner değildir. V1 görseller sharp decode/re-encode ile sanitize edilir; PDF `metadataSanitized=false` kalır.
 
 ## Authorization matrisi
 
@@ -67,6 +68,7 @@ Route sınırları:
 
 - `POST /api/files`: authenticated multipart upload;
 - `GET /api/files/:id`: authenticated authorized download;
+- `GET /api/v1/files/:id`: versioned private/no-store authorized download; owner Bearer `files:read` veya owner/client cookie, aynı FileService scope kontrolü;
 - `DELETE /api/files/:id`: authorized delete;
 - `GET /api/branding/assets/:id`: kontrollü public branding asset;
 - `GET /api/branding`: public, secret içermeyen instance markası;

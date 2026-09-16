@@ -3,7 +3,7 @@ tur: karar
 durum: mevcut
 karar_durumu: kabul-edildi
 onceki_kimlik: K-006
-guncellendi: 2026-09-03
+guncellendi: 2026-09-16
 guven: yuksek
 ozet: "Mobil istemci versioned /api/v1 sözleşmesini, web ve mobil ise aynı domain/application servislerini kullanır."
 kaynaklar:
@@ -25,7 +25,7 @@ etiketler:
 
 # ADR-006 — Mobil için versioned API ve ortak domain servisleri
 
-> Son güncelleme: **2026-09-03** — MOB-1 ortak bootstrap contract/presenter sınırı uygulandı; resource parity planlanan olarak kaldı.
+> Son güncelleme: **2026-09-16** — Versioned dosya okuma ortak dosya servisine bağlandı; dış URL origin'i canonical APP_URL ile doğrulandı. Signed release kabulü açık.
 
 **Karar durumu:** Kabul edildi · **Uygulama durumu:** Owner ve portal resource transport'u kodda mevcut; release kabulü açık
 
@@ -64,6 +64,8 @@ Mobil istemci version-aware `/api/v1` HTTP sözleşmesini kullanacaktır. Web ac
 ## Mevcut ve planlanan davranış
 
 Bootstrap/discovery, owner resource read/mutation/parity, pairing ve client portal transport'u `/api/v1` altında kodda mevcuttur. Backend ve mobil shared contract/guard sınırını kullanır; strict input, presenter, JSON 404/405, kalıcı idempotency ve optimistic concurrency uygulanmıştır. Signed cihaz, iki canlı HTTPS instance, pairing restore/revoke ve cross-client izolasyon kabulü ayrı release kanıtı olarak açıktır.
+
+`GET /api/v1/files/:id` owner Bearer/cookie ve scoped client cookie için ortak dosya servisini çağırır; legacy web dosya route'u korunur. Dosya, branding, portal asset ve davet URL'leri discovery/me ile aynı canonical `APP_URL` origin'inden üretilir. Next standalone iç request origin'i veya proxy header'ı dış URL authority'si değildir. HTTP dosya/portal/davet testleri bu origin'i doğrular; iki canlı HTTPS instance kabulü ayrıca gerekir.
 
 ## Yeniden değerlendirme koşulları
 

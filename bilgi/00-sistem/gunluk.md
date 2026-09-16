@@ -1,7 +1,7 @@
 ---
 tur: gunluk
 durum: mevcut
-guncellendi: 2026-09-03
+guncellendi: 2026-09-16
 guven: yuksek
 kaynaklar:
   - README.md
@@ -200,3 +200,45 @@ Mevcut durum, API/mobil/kimlik mimarisi, ADR-006/007/008/017 ve karar indeksi, m
 - [[07-guvenlik/bilinen-riskler|Bilinen riskler]]
 
 Sıradaki aktif faz MOB-2'dir: production build-time origin zorunluluğunu runtime domain/QR instance bağlantısına taşımak.
+
+## [2026-09-15] senkronizasyon | Lokal kurulum ve runtime doğrulaması
+
+Node 24 ve pnpm 11.5.1 ile monorepo bağımlılıkları frozen lockfile'dan kuruldu. App'in örnek environment'ındaki boş `NETA_MINIMUM_MOBILE_VERSION` artık unset kabul edilir; geçerli dolu SemVer doğrulaması korunur. Owner güvenlik ekranında ilk cihaz listesi yüklemesi effect yaşam döngüsüne uyarlandı.
+
+`pnpm typecheck:all`, app/web build, app/web lint, mobil JS testleri, contract testleri, `pnpm phase9:smoke` ve lokal app/landing/Metro HTTP smoke'u geçti. `mobile:check` bu Windows checkout'unda bulunmayan `ios/Podfile.lock` native gate'inde durdu; signed cihaz ve iki canlı instance release kabulü hâlâ açıktır. Yeni mimari karar açılmadı.
+
+Güncellenen sayfa: [[03-mimari/runtime|Runtime]].
+
+## [2026-09-16] senkronizasyon | Windows Android emülatörü ve lokal mobil açılış
+
+API 36.1 AVD eski userdata/quick-boot oturumu nedeniyle package manager hazır olmadan kalıyordu. AVD sıfırlandı, SwiftShader renderer ve cold boot ile `sys.boot_completed=1` / `Service package: found` doğrulandı. SDK adb/emulator yolları kullanıcı PATH kaydına eklendi; AVD config'i yedeklenerek sonraki açılışlar SwiftShader/cold boot olarak ayarlandı.
+
+Expo prebuild ignore edilen `apps/neta-mobile/android` projesini üretti. Android debug native build geçti, APK emülatöre kuruldu ve Neta instance bağlantı ekranı açıldı. Metro'nun IPv6 localhost ile emülatörün IPv4 localhost uyuşmazlığı `mobile:start:local` komutunda Node IPv4 DNS tercihiyle giderildi; yalnız loopback dinlenir ve ADB reverse kullanılır. Signed production, iki canlı instance ve güvenlik release kabulü açık kalır.
+
+Güncellenen sayfa: [[04-bilesenler/neta-mobile|neta-mobile]]. Canonical kurulum kaynağı: `docs/mobile/mobile-setup.md`.
+
+## [2026-09-16] implementation | MOB-6/7 otomatik güvenlik kabulü
+
+Historical refresh reuse için bütün tüketilmiş keyed digest'ler transaction içinde saklanır. 0016 migration son eski digest'i backfill eder; geçmişi eksik mevcut aktif cihazları revoke ederek yeniden eşleştirme gerektirir. Yerel `.data/neta.db` yedeklendikten sonra migration uygulandı. Web cookie session'ları migration'dan etkilenmez.
+
+API explicit device scope uygular; geçersiz/revoked Bearer geçerli web cookie'sine fallback yapmaz. Disabled owner gözlendiğinde device family'leri kapanır. Bearer profil/parola işlemleri cookie gerektirmez; parola değişimi device/web lifecycle'ını kapatır. Mobil generation ve sıralı storage write, logout/new-login sonrası geç refresh'in credential diriltmesini engeller; güvenlik formu parola sonrası logout yapar. Ortak dosya delete authorization'ı yabancı unreadable dosyanın varlığını `404` ile gizler.
+
+`pnpm mobile:security:check` migration, challenge/rate-limit/concurrent exchange, üç rotasyon sonrası ilk refresh reuse, access expiry, disable/epoch/revoke/logout-all/password, raw DB/WAL/log secret ve audit; iki gerçek davetli client session'ıyla karşılıklı ID/filter/revision/profile/owner-route/download/delete negatiflerini geçti. Mobil 111 unit, shared 6 contract ve backend 2 presenter testi, app production build ve mobil typecheck/targeted lint ile son Android JS export geçti.
+
+Otomatik HTTP ve restore edilmiş DB kanıtı signed gerçek cihaz, restore runtime'ına eski token HTTP/native ve iki canlı HTTPS instance kabulü değildir. ADR-008'in hedef grace/replay, challenge'a bağlı yanlış kod denemesi, cleanup ve native versioned bearer file transport maddeleri açık olarak kaydedildi; `mobile-v1` planned kaldı. Yeni bağımsız ADR açılmadı.
+
+Güncel faz ve kabul matrisi: [[09-yol-haritasi/mobil-uygulama-plani|Mobil plan]], [[09-yol-haritasi/mevcut-oncelikler|Öncelikler]], [[06-kararlar/adr-008-owner-device-pairing|ADR-008]], [[docs/mobile/mobile-security-acceptance]].
+
+Ek doğrulama: Ortak dosya authorization/avatar-delete regresyonu `pnpm --filter @neta/app phase3:storage-smoke --authorization-only` ile geçti. Runner Windows'ta Node üzerinden TypeScript çalıştırır ve bare-Node test çıktısına test-only `server-only` marker ekler. Tam storage smoke sandbox dışında da Windows symlink oluşturma `EPERM` yetkisinde durdu; bu senaryo açık kaldı ve geçmiş sayılmadı. Son targeted lint/diff kontrolü ve `pnpm vault:map` / `pnpm vault:check` geçti (98 Markdown, 21 ADR, 0 bulgu).
+
+## [2026-09-16] implementation | MOB-2–5 eksik tamamlama ve UI assets arşivi
+
+Aktif/kayıtlı instance kimlik değişiminde credential/cache/generation temizliği, explicit native Origin ve credentials=omit auth, account switch/logout sonrası geç async sonuç koruması ve açık auth redirect hedefleri tamamlandı. Core list ve relation/project/finance alt-list cursor takibi, mutation retry key/coalescing ve yalnız GET cache davranışı düzeltildi. Native sign-out geçerli boş JSON gönderir; portal çıkışı profil yüklemesine bağlı değildir. Client hesap self-service yalnız kendi ID'siyle çalışır; workspace owner-only kalır.
+
+Versioned dosya okuma ortak dosya servisine bağlandı. Native indirme origin/id/MIME/size ve generation doğrular, share sonrası geçici dosyayı temizler. Project asset PDF/10 MiB, diğer türler 5 MiB; icon PNG-only ve file/appearance raw hash dahil kalıcı idempotency uygulanır. Native File/FormData/Expo fetch upload redirect'i reddeder, cancellation ve retry key'i korur; gerçek byte acknowledgement olmadığından sahte yüzde göstermez. Legacy web görsel metadata durumu okuma sırasında korunur. File/branding/portal/davet URL'leri canonical APP_URL'den üretilerek standalone iç localhost origin hatası giderildi.
+
+Son backend production build, HTTP device/iki client/file/self-service/origin güvenlik kabulü, API boundary, mobil lint/type ve 129 unit test geçti. Android production JS export geçti. `mobile:check` source/i18n/a11y kapılarından sonra bu Windows checkout'undaki eksik `ios/Podfile.lock` native release gate'inde durdu; signed kabul olarak sayılmadı. Android debug'da gerçek picker avatar upload, proje dört sekmesi, yetkili download/share chooser iptali, geçici dosya temizliği ve backend session silen logout ayrıca geçti.
+
+ADR-022 ile [[assets-pipeline/indeks|UI assets pipeline]] kuruldu: 87 route (42 mobil, 41 canonical app/portal, 4 landing/docs kaynak route'u), 114 kaynak/dependency/ref asset; her sayfada kalıcı UX brief'i, source/export/design/review klasörleri. Arşiv 242 gerçek sentetik PNG içerir: 82 app, 70 landing/docs, 90 Android debug (84 açık/koyu sayfa + 6 dosya/sekme durumu). Koddan inventory, gerçek capture, aranabilir galeri ve hash/ölçü/kapsam kontrol komutları eklendi. Playwright development bağımlılığı kuruldu. Arşiv bütün UX durumlarını veya signed cihazı temsil etmez; görsel yeniden tasarım ve CI visual diff [[assets-pipeline/ui-ux-guncelleme-plani|en son planlanır]].
+
+Canonical denetim: [[docs/mobile/mobile-phase-2-5-audit]], [[docs/ui-assets-pipeline]]. ADR-006/012 ve etkilenen mobil/storage/mevcut durum/öncelik sayfaları güncellendi; ADR indeksi sonraki numarayı 023 olarak tutar. Son kasa ve arşiv kontrolleri ilgili üretilmiş raporlarda yer alır.

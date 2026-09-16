@@ -1,7 +1,7 @@
 ---
 tur: mimari
 durum: mevcut
-guncellendi: 2026-09-04
+guncellendi: 2026-09-16
 guven: yuksek
 kaynaklar:
   - apps/neta-mobile
@@ -9,6 +9,7 @@ kaynaklar:
   - packages/design-tokens
   - docs/mobile/neta-mobile-redesign-master-plan.md
   - docs/roadmaps/platform-master-plan.md
+  - docs/mobile/mobile-security-acceptance.md
 ilgili:
   - "[[04-bilesenler/neta-mobile|neta-mobile]]"
   - "[[03-mimari/api|API]]"
@@ -24,6 +25,14 @@ etiketler:
 ---
 
 # Mobil mimari
+
+## 2026-09-16 — MOB-2–5 tamamlama ve UI arşivi
+
+Instance kimliği aktif/kayıtlı hedef bazında doğrulanır; değişim native auth generation/session/cache'i temizler. Native cookie auth production CSRF için selected origin'i gönderir. JSON/binary resource transport ortak 401 refresh ve generation kontrolü kullanır. Cache yalnız GET'tir; transient retry coordinator aynı kullanıcı işleminin idempotency key'ini korur.
+
+Core listeler cursor ile devam eder; relation/project/activity/finance alt listeleri cursor collector kullanır. Project asset binary download `/api/v1/files/:id` ile aynı backend FileService scope'una bağlanır. Project PDF/10 MiB, image sanitize, native cache/share/cleanup ve owner logout kodda mevcuttur. Portal formları client rolüyle, owner formları freelancer rolüyle açılır; belirsiz root redirect döngüleri kaldırıldı.
+
+Denetim ve kanıt sınırı [[docs/mobile/mobile-phase-2-5-audit]] içindedir. [[assets-pipeline/indeks|UI assets pipeline]] yalnız tasarım arşivi/capture altyapısıdır; mobil runtime vault'tan asset import etmez. Yeni görsel tasarım en son gelir.
 
 ## Mevcut teknoloji
 
@@ -68,6 +77,12 @@ Owner read dilimi dashboard, müşteri, proje/plan/revizyon, görev ve takvim i�
 ## Güvenlik
 
 Production HTTPS, same-origin discovery URL, minimum version, instance ID ve instance-scoped SecureStore vardır. İlk auth transport'u Better Auth cookie'dir; owner için pairing access/refresh bearer yolu ayrıca kodda bulunur. Backend restore token epoch rotation'ı uygular. İki canlı instance izolasyonu ile pairing/revoke/restore gerçek cihaz kabulü bekler.
+
+2026-09-16 otomatik güvenlik kabulü historical refresh digest/reuse, explicit device scope, Bearer → cookie fallback reddi, native profil/parola ve iki gerçek client session'ının negatif HTTP/file izolasyonunu doğrular. Native auth generation ve storage write sırası, logout/new-login sonrası eski ağ sonucunun credential diriltmesini engeller. İzole restore DB kontrolü signed/native restore kanıtı değildir; [[docs/mobile/mobile-security-acceptance]] açık kabul ve tasarım farklarını listeler.
+
+MOB-2–5 denetiminde native auth taşıması Expo fetch + `credentials: omit` ile scoped SecureStore Cookie/Bearer'a bağlandı; işletim sisteminin örtük cookie deposu kullanılmaz. Sign-in `/me` ID eşleşmesi, flat actor binding ve provider operasyon epoch'u yanlış hesap/geç kalan UI sonucunu reddeder. File/appearance multipart upload aynı generation-aware wrapper'ı, redirect reddini ve gerçek dosya boyutunu kullanır; byte acknowledgement olmayan yüklemede sahte yüzde gösterilmez. Hesap self-service `/me/profile`, `/me/password`, `/me/sessions` yalnız çağıranın user ID'sinde owner/client için ortaktır; workspace ayarları owner-only kalır. Portal logout veri yüklemesinden bağımsızdır. Canonical ayrıntı: [[docs/mobile/mobile-phase-2-5-audit]].
+
+Versioned file, appearance, portal asset ve davet URL'leri canonical `APP_URL` kaynağından üretilir; Next standalone'ın proxy arkasındaki iç `request.url` origin'i dış adres authority'si değildir. Cookie sign-out JSON başlığıyla boş JSON nesnesi gönderir; lokal credential/cache temizliği finally'dedir.
 
 ## Kaynaklar
 

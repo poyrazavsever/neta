@@ -1,7 +1,7 @@
 ---
 tur: sistem
 durum: mevcut
-guncellendi: 2026-09-15
+guncellendi: 2026-09-16
 guven: yuksek
 ozet: "Neta bilgi kasasındaki bütün kalıcı notları tek satırlık özetlerle yönlendiren üretilmiş genel indeks."
 kaynaklar:
@@ -29,12 +29,12 @@ etiketler:
 
 ## Kapsam
 
-Bu harita **97** kalıcı Markdown notunu listeler. Tek satırlık özet yönlendirme içindir; karar veya implementation kanıtının yerine geçmez.
+Bu harita **100** kalıcı Markdown notunu listeler. Tek satırlık özet yönlendirme içindir; karar veya implementation kanıtının yerine geçmez.
 
 ## 00 — Sistem ve bakım
 
 - [[00-sistem/indeks|Neta yaşayan bilgi kasası]] — Bu klasör, repository ve canonical dokümanların üzerinde çalışan bağlantılı sentez katmanıdır. Kaynak kodun veya docs/ belgelerinin yerine geçmez. Bir iddia kritikse ilgili sayfadaki kaynak… _(sistem · mevcut)_
-- [[00-sistem/mevcut-durum|Mevcut durum]] — Neta, bir freelancer/owner'ın iş akışlarını kendi sunucusunda yönetmesi ve seçili verileri davetli müşterilerle paylaşması için geliştirilmiş self-hosted bir uygulamadır. Repository aynı pn… _(sistem · mevcut)_
+- [[00-sistem/mevcut-durum|Mevcut durum]] — 2026-09-16 MOB-2–5 denetiminde runtime kimlik izolasyonu, native production auth Origin, auth route/logout döngüsü, relation/core pagination, mutation retry/cache ve versioned dosya downloa… _(sistem · mevcut)_
 - [[00-sistem/acik-sorular|Açık sorular]] — Bu liste yalnız gerçek karar veya kanıt açığını içerir. Bir soru çözüldüğünde sonuç ilgili mimari/karar sayfasına taşınır ve buradan kapanış bağlantısı verilir. _(sistem · mevcut)_
 - [[00-sistem/agent-baglam-ve-hooklar|Agent bağlamı ve hooklar]] — Agentların genel haritadan başlamasını, ilgili ADR bağlamını almasını ve kalıcı kod değişikliklerinden sonra kasayı senkronize etmesini sağlayan prompt/hook düzeni. _(sistem · mevcut)_
 - [[00-sistem/celiskiler|Çelişkiler ve drift kayıtları]] — Durum: 2026-09-03'te MOB-1 ile çözüldü. _(sistem · mevcut)_
@@ -75,7 +75,7 @@ Bu harita **97** kalıcı Markdown notunu listeler. Tek satırlık özet yönlen
 - [[03-mimari/kimlik-dogrulama|Kimlik doğrulama mimarisi]] — Better Auth, Drizzle SQLite adapter ile aynı neta.db içinde user/account/session/verification verisini tutar. Uygulamaya özgü rol ve client bağı appProfiles tablosundadır. getSessionContext… _(mimari · mevcut)_
 - [[03-mimari/migrasyonlar|Migrasyonlar]] — Drizzle SQL migration'ları apps/neta-app/server/db/migrations/ altında versioned dosyalardır. scripts/migrate.mjs SQLite pragmalarını uygular, Drizzle migrator'ı çalıştırır ve runtimechecks… _(mimari · mevcut)_
 - [[03-mimari/mimari-genel-bakis|Mimari genel bakış]] — Neta'nın canonical backend'i neta-app içindedir. Web UI, portal ve mobil farklı transport/istemci yüzeyleri olsa da iş kurallarının DomainService/repository/specialized service katmanlarınd… _(mimari · mevcut)_
-- [[03-mimari/mobil-mimari|Mobil mimari]] — Expo SDK 57, React Native 0.86, React 19, Expo Router, SecureStore, AsyncStorage ve platform-neutral Neta packages kullanılır. Route ağacı public, owner, portal ve modal form gruplarına ayr… _(mimari · mevcut)_
+- [[03-mimari/mobil-mimari|Mobil mimari]] — Instance kimliği aktif/kayıtlı hedef bazında doğrulanır; değişim native auth generation/session/cache'i temizler. Native cookie auth production CSRF için selected origin'i gönderir. JSON/bi… _(mimari · mevcut)_
 - [[03-mimari/monorepo|Monorepo]] — Root pnpm-workspace.yaml, apps/ ve packages/ paketlerini kapsar. Tek package manager pnpm@11.5.1, tek lockfile ve Node 24 engine sözleşmesi vardır. Root package yalnız orchestration scriptl… _(mimari · mevcut)_
 - [[03-mimari/runtime|Runtime]] — Self-hosted ürün Next.js 16 App Router + React 19 üzerinde Node.js runtime'dır. Better Auth, better-sqlite3, Drizzle, local filesystem ve opsiyonel AI provider adapter'ları aynı @neta/app p… _(mimari · mevcut)_
 - [[03-mimari/sqlite|SQLite]] — Tek owner ve tek process self-hosting modelinde ayrı database servisini kaldırır; app verisi ile auth verisini aynı backup/cutover sınırında tutar; kurulum ve geri yükleme yüzeyini küçültür. _(mimari · mevcut)_
@@ -123,6 +123,7 @@ Bu harita **97** kalıcı Markdown notunu listeler. Tek satırlık özet yönlen
 - [[06-kararlar/adr-019-v1-validation-http-statusu|ADR-019 — V1 validation HTTP statüsü]] — V1 parse ve iş girdisi validation hataları tutarlı biçimde 400 VALIDATIONERROR döner; 422 invariant ihlalleri için ayrıdır. _(karar · mevcut)_
 - [[06-kararlar/adr-020-mobil-server-surum-uyumlulugu|ADR-020 — Mobil-server sürüm uyumluluğu]] — Mobil-server uyumluluğu API major ve server'ın ilan ettiği minimum client SemVer ile belirlenir; aynı v1 içindeki additive alanlar uyumludur. _(karar · mevcut)_
 - [[06-kararlar/adr-021-api-mutation-idempotency-kaydi|ADR-021 — API mutation idempotency kaydı]] — Retry edilebilir v1 mutation sonuçları actor, method, route ve Idempotency-Key kapsamında SQLite'ta atomik olarak saklanır. _(karar · mevcut)_
+- [[06-kararlar/adr-022-ui-assets-pipeline|ADR-022 — UI assets pipeline]] — UI kaynakları ve sentetik başlangıç çekimleri vault içinde platform/rol/sayfa bazında saklanır; runtime asset kaynağı uygulamalarda kalır. _(karar · mevcut)_
 
 ## 07 — Güvenlik
 
@@ -145,7 +146,7 @@ Bu harita **97** kalıcı Markdown notunu listeler. Tek satırlık özet yönlen
 
 - [[09-yol-haritasi/mevcut-oncelikler|Mevcut öncelikler]] — Aşağıdaki sıra mobil uygulama planının ilk kritik yoludur. _(yol-haritasi · planlanan)_
 - [[09-yol-haritasi/mobil-uygulama-plani|Neta Mobile uygulama planı]] — Neta Mobile'ı build-time tek instance istemcisinden güvenli evrensel uygulamaya taşıyan, backend API ve release kapılarıyla birlikte yürütülen uygulama planı. _(yol-haritasi · mevcut)_
-- [[09-yol-haritasi/planlanan-yetenekler|Planlanan yetenekler]] — Bir yetenek ancak schema/route/service/authorization/contract/negative test ve operasyon etkileri tamamlandığında mevcute taşınır. ADR veya ekran tasarımı tek başına yeterli değildir. _(yol-haritasi · planlanan)_
+- [[09-yol-haritasi/planlanan-yetenekler|Planlanan yetenekler]] — Bu liste store-ready mobile-v1 ilanı değildir. docs/mobile/mobile-security-acceptance otomasyon ile açık native/tasarım kabulünü ayırır. _(yol-haritasi · planlanan)_
 - [[09-yol-haritasi/teknik-borc|Teknik borç]] — Tenant izolasyonu, secret/token lifecycle ve backup bütünlüğü; görsel parity veya yeni feature sayısından önce gelir. Contract drift, yeni mobil endpoint eklenmeden önce kapatılmalıdır. _(yol-haritasi · mevcut)_
 - [[09-yol-haritasi/yol-haritasi|Yol haritası sentezi]] — Web self-hosted runtime'ı canonical backend olarak koruyup landing, web app ve resmî evrensel mobile'ı aynı monorepo/contract disiplini altında birleştirmek. Mobil için ikinci backend veya… _(yol-haritasi · planlanan)_
 
@@ -156,6 +157,11 @@ Bu harita **97** kalıcı Markdown notunu listeler. Tek satırlık özet yönlen
 ## 11 — Kaynaklar
 
 - [[11-kaynaklar/indeks|Kaynak indeksi]] — Bu sayfa canonical kaynak ailelerini ve gelecekte eklenecek dış kaynak notlarını yönlendirir. Kaynak içeriğini kopyalamaz. _(kaynak · mevcut)_
+
+## Assets pipeline
+
+- [[assets-pipeline/indeks|Assets pipeline]] — Mobil, canonical web uygulaması, portal ve landing/docs için sayfa planı, kaynak asset ve gerçek ekran görüntüsü arşivi. _(is-akisi · mevcut)_
+- [[assets-pipeline/ui-ux-guncelleme-plani|UI/UX güncelleme planı]] — Fonksiyonel mobil çalışma sonrasında sayfa akışları, tasarım sistemi, asset üretimi ve görsel kabulün sıralı yürütülmesi. _(yol-haritasi · planlanan)_
 
 ## Ham kaynak alanı
 

@@ -1,7 +1,7 @@
 ---
 tur: sistem
 durum: mevcut
-guncellendi: 2026-09-04
+guncellendi: 2026-09-16
 guven: yuksek
 kaynaklar:
   - README.md
@@ -12,6 +12,7 @@ kaynaklar:
   - apps/neta-mobile/app.config.ts
   - docs/neta-backend-mobile-api-master-plan.md
   - docs/roadmaps/platform-master-plan.md
+  - docs/mobile/mobile-security-acceptance.md
 ilgili:
   - "[[03-mimari/mimari-genel-bakis|Mimari genel bakış]]"
   - "[[00-sistem/celiskiler|Çelişkiler]]"
@@ -21,6 +22,8 @@ etiketler:
 ---
 
 # Mevcut durum
+
+2026-09-16 MOB-2–5 denetiminde runtime kimlik izolasyonu, native production auth Origin, auth route/logout döngüsü, relation/core pagination, mutation retry/cache ve versioned dosya download/PDF parity eksikleri giderildi. Ayrıntı [[docs/mobile/mobile-phase-2-5-audit]]. [[assets-pipeline/indeks|UI assets pipeline]] koddan envanter, sentetik screenshot ve kaynak asset arşivi sunar; [[assets-pipeline/ui-ux-guncelleme-plani|görsel güncelleme]] en son planlanır. Bu çalışma signed cihaz/iki HTTPS instance release kapılarını açmaz.
 
 ## Bir bakışta Neta
 
@@ -91,6 +94,8 @@ Backend'de çalışan mobil v1 yüzeyi şunları kapsar:
 - Görsel upload ile proje asset liste/silme yüzeyleri
 
 Owner read/mutation/parity dilimi strict query, opaque cursor, session-derived owner scope, explicit DTO, persistent idempotency ve optimistic concurrency kullanır. Contract/type/build kapıları ile core mutation canlı smoke'u geçer. Backend'de owner pairing challenge/exchange/refresh/revoke ve client portal v1 route'ları; mobilde pairing token transport'u ve portal istemcisi kodda bulunur. Bunların gerçek cihaz, restore ve tenant izolasyonu kabul kanıtı henüz tamamlanmamıştır. AI assistant'ın native taşıma yüzeyi planlanandır. Mağaza yayını signed native ve iki canlı HTTPS instance kanıtına kadar blokludur.
+
+2026-09-16'da MOB-6/7 otomatik güvenlik kabulü geçti: historical token reuse, Bearer/scope sınırı, native profil/parola, expiry/disable/revoke/logout-all, izole DB restore epoch ve iki gerçek client session'ının karşılıklı HTTP/file negatifleri doğrulandı. 0016 migration geçmişi eksik mevcut aktif cihaz oturumlarını kapatır; yeniden eşleştirme gerekir. Mobilde logout/new-login sonrası geç refresh/storage write koruması eklendi. [[docs/mobile/mobile-security-acceptance]] signed/native kanıt ve açık ADR tasarım farklarını ayrı listeler.
 
 ## AI'nin bugünkü gerçekliği
 

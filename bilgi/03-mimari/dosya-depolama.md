@@ -1,7 +1,7 @@
 ---
 tur: mimari
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-16
 guven: yuksek
 kaynaklar:
   - apps/neta-app/server/files/service.ts
@@ -47,11 +47,17 @@ Read authorization metadata üzerinden uygulanır. Fiziksel file `O_NOFOLLOW` il
 
 ## Güvenlik sınırları
 
-5 MB, JPEG/PNG/WebP/GIF; ikon PNG; SVG yoktur. Magic-byte doğrulaması parsing saldırılarını tamamen ortadan kaldırmaz. Image re-encode, EXIF stripping, malware scanning ve content-disarm doğrulanmamıştır.
+Project asset en fazla 10 MiB; diğer türler 5 MiB. JPEG/PNG/WebP/GIF; ikon PNG; PDF yalnız project asset; SVG yoktur. V1 image upload gerçek decode/re-encode ile metadata temizler. PDF header/EOF doğrulamasıyla kabul edilir, `metadataSanitized=false` ve download `attachment` olur. Magic-byte kontrolü PDF parsing/malware/content-disarm kabulü değildir; malware scanning uygulanmamıştır.
+
+Mobil dosya indirme URL'si `/api/v1/files/:id` olur. Aynı FileService authorization'ı owner Bearer + `files:read`, owner cookie ve scoped client cookie için uygulanır; response private/no-store'dur. Native indirme seçilmiş origin ve file ID/MIME/size'ı kontrol eder, cache dosyasını share sonrası finally siler. Legacy `/api/files/:id` cookie yüzeyi korunur.
 
 ## Operasyon
 
 Uploads DB ile birlikte backup/restore edilmelidir. Sadece DB veya sadece dosya ağacını geri yüklemek referans bütünlüğünü bozabilir.
+
+## Delete authorization
+
+2026-09-16 güvenlik kabulünde iki gerçek client session'ıyla portal-visible/private/foreign download ve metadata negatifleri doğrulandı. Delete, unreadable yabancı dosya ile olmayan ID için aynı `404` üretir; izinli portal dosyasını silme gibi actor'ın görebildiği ama yetkisiz işlemler `403` kalır. Ortak `FileService` read authorization'ını delete öncesinde de uygular. [[docs/mobile/mobile-security-acceptance]] HTTP portal kanıtını native dosya transport kabulünden ayırır.
 
 ## Kaynaklar
 

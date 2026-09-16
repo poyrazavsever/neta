@@ -3,7 +3,7 @@ tur: karar
 durum: mevcut
 karar_durumu: kabul-edildi
 onceki_kimlik: K-003
-guncellendi: 2026-09-03
+guncellendi: 2026-09-16
 guven: yuksek
 ozet: "Upload byte'ları yerel persistent filesystem'da, erişim metadata'sı SQLite'ta saklanır."
 kaynaklar:
@@ -33,6 +33,8 @@ Self-hosted instance upload'ları harici object storage zorunluluğu olmadan sak
 ## Karar
 
 Upload byte'ları persistent yerel filesystem'da, dosya metadata'sı ve erişim kapsamı SQLite'ta tutulur.
+
+2026-09-16 mobil parity güncellemesi: project asset'leri en fazla 10 MiB ve PDF/görsel kabul eder; avatar/logo/icon en fazla 5 MiB, icon PNG-only kalır. PDF header/EOF doğrulanır ve indirme `attachment` olur; bu malware scanning veya PDF content-disarm değildir. V1 görseller gerçek decode/re-encode ile sanitize edilir; PDF `metadataSanitized=false` taşır. Eski Faz 3 bütün türler için image/5 MiB hükmü bu project kapsamıyla güncellenmiştir; yerel persistence kararı değişmez.
 
 ## Gerekçe
 

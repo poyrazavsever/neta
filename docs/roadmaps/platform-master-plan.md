@@ -1,8 +1,8 @@
 ---
 title: Neta Platform Master Planı
 status: active
-current_phase: MOB-7-code-security-acceptance-open
-last_updated: 2026-09-15
+current_phase: MOB-6-7-automated-security-native-open
+last_updated: 2026-09-16
 owners:
   - platform
   - backend-api
@@ -12,7 +12,7 @@ owners:
 
 # Neta platform master planı
 
-> 2026-09-15: MOB-4/5 owner parity ve MOB-6/7 pairing/portal transport'u kodda yer alır. Signed iki-instance native, pairing restore/revoke ve client tenant negatif kabulü mağaza yayını için açıktır.
+> 2026-09-16: MOB-6/7 otomatik güvenlik kabulü historical refresh reuse, Bearer/scope, profil/parola lifecycle, izole DB restore ve iki client HTTP/file negatiflerini doğrular. [Kanıt sınırı ve açık tasarım farkları](../mobile/mobile-security-acceptance.md) signed iki-instance/native kabulden ayrıdır; mağaza kabulü tamamlanmamıştır.
 
 ## 1. Ürün kararı
 

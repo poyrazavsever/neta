@@ -1,13 +1,13 @@
 # Neta Mobile kurulum kararları
 
-Son güncelleme: 2026-07-29
+Son güncelleme: 2026-09-16
 
 ## Sabitlenen taban
 
 | Bileşen | Sürüm/karar |
 | --- | --- |
 | Expo | SDK 57 (stable) |
-| React Native | 0.86.0 |
+| React Native | 0.86.2 |
 | React | 19.2.3 |
 | TypeScript | 6.0 strict |
 | Node.js | 24 LTS; destek aralığı `>=24 <25` |
@@ -17,7 +17,7 @@ Son güncelleme: 2026-07-29
 | Native mimari | Expo development build + New Architecture |
 | UI | `packages/design-tokens` + React Native `StyleSheet`; ek styling framework yok |
 | Native date/time | Expo SDK 57 uyumlu `@react-native-community/datetimepicker` 9.1.0 |
-| Test | Node 24 type-stripping + yerleşik test runner; ek test runner yok; 88 unit/contract test |
+| Test | Node 24 type-stripping + yerleşik test runner; mobil 129 unit/contract test (2026-09-16); UI arşivleme için root Playwright |
 
 Sürümler Expo'nun SDK 57 uyumluluk matrisi ve resmi `default@sdk-57`
 şablonu temel alınarak lockfile'a sabitlenir. Canary/beta paket kullanılmaz.
@@ -71,6 +71,36 @@ ham `fetch` çağırmaz.
 TanStack Query, gerçek feature sayısı ve invalidation ihtiyacı arttığında tekrar
 değerlendirilecek. Şimdilik küçük AsyncStorage TTL cache yeterli.
 
+## Windows Android emülatörü ve lokal Metro
+
+Android Studio SDK'sındaki `platform-tools` ve `emulator` klasörleri kullanıcı
+PATH'inde bulunmalıdır. `ANDROID_HOME` SDK kökünü göstermelidir.
+
+İlk native development build için repository kökünde `pnpm mobile:android`
+çalıştırılır. `android/` yoksa Expo prebuild tarafından üretilir; bu klasör git
+tarafından ignore edilir. Sonraki JS geliştirmelerinde `pnpm mobile:start:local`
+ve terminalde `a` tuşu kullanılır. Bu komut Metro'yu yalnız IPv4 localhost'ta
+dinletir; emülatör bağlantısı ADB `tcp:8081` reverse üzerinden kurulur.
+
+`start:local` ayrıca `EXPO_OFFLINE=1` ile dış Expo hesap API'sine bağımlı olmayan yerel manifest sunar. API bağlantısı kullanıcının doğruladığı Neta instance'ına normal devam eder. Bu ayar loopback CLI wrapper'ındadır. Metro diğer app'lerin geçici `.next*`, `.data`, `.artifacts`, `.tooling` ve vault asset arşivini taramaz; smoke cleanup'ının Windows FSWatcher'ı çökertmesi önlenir.
+
+`Error: cmd: Can't find service: package`, Android package manager henüz hazır
+değilken görülür. Uygulama kurulmadan önce aşağıdaki sonuçlar doğrulanır:
+
+```powershell
+adb shell getprop sys.boot_completed
+# 1
+adb shell service check package
+# Service package: found
+```
+
+2026-09-16 lokal kabulünde API 36.1 AVD'nin eski userdata/quick-boot oturumu
+sıfırlandı ve `-gpu swiftshader_indirect -no-snapshot` ile cold boot yapıldı.
+Kurulu emulator 36.3.10, `-gpu software` değerini desteklemez. AVD GPU tercihi
+SwiftShader ve sonraki açılışlar cold boot olarak ayarlandı. Android debug APK
+başarıyla derlendi, emülatöre kuruldu ve Neta instance bağlantı ekranı açıldı.
+Bu lokal development kabulü signed production/two-instance release kanıtı değildir.
+
 ## iOS Pod ve Xcode kurulumu
 
 Apple Silicon ortamında Ruby 3.4 bir kez kurulur:
@@ -97,10 +127,9 @@ Public build-time değerleri `EXPO_PUBLIC_*` adıyla verilir. Secret değerler
 mobil bundle'a konmaz. Self-host instance origin'i build-time environment
 değildir; kullanıcı bağlantı ekranında girer ve discovery ile doğrulanır.
 
-## Henüz tamamlanmayan Faz 0 işleri
+## Faz 0 açıklarının güncel durumu
 
-Bu repository'de web/backend kaynakları bulunmadığından aşağıdakiler henüz
-kanıtlanamaz:
+Eski 2026-07 Faz 0 notunda web/backend kaynakları olmadığı varsayılmıştı. Güncel monorepo canonical backend'i `apps/neta-app`, mobil istemciyi `apps/neta-mobile` altında içerir. Route/schema/versioned auth ve portal kodu artık incelenebilir; otomatik kabul [mobil güvenlik matrisi](mobile-security-acceptance.md) ve [MOB-2–5 denetimi](mobile-phase-2-5-audit.md) ile izlenir. Aşağıdaki tarihsel liste tümüyle güncel açık iş listesi değildir:
 
 - Route, Server Action, DomainService ve schema envanteri.
 - Better Auth Expo multi-domain gerçek cihaz spike'ı.
@@ -108,8 +137,7 @@ kanıtlanamaz:
 - ADR-0018 ve portal auth lifecycle güncellemesi.
 - Mevcut Poyraz UI tokenlarının kaynak web uygulamasından çıkarılması.
 
-Bu işler için web/backend repository'si veya erişilebilir bir test Neta
-instance'ı gereklidir. Mobil bootstrap bunları tamamlanmış saymaz.
+Signed gerçek cihaz, iki bağımsız canlı HTTPS instance ve restore runtime lifecycle kabulü hâlâ gerekir. UI screenshot envanteri [assets pipeline](../ui-assets-pipeline.md) içindedir; signed kabulün yerine geçmez.
 
 ## Doğrulama durumu
 
