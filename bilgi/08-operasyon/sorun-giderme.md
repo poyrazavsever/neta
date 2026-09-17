@@ -1,9 +1,10 @@
 ---
 tur: operasyon
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-data-acceptance.md
   - README.md
   - apps/neta-app/server/config.ts
   - apps/neta-app/server/db/health.ts
@@ -42,11 +43,11 @@ DB metadata ile uploads path aynı restore point'ten mi? File size değişmiş m
 
 ## Mobil discovery çalışıyor, ekranlar 404
 
-Bu bugünkü bilinen backend açığı olabilir. Backend `/api/v1` içinde yalnız bootstrap route'ları vardır. Capability string'ine güvenme; gerçek route inventory ve [[docs/neta-backend-mobile-api-master-plan]] kontrol et.
+Discovery başarısı resource erişimini kanıtlamaz. Capability → route matrisi, API sürümü ve actor/resource scope kontrol edilir. Owner/portal/AI route’ları mevcuttur; çapraz scope kaynaklar veri sızdırmamak için 404 dönebilir. [[docs/neta-backend-mobile-api-master-plan]] canonical route kaynağıdır.
 
 ## Mobil dil/tema güncellenmiyor
 
-`language` vs `locale`, PATCH response shape ve `catalogVersion` vs `version` drift'ini kontrol et. Bu bilinen contract uyuşmazlığıdır.
+Canonical preferences locale/timezone ve MeProfile yanıtını, catalog version’ını, seçili instance/actor/generation ve cache invalidation’ı kontrol edin. Eski language/locale ve PATCH response drift’i kapandı; historical parser biçimine geri dönmeyin.
 
 ## AI key hatası
 
@@ -61,3 +62,7 @@ App durmuş mu? Bundle manifest, path, size/checksum ve ekstra file kontrolünü
 - [[README]]
 - `apps/neta-app/server/config.ts`
 - `apps/neta-app/server/db/health.ts`
+
+## 2026-09-17 — Migration/restore 503
+
+Eksik migration forward upgrade ile tamamlanır. Hash/sıra uyuşmazlığı veya daha yeni DB’de matching release + doğrulanmış backup seçilir; ledger elle düzeltilmez. Eksik paketlenmiş journal/SQL artifact hatasıdır. WAL/SHM hatasında app’i durdurup matching release/SQLite ile checkpoint/temiz kapanış yapın; WAL’ı elle silmeyin. [[docs/mobile/mobile-data-acceptance]] kapsamı açıklar.

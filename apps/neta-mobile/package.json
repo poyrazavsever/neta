@@ -59,14 +59,17 @@
     "redesign:phase0": "node scripts/redesign-phase0-gate.mjs",
     "redesign:phase6-7": "node scripts/redesign-phase6-7-gate.mjs",
     "redesign:phase8-11": "node scripts/redesign-phase8-11-gate.mjs",
-    "redesign:phase12": "node scripts/redesign-phase12-gate.mjs && node scripts/native-release-gate.mjs && node scripts/fork-config-smoke.mjs",
+    "redesign:phase12": "node scripts/redesign-phase12-gate.mjs && node scripts/native-release-gate.mjs --source-only && node scripts/fork-config-smoke.mjs",
     "native:verify": "node scripts/native-release-gate.mjs",
     "fork:config-smoke": "node scripts/fork-config-smoke.mjs",
     "native:build:android": "cd android && ./gradlew app:assembleRelease",
     "native:build:ios": "xcodebuild -workspace ios/Neta.xcworkspace -scheme Neta -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build",
     "release:guard": "node scripts/production-release-gate.mjs",
+    "release:evidence:test": "node --test scripts/release-readiness.test.mjs",
+    "release:readiness": "node scripts/release-readiness-gate.mjs --report",
+    "release:acceptance": "node scripts/release-readiness-gate.mjs --strict",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm i18n:check && pnpm a11y:check && pnpm redesign:phase0 && pnpm redesign:phase6-7 && pnpm redesign:phase8-11 && pnpm redesign:phase12 && pnpm config:check",
-    "release:check": "pnpm check && pnpm release:guard"
+    "release:check": "pnpm check && pnpm release:guard && pnpm release:evidence:test"
   },
   "private": true
 }

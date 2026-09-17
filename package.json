@@ -26,7 +26,10 @@
     "mobile:android": "pnpm --filter @neta/mobile android",
     "mobile:check": "pnpm --filter @neta/mobile check",
     "mobile:release:check": "pnpm --filter @neta/mobile release:check",
+    "mobile:release:readiness": "pnpm --filter @neta/mobile release:readiness",
+    "mobile:store:check": "pnpm --filter @neta/mobile release:acceptance && pnpm contract:check && pnpm mobile:release:check && pnpm mobile:security:check && pnpm mobile:ai:check && pnpm mobile:data:check",
     "mobile:security:check": "pnpm --filter @neta/app mobile:security:check && pnpm --filter @neta/mobile test",
+    "mobile:ai:check": "pnpm --filter @neta/app mobile:ai:check && pnpm --filter @neta/mobile test",
     "contract:check": "pnpm --filter @neta/api-contracts test && pnpm --filter @neta/app mobile:contract:test && pnpm --filter @neta/app typecheck && pnpm --filter @neta/mobile typecheck && pnpm --filter @neta/mobile test",
     "vault:map": "node tools/vault/generate-map.mjs",
     "vault:map:check": "node tools/vault/generate-map.mjs --check",
@@ -80,7 +83,7 @@
     "ui:assets:smoke:mobile": "node tools/ui-assets/native-file-smoke.mjs",
     "ui:assets:gallery": "node tools/ui-assets/gallery.mjs",
     "ui:assets:check": "node tools/ui-assets/check.mjs",
-    "mobile:ai:check": "pnpm --filter @neta/app mobile:ai:check && pnpm --filter @neta/mobile test"
+    "mobile:data:check": "pnpm --filter @neta/app mobile:data:check"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0"

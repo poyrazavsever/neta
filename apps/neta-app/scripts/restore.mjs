@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
 import { ensureDataLayout, getDataConfig } from "./lib/data-dir.mjs";
+import { assertMigrationState, readMigrationManifest } from "../server/db/migration-state.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 
@@ -32,6 +33,10 @@ if (fs.existsSync(config.databasePath) && !args.force) {
   throw new Error(`Target database exists: ${config.databasePath}. Pass --force to overwrite.`);
 }
 
+if (fs.existsSync(config.databasePath + "-wal") || fs.existsSync(config.databasePath + "-shm")) {
+  throw new Error("Target database has WAL/SHM files. Stop the app and checkpoint with its matching release before restore.");
+}
+
 const restoreId = `${process.pid}-${Date.now()}`;
 const stagedDatabasePath = `${config.databasePath}.restore-stage-${restoreId}`;
 const rollbackDatabasePath = `${config.databasePath}.restore-rollback-${restoreId}`;
@@ -47,6 +52,15 @@ try {
   fs.copyFileSync(backupDbPath, stagedDatabasePath, fs.constants.COPYFILE_EXCL);
   if (hashFile(stagedDatabasePath) !== hashFile(backupDbPath)) {
     throw new Error("Staged database checksum does not match the verified backup.");
+  }
+  const staged = new Database(stagedDatabasePath, { readonly: true });
+  try {
+    if (staged.pragma("integrity_check", { simple: true }) !== "ok" || staged.pragma("foreign_key_check").length) {
+      throw new Error("Backup database integrity validation failed.");
+    }
+    assertMigrationState(staged, readMigrationManifest(config.migrationsDir), { allowPending: true });
+  } finally {
+    staged.close();
   }
   fs.mkdirSync(stagedUploadsDir);
   if (fs.existsSync(backupUploadsDir)) {
@@ -83,6 +97,8 @@ try {
   throw error;
 } finally {
   fs.rmSync(stagedDatabasePath, { force: true });
+  fs.rmSync(stagedDatabasePath + "-wal", { force: true });
+  fs.rmSync(stagedDatabasePath + "-shm", { force: true });
   fs.rmSync(stagedUploadsDir, { recursive: true, force: true });
 }
 
@@ -95,7 +111,10 @@ function rotateDeviceTokenEpoch(databasePath) {
   const sqlite = new Database(databasePath);
   try {
     sqlite.transaction(() => {
-      sqlite.exec("CREATE TABLE IF NOT EXISTS device_security_state (key text PRIMARY KEY NOT NULL DEFAULT 'default', token_epoch text NOT NULL, updated_at integer NOT NULL DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)))");
+      // Backups before 0015 have no device credentials. Leave table creation to
+      // its versioned migration so a subsequent forward upgrade does not collide.
+      const security = sqlite.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'device_security_state'").get();
+      if (!security) return;
       const epoch = crypto.randomBytes(32).toString("base64url");
       sqlite.prepare("INSERT INTO device_security_state (key, token_epoch, updated_at) VALUES ('default', ?, ?) ON CONFLICT(key) DO UPDATE SET token_epoch = excluded.token_epoch, updated_at = excluded.updated_at").run(epoch, Date.now());
       const table = sqlite.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'device_sessions'").get();

@@ -1,6 +1,6 @@
 # App Store ve Play Store listing taslağı
 
-Son güncelleme: 2026-07-29
+Son güncelleme: 2026-09-17
 
 ## Türkçe
 
@@ -14,7 +14,8 @@ Uzun açıklama:
 > müşterilerinizi ve günlük iş akışınızı hareket halindeyken yönetin. Müşteri
 > portalı, paylaşılan proje ilerlemesini ve revizyonları rol bazlı erişimle sunar.
 > Açık/koyu tema, çoklu dil ve erişilebilir form deneyimi cihaz tercihlerinize
-> uyum sağlar. Verileriniz seçtiğiniz self-hosted Neta instance'ında kalır.
+> uyum sağlar. Ana iş kayıtlarınız seçtiğiniz self-hosted Neta instance’ında saklanır. AI
+> kullanıldığında ilgili çalışma bağlamı instance’ta seçilen sağlayıcıya gönderilir.
 
 Anahtar kelimeler: proje, görev, müşteri, freelancer, self-hosted, iş yönetimi
 
@@ -32,7 +33,8 @@ Long description:
 > clients, and everyday work on the go. The client portal presents shared
 > project progress and revisions through role-based access. Light and dark
 > themes, multilingual content, and accessible forms adapt to your device.
-> Your workspace data remains on the self-hosted Neta instance you choose.
+> Workspace records are stored on the self-hosted Neta instance you choose.
+> When AI is used, relevant workspace context is sent to its configured provider.
 
 Keywords: project, task, client, freelancer, self-hosted, work management
 
@@ -43,7 +45,7 @@ Promotional text: Connect to your Neta workspace from iOS and Android.
 Her platform ve dil için gerçek release build, seed edilmiş sentetik fixture ve
 kişisel veri içermeyen aynı senaryo kullanılmalıdır:
 
-1. Onboarding/login — fork'a ait Neta alanının markalı girişi.
+1. Domain/QR bağlantısı → metadata onayı → seçilen instance’ın markalı login’i.
 2. Owner dashboard — stats ve son işler; light TR.
 3. Projects/tasks — uzun liste ve durumlar; dark TR.
 4. Calendar/finance — üretkenlik akışı; light EN.

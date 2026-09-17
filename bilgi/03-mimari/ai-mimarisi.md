@@ -1,9 +1,10 @@
 ---
 tur: mimari
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-ai-acceptance.md
   - apps/neta-app/server/settings/ai.ts
   - apps/neta-app/server/ai/provider.ts
   - apps/neta-app/app/api/chat/route.ts
@@ -44,7 +45,7 @@ Sonuç: `BETTER_AUTH_SECRET` kaybı AI key'i de kaybettirir; plansız secret rot
 
 ## Hata sınırı
 
-Timeout, model bulunamadı, auth rejection, rate limit ve provider 5xx kullanıcıya normalize edilmiş domain hatası olur. Bilinmeyen upstream hata server loguna yazılır; provider secret response'a girmez.
+Timeout, model bulunamadı, auth rejection, rate limit ve provider 5xx kullanıcıya normalize edilmiş domain hatası olur. Bilinmeyen upstream hatada yalnız sabit, genel bir hata etiketi loglanır; raw error/request/prompt/key gövdesi loglanmaz ve provider secret response'a girmez.
 
 ## Veri paylaşımı
 
@@ -52,7 +53,9 @@ AI çağrısına eklenen proje/finans/chat içeriği seçilen harici provider tr
 
 ## Mevcut/planned
 
-Web AI chat/risk/finance akışları mevcuttur. Mobil v1 AI resource route, granular capability ve native streaming planlanandır. “AI assistant available” capability'si bugün mobil çağrılabilirlik için güvenilir değildir.
+Web AI chat/risk/finance akışları korunur. 2026-09-17’de canonical v1 chat/session/message/stream, project risk ve seçilen ay finance structured transport’u uygulandı; `ai.assistant.v1` available’dır. Native actor/origin/generation/refresh/cancel sınırı ve sentetik sağlayıcı HTTP kabulü [[docs/mobile/mobile-ai-acceptance]] sayfasındadır. Gerçek provider/signed cihaz ve iki canlı HTTPS instance kabulü açıktır.
+
+`server/ai/operations.ts` mevcut api_idempotency_records tablosunda pending/failed/completed lease tutar; provider I/O transaction dışında, user-message claim ve assistant/result completion kısa immediate transaction’larla atomiktir. Owner başına en fazla üç aktif işlem; lease timeout + 30 saniye, eski lease yazıları fenced, completed retry aynı DTO’dur. Failed/recovered istek provider’da yeniden maliyet oluşturabilir. Yeni migration veya ikinci backend yoktur. Ollama `/chat/completions` kullanır; raw SDK/provider hata gövdesi loglanmaz. Finance month/context totals currency fraction digits ve BigInt ile hesaplanır; 200 detay/16.000 karakter sınırı uygulanır.
 
 ## Kaynaklar
 

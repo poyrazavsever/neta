@@ -1,9 +1,11 @@
 ---
 tur: urun
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-ai-acceptance.md
+  - docs/mobile/mobile-security-acceptance.md
   - apps/neta-app/app
   - apps/neta-app/server/domain
   - apps/neta-app/server/api/v1/contracts.ts
@@ -36,19 +38,18 @@ etiketler:
 ## Mevcut ama sınırlı: mobil
 
 - Expo Router ile owner/client screen yapısı ve native UI altyapısı.
-- Build-time belirlenen tek origin için discovery, instance identity ve branding.
-- Better Auth sign-in sonucu cookie/bearer materyalini instance-scoped SecureStore'da tutma.
+- Runtime domain veya secret-free connect QR ile discovery, instance identity ve branding.
+- Better Auth cookie ve ayrı owner device pairing access/refresh materyalini instance-scoped SecureStore’da tutma.
 - Geniş resource API client/guard ve private cache katmanı.
-- Ancak eksik backend v1 route'ları nedeniyle ekranların çoğu production'da gerçek veriyle tamamlanamaz.
+- Canonical v1 owner read/mutation ve client portal yüzeyleri; cursor pagination, idempotency ve concurrency kontrolleri.
+- Chat/risk/seçili ay finance AI v1 taşıması ve sentetik provider kabulü; signed/native ve gerçek provider kanıtı açık.
 
 ## Planlanan
 
-- Resmî tek mobil binary'de runtime domain/QR instance bağlantısı.
-- Mobil owner resource API read ve mutation parity'si.
-- Mobil client portal parity'si.
-- Idempotency, cursor pagination ve optimistic concurrency.
-- Owner device pairing, opaque access/refresh token rotation, revoke/reuse detection.
-- Notification, AI streaming ve store operasyonlarının gerçek backend sözleşmeleri.
+- Resmî binary’nin signed cihaz ve iki canlı HTTPS instance ile mağaza kabulü.
+- AI streaming/cancel/retry için signed cihaz ve gerçek provider kabulü.
+- Ayrı ADR ile notification/push backend ve relay sözleşmesi.
+- Store/privacy/support ve production operasyon kabulü.
 
 ## Legacy
 
@@ -57,4 +58,4 @@ etiketler:
 
 ## Capability uyarısı
 
-`/api/v1/meta` bugün bazı geniş capability'leri `available` döndürse de karşılık gelen resource route'ları yoktur. Product readiness değerlendirmesinde capability string'i tek başına kanıt sayılmaz; bkz. [[00-sistem/celiskiler|C-001]].
+Capability, yayınlanan route sözleşmesini belirtir; signed/store readiness kanıtı değildir. `ai.assistant.v1` mevcut taşıma yüzeyidir; `mobile-v1` release kabulü tamamlanana kadar planned kalır. Product readiness için kod, otomatik kabul ve açık release kapıları birlikte değerlendirilir.

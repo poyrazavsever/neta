@@ -1,9 +1,10 @@
 ---
 tur: is-akisi
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-release-acceptance.md
   - README.md
   - Dockerfile
   - docs/self-hosted-redesign/phase-8-import-release.md
@@ -41,7 +42,7 @@ DNS, TLS certificate, proxy header, persistent volume, off-site backup, producti
 
 ## Mobil release gate
 
-Mevcut mobile README, backend resource API'leri 404 döndüğü için store release'i bloklu sayar. UI ve native build gate'lerinin geçmesi backend parity yerine geçmez.
+Owner/client/AI resource parity’si kodda ve otomatik kabulde mevcuttur. Store release signed cihaz, iki canlı HTTPS instance ve operasyon kanıtını bekler. [[08-operasyon/mobil-yayin|Mobil yayın]] kaynak kalite ile reviewer/hash’li strict store acceptance’ı ayırır; UI/native graph gate’i gerçek cihaz veya signing yerine geçmez.
 
 ## Kaynaklar
 

@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { ensureDataDirectories, getServerConfig } from "@/server/config";
 import { getSqliteConnection } from "@/server/db/client";
+import { assertMigrationState, readMigrationManifest } from "./migration-state.mjs";
 
 export type ReadinessStatus = {
   ok: boolean;
@@ -32,15 +33,12 @@ export function checkReadiness(): ReadinessStatus {
     sqlite.prepare("select 1 as ok").get();
     checks.databaseReachable = true;
 
-    const migrationRow = sqlite
-      .prepare("select name from sqlite_master where type = 'table' and name = 'runtime_checks'")
-      .get();
-    checks.migrationsApplied = Boolean(migrationRow);
+    assertMigrationState(sqlite, readMigrationManifest(path.join(process.cwd(), "server/db/migrations")));
+    checks.migrationsApplied = true;
 
     return {
-      ok: Boolean(migrationRow),
+      ok: true,
       checks,
-      error: migrationRow ? undefined : "Migrations have not been applied.",
     };
   } catch (error) {
     return {

@@ -1,5 +1,7 @@
 # Fork deployment ve release runbook
 
+> 2026-09-17: Güncel MOB-9 source/native/store gate ve açık kabul kaydı [mobil release kabulü](../mobile-release-acceptance.md) sayfasındadır. Bu belgedeki tarihsel derleme/numara örnekleri signed candidate kanıtı değildir.
+
 Son güncelleme: 2026-07-29
 
 ## 1. Gereksinimler

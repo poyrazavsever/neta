@@ -1,5 +1,7 @@
 # Neta Mobile privacy, support ve domain troubleshooting taslağı
 
+> 2026-09-17: Güncel MOB-9 source/native/store gate ve açık kabul kaydı [mobil release kabulü](../mobile-release-acceptance.md) sayfasındadır. Bu belgedeki tarihsel derleme/numara örnekleri signed candidate kanıtı değildir.
+
 Son güncelleme: 2026-07-29
 
 Yayın durumu: repository taslağı; public URL henüz atanmadı
@@ -16,6 +18,13 @@ Chat, finans, günlük, profil/security/settings ve file response'ları kalıcı
 cache'e yazılmaz. Logout, instance disconnect ve geçersiz session ilgili cache'i
 temizler. Şifre, API key, auth token, request/response body ve private journal
 içeriği analytics veya uygulama loguna gönderilmez.
+
+AI sohbet/risk/finans analizi kullanıldığında owner-scoped proje/görev/müşteri/finans
+ve mevcut chat context’indeki günlük notu seçilen instance AI sağlayıcısına gider.
+Sağlayıcı local Ollama veya harici provider olabilir; provider seçimi ve key server
+tarafındadır. Ayrı journal redaction/egress opt-in geliştirmesi tamamlanmadı.
+AI provider hataları ham request/prompt/key gövdesiyle loglanmaz. Gerçek provider
+privacy/processor açıklaması store formu ve yayınlanan policy ile eşleştirilir.
 
 Merkezi telemetry ve crash reporting varsayılan olarak kapalıdır; mevcut mobil
 binary bunlar için SDK içermez. Gelecekte eklenmesi ayrı açık kullanıcı opt-in'i,

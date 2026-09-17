@@ -6,6 +6,7 @@ const root = new URL('../', import.meta.url);
 const failures = [];
 const packageJson = JSON.parse(await readFile(new URL('package.json', root), 'utf8'));
 const appConfig = await readFile(new URL('app.config.ts', root), 'utf8');
+const eas = JSON.parse(await readFile(new URL('eas.json', root), 'utf8'));
 const sourceFiles = await collectSourceFiles(new URL('src/', root));
 
 for (const dependency of Object.keys(packageJson.dependencies ?? {})) {
@@ -24,8 +25,15 @@ if (!/version:\s*APP_VERSION/.test(appConfig)) failures.push('app.config.ts: do�
 if (!/buildNumber:\s*IOS_BUILD_NUMBER/.test(appConfig)) failures.push('app.config.ts: doğrulanmış iOS buildNumber eksik');
 if (!/versionCode:\s*ANDROID_VERSION_CODE/.test(appConfig)) failures.push('app.config.ts: doğrulanmış Android versionCode eksik');
 if (!/scheme:\s*APP_SCHEME/.test(appConfig)) failures.push('app.config.ts: custom scheme eksik');
+for (const profile of ['preview', 'production']) {
+  if (eas.build?.[profile]?.env?.EXPO_PUBLIC_NETA_ORIGIN !== '') failures.push(`eas.json ${profile}: universal binary origin boş olmalıdır`);
+  if (eas.build?.[profile]?.env?.EXPO_PUBLIC_APP_ENV !== profile) failures.push(`eas.json ${profile}: environment uyuşmuyor`);
+}
 
 for (const requiredDocument of [
+  '../../docs/mobile/mobile-release-acceptance.md',
+  '../../docs/mobile/release/release-candidate.json',
+  '../../docs/mobile/mobile-server-compatibility.md',
   '../../docs/mobile/phase-21/README.md',
   '../../docs/mobile/phase-21/adr-0021-self-hosted-notifications.md',
   '../../docs/mobile/phase-22/README.md',

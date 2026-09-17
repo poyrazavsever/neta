@@ -1,7 +1,7 @@
 ---
 tur: gunluk
 durum: mevcut
-guncellendi: 2026-09-16
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
   - README.md
@@ -266,3 +266,39 @@ Son güvenlik kapısı yedi backend migration/maintenance/replay testi ve gerçe
 Mevcut ADR ve etkilenen mevcut durum/mimari/roadmap/teknik borç sayfaları senkronize edildi; yeni bağımsız karar açılmadı. Signed iOS/Android, iki canlı HTTPS instance ve native/canlı restore kabulü açık release kapılarıdır. Sıradaki uygulama dilimi MOB-8 AI taşıması; UI/UX yeniden tasarımı en son kalır.
 
 Android debug development client yeni Expo Crypto modülüyle emülatör mimarisi x86_64 için iki worker'la yeniden derlendi; APK mevcut emulator-5554'e `install -r` ile veriler korunarak güncellendi ve MainActivity açıldı. İlk tüm-mimari derleme kaynak tüketimi nedeniyle durduruldu; emülatör hedefli derleme başarılıdır, signed/store veya iOS kanıtı değildir. Onboarding manuel kod örneği tam locator-secret biçimine uyarlandı. Son kasa kontrolü 101 Markdown, 22 ADR ve sıfır bulguyla geçti.
+
+## [2026-09-17] mobil-ai | MOB-8 canonical AI taşıması ve otomatik kabul
+
+Owner chat session/message NDJSON, proje risk ve seçili ay finance analysis canonical `/api/v1` yüzeyine eklendi; `ai.assistant.v1` available oldu. Mevcut domain/provider/context kullanıldı; ayrı mobil backend veya yeni DB migration açılmadı. Async idempotency pending/failed/completed lease, eski completion fence’i, tek user-message retry, atomik assistant acknowledgement ve owner başına üç aktif işlem sınırı mevcut kayıt tablosunda uygulanır. Provider çağrısı transaction dışında kalır; failed/crash retry upstream maliyetini exactly-once yapmaz.
+
+Native stream ortak origin/actor/generation/refresh auth, credentials omit ve redirect reddini kullanır. UTF-8/emoji, terminal acknowledgement, reader cancel ve session’a bağlı retry kontrolleri eklendi. Private context için explicit read scope ve completion öncesi yeniden auth zorunludur. Finans seçilen ayı filtreler; currency minor-unit ve BigInt toplamları para birimi bazında ayrı kalır. Ollama chat-completions adapter’ı düzeltildi, raw provider error log’u kaldırıldı.
+
+Kabul: dört async-operation unit testi, sentetik loopback provider ile gerçek Next HTTP matrisi, 138 mobil test, iki consumer TypeScript kontrolü, API boundary, hedef backend lint ve mobil lint geçti. Android production JS/Hermes export’u üretildi. HTTP kabulü malformed/oversized input, owner/client/foreign/Bearer/scope, replay, timeout/cancel, provider privacy ve stream sürerken revoke sonrası assistant persistence reddini içerir.
+
+Canonical kanıt ve açık kapılar [[docs/mobile/mobile-ai-acceptance]] sayfasındadır. [[03-mimari/ai-mimarisi|AI mimarisi]], [[03-mimari/mobil-mimari|mobil mimari]], [[02-domainler/ai-ve-analiz|AI domaini]], [[06-kararlar/adr-021-api-mutation-idempotency-kaydi|ADR-021]], ürün/mevcut durum ve mobil roadmap senkronlandı. Sıradaki kritik yol MOB-9 release/operasyondur; signed cihaz, gerçek provider ve iki canlı HTTPS instance kabulü açık. Notification/push ayrı ADR, UI/UX güncellemesi en son kalır.
+
+Aynı çalışma içinde izole Next production build de geçti. Geliştirici Next config dosyaları byte düzeyinde geri yüklendi; AI kabulü kökten `pnpm mobile:ai:check` ile tekrar çalıştırılabilir.
+
+Ek legacy web AI boundary kontrolü eski Türkçe diagnostic metinleri ve i18n-provider import adına bağlı yanlış negatif veriyordu. Kontrol güncel invalid_json/invalid_message_format reason kodlarına bağlandı; page ve gerçek chat-client üzerinde AI provider/secret sınırı korunarak 14 dosyalık gate geçti.
+
+## [2026-09-17] mobil-release | MOB-9 yerel teknik gate ve kanıt kaydı
+
+Windows shell shim CLI çağrıları Node entry point’lerine taşındı. Generated/ignored native klasörler temiz source check’in ön koşulu olmaktan çıkarıldı; ayrı native platform gate’i Android proje veya iOS Pod/Manifest/xcworkspace’ı zorunlu tutar. Crypto, SecureStore, sharing ve file/document modüllerinin gerçek autolinking çözümlemesi kontrol edilir. iOS Bundler Homebrew veya PATH’ten seçilebilir; macOS/native kabulü ayrı kalır. EAS preview/production ve CI demo origin’i kaldırıldı. Capture-only console izi kaldırıldı; guarded capture yönlendirmesi korunur.
+
+SemVer minimum client kontrolünde RC/stable eşitliği düzeltildi; numeric prerelease precision korunur, build metadata yok sayılır ve discovery malformed/partial minimumu fail closed reddeder. Canonical compatibility, upgrade/restore/epoch, privacy/AI paylaşımı, support/license ve incident runbook’ları [[docs/mobile/mobile-release-acceptance]] ve [[docs/mobile/mobile-server-compatibility]] içinde senkronlandı. [[06-kararlar/adr-023-mobil-release-kanit-kaydi|ADR-023]] source quality ile reviewer/hash/source-commit bağlı strict store kabulünü ayırır. [[08-operasyon/mobil-yayin|Mobil yayın]] yeni operasyon hub’ıdır; karar indeksinin sıradaki numarası ADR-024 oldu.
+
+Kabul: production/origin boş mobile:release:check, lint/TypeScript, 140 mobil test ve beş release evidence testi geçti. Geçici ayrı Git CLI fixture’ı evidence-only commit’i kabul eder; source değişimi/dirty tree’de reddeder. Workspace contract gate altı shared contract, iki backend presenter ve iki consumer TypeScript ile geçti. İki platform origin’siz production JS/Hermes export, Android native/autolinking ve native dizini olmayan source kopyası gate’i başarılıdır. Missing iOS Pods ve eksik release record strict gate’i beklenen exit 1 verir; report ready=false’dur.
+
+Mobile CI source/vault/contract, origin’siz iki export ve güvenli blocker artifact; ayrı Android temiz prebuild/native graph ve sentetik backend security/AI job’larıyla güncellendi. YAML yerelde parse edildi; remote CI çalışmış veya signed/native fiziksel kabul yapılmış sayılmaz. Release kaydında signed IPA/AAB, iki canlı HTTPS, gerçek provider/native/client/file/a11y/performans, production-like migration/restore, internal store testleri ve privacy/support/license/incident değerleri pending’dir. Mobile-v1 capability açılmadı. UI/UX/assets diff çalışması en son kalır.
+
+## [2026-09-17] mobil-veri-kabulu | MOB-9 migration/readiness/restore devamı
+
+Readiness yalnız runtime_checks varlığı yerine release journal sıra/timestamp/SQL hash ledger’ını doğrular. Startup migrate boş DB/doğru prefix’i kabul eder; bozuk/missing/duplicate/future kayıt öncesinde reddedilir ve migration sonrasında ledger yeniden doğrulanır. Windows/Linux LF/CRLF eşdeğerliği korunur; tam schema diff eklenmedi. Ortak kontrol server/db/migration-state.mjs içindedir.
+
+Restore checksum sonrası staging DB’de integrity/FK ve desteklenen migration prefix’ini swap öncesinde doğrular. Empty/geçmişsiz/future DB ile target WAL/SHM reddedilir; kendi staging sidecar’ları temizlenir, hedef korunur. Pre-pairing 0014 backup’ta device_security_state erken oluşturulmaz; 0015 forward migration çakışması giderildi. Current restore epoch/revoke/replay temizliği korunur.
+
+Production standalone hazırlığı migration SQL/journal’ını paketler; trace data/env dosyalarını dışlar ve generated paketteki data/env kopyalarını çıkarır. Runtime volume link’i izlenmez. Docker migration CLI için ortak MJS dosyası ayrıca kopyalanır. pnpm mobile:data:check on SQLite/CLI testi + izole production standalone/gerçek loopback HTTP kontrolüdür; Mobile CI ve strict store check’e eklendi.
+
+Kabul: on veri testi, phase8 import/normalization/file/idempotency/negative/rollback provası, hedef backend ESLint ve production build/TypeScript geçti. Plain/v1 health 200→503→200; gerçek ledger UPDATE bir satırı etkiler, eksik SQL reddedilir ve internal path/hash response’a çıkmaz. Paketlenmiş local data/env yoktur. Windows agent sandbox’ının native alt süreç dosya erişim sınırı nedeniyle son production fixture kabulü otomatik onaylı sandbox dışı aynı sentetik kapsamda çalıştı. Test kendi child process’ini kapatıp generated config/type dosyalarını byte olarak geri yükledi.
+
+Canonical kapsam [[docs/mobile/mobile-data-acceptance]], release runbook, ADR-009, migration/health/operasyon, teknik borç ve mobil roadmap içinde güncellendi. Remote CI/Docker image çalışmış veya gerçek production/signed kabul yapılmış sayılmaz. Migration-restore evidence pending; signed iOS/Android, iki canlı HTTPS, privacy/support/license/incident ve store iç test kapıları açık kalır. UI/UX çalışması en son gelir.

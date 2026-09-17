@@ -1,9 +1,11 @@
 ---
 tur: mimari
 durum: mevcut
-guncellendi: 2026-09-16
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-release-acceptance.md
+  - docs/mobile/mobile-ai-acceptance.md
   - apps/neta-mobile
   - packages/api-contracts
   - packages/design-tokens
@@ -74,6 +76,10 @@ stateDiagram-v2
 
 Owner read dilimi dashboard, müşteri, proje/plan/revizyon, görev ve takvim için; mutation dilimi client/project/task/calendar için mevcuttur. Finans, günlük, hesap/session, marka/locale/AI ayarları ve dosya/proje asset owner parity'si de `/api/v1` üzerinden çalışır. Mobil shared guard, capability, targeted invalidation ve instance-scoped cache kullanır. Client portal v1 read/revision/profile istemcisi de backend route'larına bağlanır.
 
+## MOB-8 AI taşıması
+
+2026-09-17’de chat session/message, proje risk ve seçili ay finance analysis canonical `/api/v1` yüzeyine bağlandı; `ai.assistant.v1` available’dır. Native NDJSON istemcisi ortak Cookie/Bearer refresh, actor/origin/generation kontrolü ve `credentials: omit` kullanır. UTF-8 reader terminal assistant acknowledgement olmadan başarı saymaz; abort/logout sonrası chunk’ları reddeder. Aynı session’a bağlı retry key korunur, cursor listeleri tamamlanır ve chat diske cache yazılmaz. Backend async lease ve completion transaction’ları provider I/O dışında tutar; revoke sonrası kalıcı assistant yazmaz. Sentetik provider HTTP/stream kabulü [[docs/mobile/mobile-ai-acceptance]] içindedir; signed cihaz ve gerçek provider/iki canlı HTTPS kabulü açık kalır.
+
 ## Güvenlik
 
 Production HTTPS, same-origin discovery URL, minimum version, instance ID ve instance-scoped SecureStore vardır. İlk auth transport'u Better Auth cookie'dir; owner için pairing access/refresh bearer yolu ayrıca kodda bulunur. Backend restore token epoch rotation'ı uygular. İki canlı instance izolasyonu ile pairing/revoke/restore gerçek cihaz kabulü bekler.
@@ -87,6 +93,10 @@ Versioned file, appearance, portal asset ve davet URL'leri canonical `APP_URL` k
 2026-09-16 lifecycle devamı: canonical backend Node instrumentation başlangıcında ve saatlik timer ile `device-maintenance.ts` çalıştırır. Expiry/30 gün idle doğrulaması access/refresh request'inde anında yapılır; toplu cleanup request path'inde değildir. Kapalı session 30 gün sonra history cascade ile, challenge expiry'den bir gün sonra silinir; aktif family geçmişi korunur. Restore HTTP kabulü ikinci sentetik loopback backend'de eski token reddi ve fresh pairing'i doğrular. Signed/native ve canlı HTTPS kabulü açık kalır.
 
 2026-09-16 replay devamı: mobil `device-refresh-operation.ts`, Expo Crypto requestId'sini istekten önce instance-scoped SecureStore'a yazar; transient hatada aynı işlem korunur, logout'ta silinir. Backend aynı token/nonce için 30 saniyelik AES-256-GCM şifreli yanıtı yalnız successor güncelse tekrar verir. AAD cihaz/epoch/digest/nonce/expiry'yi bağlar; farklı nonce veya grace dışı reuse family'yi kapatır. Public locator QR/manual yanlış secret denemelerini aynı persistent counter'da birleştirir, beşte kilitler. 0017 eski pending kodları yeniden üretmeyi gerektirir; mevcut oturumları korur. Replay kullanım expiry'si anındadır; fiziksel cleanup startup/saatlik bounded iştedir. Yeni native kripto bağımlılığı development client rebuild gerektirir. Signed/native ve iki canlı HTTPS instance kabulü bu otomasyondan ayrıdır.
+
+## MOB-9 release sınırı
+
+Source kalite gate’i generated native dizin istemez; platform native gate’i Android proje veya iOS Pod/Manifest senkronunu ayrıca doğrular. EAS preview/production origin’sizdir. Reviewer/hash/source-commit bağlı release acceptance [[08-operasyon/mobil-yayin|mobil yayın]] ve [[06-kararlar/adr-023-mobil-release-kanit-kaydi|ADR-023]] içindedir. Kod gate’leri signing/store veya gerçek cihaz kabulü değildir.
 
 ## Kaynaklar
 

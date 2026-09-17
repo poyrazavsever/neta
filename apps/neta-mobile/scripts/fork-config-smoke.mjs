@@ -1,9 +1,4 @@
-import { execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-
-const root = new URL('../', import.meta.url);
-const projectRoot = fileURLToPath(root);
-const expoBin = fileURLToPath(new URL('node_modules/.bin/expo', root));
+import { runExpo } from './expo-cli.mjs';
 const baseEnv = {
   ...process.env,
   EXPO_PUBLIC_APP_ENV: 'production',
@@ -18,16 +13,12 @@ const baseEnv = {
   NETA_IOS_BUNDLE_ID: 'com.example.neta',
 };
 
-const config = JSON.parse(execFileSync(expoBin, ['config', '--type', 'public', '--json'], {
-  cwd: projectRoot,
-  encoding: 'utf8',
+const config = JSON.parse(runExpo(['config', '--type', 'public', '--json'], {
   env: baseEnv,
 }));
 
 const universalEnv = { ...baseEnv, EXPO_PUBLIC_NETA_ORIGIN: '' };
-const universalConfig = JSON.parse(execFileSync(expoBin, ['config', '--type', 'public', '--json'], {
-  cwd: projectRoot,
-  encoding: 'utf8',
+const universalConfig = JSON.parse(runExpo(['config', '--type', 'public', '--json'], {
   env: universalEnv,
 }));
 
@@ -39,9 +30,7 @@ if (config.extra?.netaOrigin !== 'https://neta.example.com' || config.extra?.env
 if ((universalConfig.extra?.netaOrigin ?? null) !== null) failures.push('Universal production build origin olmadan üretilemedi');
 
 try {
-  execFileSync(expoBin, ['config', '--type', 'public', '--json'], {
-    cwd: projectRoot,
-    encoding: 'utf8',
+  runExpo(['config', '--type', 'public', '--json'], {
     env: { ...baseEnv, EXPO_PUBLIC_NETA_ORIGIN: 'http://neta.example.com' },
     stdio: 'pipe',
   });

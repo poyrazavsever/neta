@@ -14,7 +14,7 @@ import { normalizeHex } from '@/theme/tokens';
 
 import { isSameTrustedOrigin, normalizeNetaOrigin } from './domain';
 import type { DiscoveryResult, PublicCatalog, StoredInstance } from './types';
-import { compareSemver, isSupportedApiVersion } from './version';
+import { isCompatibleClientVersion, isSupportedApiVersion } from './version';
 
 export type DiscoveryStep =
   | 'idle'
@@ -95,10 +95,10 @@ function validateMetaDocument(
 
   const minimumVersion = meta.client.minimumSupportedVersion;
   const currentVersion = Constants.expoConfig?.version ?? '0.0.0';
-  if (minimumVersion && compareSemver(currentVersion, minimumVersion) < 0) {
+  if (!isCompatibleClientVersion(currentVersion, minimumVersion)) {
     throw new NetaClientError(
       'INCOMPATIBLE_CLIENT',
-      `Bu instance Neta Mobile ${minimumVersion} veya üstünü istiyor.`,
+      minimumVersion ? `Bu instance Neta Mobile ${minimumVersion} veya üstünü istiyor.` : 'Neta Mobile sürüm bilgisi doğrulanamadı.',
     );
   }
 }

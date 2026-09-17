@@ -1,10 +1,13 @@
 ---
 tur: yol-haritasi
 durum: mevcut
-guncellendi: 2026-09-16
+guncellendi: 2026-09-17
 guven: yuksek
 ozet: "Neta Mobile'ı build-time tek instance istemcisinden güvenli evrensel uygulamaya taşıyan, backend API ve release kapılarıyla birlikte yürütülen uygulama planı."
 kaynaklar:
+  - docs/mobile/mobile-data-acceptance.md
+  - docs/mobile/mobile-release-acceptance.md
+  - docs/mobile/mobile-ai-acceptance.md
   - docs/roadmaps/platform-master-plan.md
   - docs/neta-backend-mobile-api-master-plan.md
   - docs/mobile/neta-mobile-redesign-master-plan.md
@@ -29,7 +32,7 @@ etiketler:
 
 # Neta Mobile uygulama planı
 
-> Son güncelleme: **2026-09-16** — MOB-6/MOB-7 otomatik güvenlik kabulü geçti: historical refresh reuse, Bearer/scope sınırı, hesap lifecycle'ı, izole restore ve iki client negatifleri doğrulandı. Signed gerçek cihaz ve iki canlı HTTPS instance kabulü release kapısı olarak açık.
+> Son güncelleme: **2026-09-17** — MOB-8 AI v1 chat/risk/seçili ay finance transport’u ve sentetik provider kabulü uygulandı. MOB-6/MOB-7 otomatik güvenlik kabulü de geçti. Sıradaki kritik yol MOB-9 release/operasyondur; signed gerçek cihaz, gerçek provider ve iki canlı HTTPS instance kabulü açık kalır.
 
 ## Planın rolü
 
@@ -409,6 +412,8 @@ Client mobil auth lifecycle'ı ayrı ADR ile kapatılır; owner pairing otomatik
 
 Core parity tamamlanmadan bu faz kritik yolu geciktirmez.
 
+**AI durumu (2026-09-17):** Canonical v1 chat pagination/NDJSON, kalıcı lease/idempotent retry, project risk ve seçilen ay finance structured presenter’ları uygulandı. `ai.assistant.v1` available’dır. Native stream ortak actor/origin/generation/refresh yolunda credentials=omit ve redirect reddiyle çalışır. Sentetik loopback provider HTTP kabulü geçti; gerçek provider/signed cihaz/iki canlı HTTPS kabulü ayrıdır. Kanıt ve komutlar [[docs/mobile/mobile-ai-acceptance]] sayfasındadır. Push/notification ayrı ADR gerektiren açık iştir; bu fazda açılmadı.
+
 - NDJSON chat streaming, chunk-safe parser, cancel/retry ve timeout.
 - Project risk ve finance analysis structured presenter'ları.
 - Prompt/provider failure için kararlı, privacy-safe hata modeli.
@@ -418,6 +423,8 @@ Core parity tamamlanmadan bu faz kritik yolu geciktirmez.
 Tam offline mutation queue, merkezi push/control-plane ve conflict merge bu fazın varsayılan parçası değildir.
 
 ## MOB-9 — Store release ve operasyon
+
+**Yerel hazırlık (2026-09-17):** Windows CLI/config, clean-checkout source/autolinking gate ve origin’siz EAS profilleri düzeltildi. Reviewer/hash/source-commit bağlı release kaydı ve strict/report komutları [[docs/mobile/mobile-release-acceptance]] kapsamındadır. Bu implementasyon signed/store kabulü değildir; tüm dış ortam maddeleri pending kalır. [[06-kararlar/adr-023-mobil-release-kanit-kaydi|ADR-023]] kalite/kabul ayrımını tanımlar.
 
 ### Teknik release kapıları
 
@@ -561,3 +568,7 @@ Bu maddelerden biri kritik yola alınırsa mevcut plan sessizce genişletilmez; 
 - `apps/neta-mobile/src/`
 - `apps/neta-app/app/api/v1/`
 - `packages/api-contracts/src/index.ts`
+
+## 2026-09-17 — MOB-9 veri/restore devamı
+
+Release journal sıra/timestamp/SQL hash readiness kontrolü, startup ön/son doğrulaması ve swap öncesi restore integrity/FK/prefix kabulü uygulandı. pnpm mobile:data:check izole SQLite/CLI ve production standalone/loopback HTTP gate’idir: [[docs/mobile/mobile-data-acceptance]]. Signed/native, gerçek pre-upgrade veri, iki canlı HTTPS instance ve store evidence pending kalır; UI/UX en son gelir.

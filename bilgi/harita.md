@@ -1,7 +1,7 @@
 ---
 tur: sistem
 durum: mevcut
-guncellendi: 2026-09-16
+guncellendi: 2026-09-17
 guven: yuksek
 ozet: "Neta bilgi kasasındaki bütün kalıcı notları tek satırlık özetlerle yönlendiren üretilmiş genel indeks."
 kaynaklar:
@@ -29,7 +29,7 @@ etiketler:
 
 ## Kapsam
 
-Bu harita **100** kalıcı Markdown notunu listeler. Tek satırlık özet yönlendirme içindir; karar veya implementation kanıtının yerine geçmez.
+Bu harita **102** kalıcı Markdown notunu listeler. Tek satırlık özet yönlendirme içindir; karar veya implementation kanıtının yerine geçmez.
 
 ## 00 — Sistem ve bakım
 
@@ -49,7 +49,7 @@ Bu harita **100** kalıcı Markdown notunu listeler. Tek satırlık özet yönle
 - [[01-urun/neta|Neta]] — Neta, freelancer ve küçük stüdyoların müşteri ilişkisi ile iş operasyonlarını kendi altyapılarında yönetmesine odaklanan self-hosted bir çalışma alanıdır. Owner; müşteri, proje, görev, takv… _(urun · mevcut)_
 - [[01-urun/urun-felsefesi|Ürün felsefesi]] — Neta'nın ana ayrımı self-hosting'dir. Kimlik, iş verisi, dosya ve ayar bir merkezi SaaS hesabında değil, owner'ın yönettiği instance'ta bulunur. Mobil istemci hedefte bile bağımsız veri oto… _(urun · mevcut)_
 - [[01-urun/urun-haritasi|Ürün haritası]] — Bugünkü öncelik yeni ekran eklemek değil, mobilin zaten ifade ettiği temel owner/client akışlarını backend'in gerçek, yetkili ve test edilmiş v1 resource API'lerine bağlamaktır. Bunun önces… _(urun · mevcut)_
-- [[01-urun/yetenekler|Yetenekler]] — /api/v1/meta bugün bazı geniş capability'leri available döndürse de karşılık gelen resource route'ları yoktur. Product readiness değerlendirmesinde capability string'i tek başına kanıt sayı… _(urun · mevcut)_
+- [[01-urun/yetenekler|Yetenekler]] — Capability, yayınlanan route sözleşmesini belirtir; signed/store readiness kanıtı değildir. ai.assistant.v1 mevcut taşıma yüzeyidir; mobile-v1 release kabulü tamamlanana kadar planned kalır… _(urun · mevcut)_
 
 ## 02 — Domainler
 
@@ -124,6 +124,7 @@ Bu harita **100** kalıcı Markdown notunu listeler. Tek satırlık özet yönle
 - [[06-kararlar/adr-020-mobil-server-surum-uyumlulugu|ADR-020 — Mobil-server sürüm uyumluluğu]] — Mobil-server uyumluluğu API major ve server'ın ilan ettiği minimum client SemVer ile belirlenir; aynı v1 içindeki additive alanlar uyumludur. _(karar · mevcut)_
 - [[06-kararlar/adr-021-api-mutation-idempotency-kaydi|ADR-021 — API mutation idempotency kaydı]] — Retry edilebilir v1 mutation sonuçları actor, method, route ve Idempotency-Key kapsamında SQLite'ta atomik olarak saklanır. _(karar · mevcut)_
 - [[06-kararlar/adr-022-ui-assets-pipeline|ADR-022 — UI assets pipeline]] — UI kaynakları ve sentetik başlangıç çekimleri vault içinde platform/rol/sayfa bazında saklanır; runtime asset kaynağı uygulamalarda kalır. _(karar · mevcut)_
+- [[06-kararlar/adr-023-mobil-release-kanit-kaydi|ADR-023 — Mobil release kanıt kaydı]] — Mobil kaynak kalite kapısı ile signed/native/store kabulü ayrı doğrulanır; release kararı source commit ve hash’li, reviewer onaylı kanıt kaydına bağlıdır. _(karar · mevcut)_
 
 ## 07 — Güvenlik
 
@@ -136,7 +137,8 @@ Bu harita **100** kalıcı Markdown notunu listeler. Tek satırlık özet yönle
 
 - [[08-operasyon/docker|Docker]] — Runtime nextjs UID 1001 kullanır; /app/data bu kullanıcıya aittir. DATADIR=/app/data, internal port 3000 ve volume declaration vardır. CMD migration'ı server'dan önce çalıştırır. _(operasyon · mevcut)_
 - [[08-operasyon/felaket-kurtarma|Felaket kurtarma]] — Doğrulanmış DB + upload bundle'ından tek instance'ı, scope/auth/file bütünlüğünü koruyarak geri getirmek. _(operasyon · mevcut)_
-- [[08-operasyon/health-checkler|Health check'ler]] — checkReadiness data dir'de probe file oluşturup siler, select 1 yapar ve runtimechecks tablosunu arar. Hata text'i server-side tutulur; HTTP response check durumlarını döndürür. _(operasyon · mevcut)_
+- [[08-operasyon/health-checkler|Health check'ler]] — checkReadiness probe file oluşturup siler, select 1 yapar ve release journal sıra/timestamp/SQL hash’lerini DB ledger’ıyla doğrular. Hata text’i server-side tutulur; HTTP yalnız check durum… _(operasyon · mevcut)_
+- [[08-operasyon/mobil-yayin|Mobil yayın]] — MOB-9 source kalite, native generation, reviewer/hash’li release kanıtı ve açık signing/store operasyon kapıları. _(operasyon · mevcut)_
 - [[08-operasyon/production|Production]] — HTTPS reverse proxy → tek neta-app container/process → kalıcı /app/data volume. Landing ayrı deploy, mobile ayrı native release'tir. _(operasyon · mevcut)_
 - [[08-operasyon/sorun-giderme|Sorun giderme]] — dataDirWritable, databaseReachable, migrationsApplied alanlarını ayır. Disk/permission, DB open/lock ve migration logunu kontrol et. Yalnız liveness 200 ise trafik vermek güvenli değildir. _(operasyon · mevcut)_
 - [[08-operasyon/yayin-hazirligi|Yayın hazırlığı]] — Değişikliğe göre app phase smoke/boundary, i18n integrity/release gate, import/backup/restore ve mobil release check de çalıştırılır. _(operasyon · mevcut)_
@@ -147,7 +149,7 @@ Bu harita **100** kalıcı Markdown notunu listeler. Tek satırlık özet yönle
 - [[09-yol-haritasi/mevcut-oncelikler|Mevcut öncelikler]] — Aşağıdaki sıra mobil uygulama planının ilk kritik yoludur. _(yol-haritasi · planlanan)_
 - [[09-yol-haritasi/mobil-uygulama-plani|Neta Mobile uygulama planı]] — Neta Mobile'ı build-time tek instance istemcisinden güvenli evrensel uygulamaya taşıyan, backend API ve release kapılarıyla birlikte yürütülen uygulama planı. _(yol-haritasi · mevcut)_
 - [[09-yol-haritasi/planlanan-yetenekler|Planlanan yetenekler]] — Bu liste store-ready mobile-v1 ilanı değildir. docs/mobile/mobile-security-acceptance otomasyon ile açık native/release kabulünü ayırır. _(yol-haritasi · planlanan)_
-- [[09-yol-haritasi/teknik-borc|Teknik borç]] — Tenant izolasyonu, secret/token lifecycle ve backup bütünlüğü; görsel parity veya yeni feature sayısından önce gelir. Contract drift, yeni mobil endpoint eklenmeden önce kapatılmalıdır. _(yol-haritasi · mevcut)_
+- [[09-yol-haritasi/teknik-borc|Teknik borç]] — MOB-9 için source/autolinking/config ve release kanıt gate’i hazırdır; signing/provisioning, iki canlı HTTPS/native kabulü, public privacy/support, incident owner ve lisans çözümü pending’d… _(yol-haritasi · mevcut)_
 - [[09-yol-haritasi/yol-haritasi|Yol haritası sentezi]] — Web self-hosted runtime'ı canonical backend olarak koruyup landing, web app ve resmî evrensel mobile'ı aynı monorepo/contract disiplini altında birleştirmek. Mobil için ikinci backend veya… _(yol-haritasi · planlanan)_
 
 ## 10 — Araştırma

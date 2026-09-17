@@ -1,8 +1,8 @@
 ---
 title: Neta Platform Master Planı
 status: active
-current_phase: MOB-6-7-automated-security-native-open
-last_updated: 2026-09-16
+current_phase: MOB-9-local-gates-ready-signed-live-store-open
+last_updated: 2026-09-17
 owners:
   - platform
   - backend-api
@@ -471,6 +471,8 @@ Kabul:
 
 ### P8 — AI/chat, bildirim ve ileri özellikler
 
+2026-09-17: v1 chat NDJSON/history, project risk ve selected-month finance structured transport’u, persistent async lease/retry ve native auth/cancel sınırı uygulandı. `ai.assistant.v1` available’dır; [sentetik sağlayıcı HTTP kabulü](../mobile/mobile-ai-acceptance.md) signed/native ve gerçek provider kabulünden ayrıdır. Push/notification ayrı ADR gerektiren açık iştir.
+
 Amaç: Core parity sonrasında pahalı ve güvenlik duyarlı yüzeyleri eklemek.
 
 - Native NDJSON streaming chat, cancel/retry ve timeout.
@@ -659,3 +661,5 @@ P0/P1 ve P2'nin backend contract doğruluğu tamamlandı. Sıradaki iş P2'nin e
 
 Bu sıra, büyük resource API yatırımından önce mobilin gerçekten herhangi bir
 self-hosted instance'a güvenli biçimde bağlanabildiğini kanıtlar.
+
+2026-09-17 MOB-9 yerel release hazırlığı: source/native/config Windows gate ve origin’siz EAS/CI, prerelease SemVer uyumluluğu ve reviewer/hash/source-commit bağlı [release kanıtı](../mobile/mobile-release-acceptance.md) uygulandı. Signed/live/store kabulü pending’dir; mobile-v1 açılmadı.

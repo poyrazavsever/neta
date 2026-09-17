@@ -3,10 +3,14 @@
 set -eu
 
 RUBY_ROOT="/opt/homebrew/opt/ruby@3.4"
-BUNDLE_BIN="$RUBY_ROOT/bin/bundle"
+if [ -x "$RUBY_ROOT/bin/bundle" ]; then
+  BUNDLE_BIN="$RUBY_ROOT/bin/bundle"
+else
+  BUNDLE_BIN="$(command -v bundle || true)"
+fi
 
 if [ ! -x "$BUNDLE_BIN" ]; then
-  echo "Ruby 3.4 bulunamadı. Önce 'brew install ruby@3.4' çalıştırın." >&2
+  echo "Ruby 3.4 ve Gemfile.lock ile uyumlu Bundler gerekli; PATH veya Homebrew kurulumunu kontrol edin." >&2
   exit 1
 fi
 

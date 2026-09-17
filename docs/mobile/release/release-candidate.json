@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "release": {
+    "appVersion": "0.1.0",
+    "commit": null
+  },
+  "operations": {
+    "privacyUrl": null,
+    "supportUrl": null,
+    "incidentOwner": null,
+    "licenseDecision": "pending"
+  },
+  "gates": [
+    {
+      "id": "signed-ios",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "signed-android",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "two-https-instances",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "owner-client-native",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "ai-provider-native",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "native-a11y-performance",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "migration-restore",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "compatibility",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "store-internal",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "privacy-support-license",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    },
+    {
+      "id": "operations",
+      "status": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "evidence": null,
+      "artifact": null
+    }
+  ]
+}

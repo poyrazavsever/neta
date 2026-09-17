@@ -1,9 +1,12 @@
 ---
 tur: sistem
 durum: mevcut
-guncellendi: 2026-09-16
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-data-acceptance.md
+  - docs/mobile/mobile-release-acceptance.md
+  - docs/mobile/mobile-ai-acceptance.md
   - README.md
   - apps/neta-app/package.json
   - apps/neta-app/server/db/schema
@@ -24,6 +27,8 @@ etiketler:
 # Mevcut durum
 
 2026-09-16 MOB-2–5 denetiminde runtime kimlik izolasyonu, native production auth Origin, auth route/logout döngüsü, relation/core pagination, mutation retry/cache ve versioned dosya download/PDF parity eksikleri giderildi. Ayrıntı [[docs/mobile/mobile-phase-2-5-audit]]. [[assets-pipeline/indeks|UI assets pipeline]] koddan envanter, sentetik screenshot ve kaynak asset arşivi sunar; [[assets-pipeline/ui-ux-guncelleme-plani|görsel güncelleme]] en son planlanır. Bu çalışma signed cihaz/iki HTTPS instance release kapılarını açmaz.
+
+2026-09-17 MOB-9 yerel release hazırlığı source/native gate ve Windows CLI/config düzeltmeleri, origin’siz EAS/CI, SemVer prerelease compatibility ve hash/reviewer/source-commit bağlı kabul kaydı sunar. [[08-operasyon/mobil-yayin|Mobil yayın]] kod gate’iyle signed/live/store kabulünü ayırır; dış ortam maddeleri pending’dir.
 
 ## Bir bakışta Neta
 
@@ -92,8 +97,9 @@ Backend'de çalışan mobil v1 yüzeyi şunları kapsar:
 - Finans ve günlük read/write yüzeyleri
 - Profil, parola, session, genel görünüm, locale ve AI ayarları
 - Görsel upload ile proje asset liste/silme yüzeyleri
+- Owner chat session/message NDJSON, proje risk ve seçili ay finance analysis
 
-Owner read/mutation/parity dilimi strict query, opaque cursor, session-derived owner scope, explicit DTO, persistent idempotency ve optimistic concurrency kullanır. Contract/type/build kapıları ile core mutation canlı smoke'u geçer. Backend'de owner pairing challenge/exchange/refresh/revoke ve client portal v1 route'ları; mobilde pairing token transport'u ve portal istemcisi kodda bulunur. Bunların gerçek cihaz, restore ve tenant izolasyonu kabul kanıtı henüz tamamlanmamıştır. AI assistant'ın native taşıma yüzeyi planlanandır. Mağaza yayını signed native ve iki canlı HTTPS instance kanıtına kadar blokludur.
+Owner read/mutation/parity dilimi strict query, opaque cursor, session-derived owner scope, explicit DTO, persistent idempotency ve optimistic concurrency kullanır. Contract/type/build kapıları ile core mutation canlı smoke'u geçer. Backend'de owner pairing challenge/exchange/refresh/revoke ve client portal v1 route'ları; mobilde pairing token transport'u ve portal istemcisi kodda bulunur. Bunların gerçek cihaz, restore ve tenant izolasyonu kabul kanıtı henüz tamamlanmamıştır. AI assistant’ın native v1 taşıma yüzeyi 2026-09-17’de uygulandı; sentetik provider HTTP kabulü [[docs/mobile/mobile-ai-acceptance]] sayfasındadır. Mağaza yayını signed native ve iki canlı HTTPS instance kanıtına kadar blokludur.
 
 2026-09-16'da MOB-6/7 otomatik güvenlik kabulü geçti: historical token reuse, Bearer/scope sınırı, native profil/parola, expiry/disable/revoke/logout-all, izole DB restore epoch ve iki gerçek client session'ının karşılıklı HTTP/file negatifleri doğrulandı. 0016 migration geçmişi eksik mevcut aktif cihaz oturumlarını kapatır; yeniden eşleştirme gerekir. Mobilde logout/new-login sonrası geç refresh/storage write koruması eklendi. [[docs/mobile/mobile-security-acceptance]] signed/native kanıt ve açık ADR tasarım farklarını ayrı listeler.
 
@@ -101,7 +107,7 @@ Owner read/mutation/parity dilimi strict query, opaque cursor, session-derived o
 
 ## AI'nin bugünkü gerçekliği
 
-Owner Gemini, OpenAI, Groq veya Ollama seçebilir. Harici provider API key'i SQLite'ta `BETTER_AUTH_SECRET`ten türetilen anahtarla AES-256-GCM şifreli saklanır; public ayar DTO'su yalnız `hasApiKey` döndürür. Ollama için local OpenAI-compatible URL kullanılabilir. AI sohbeti, proje risk analizi ve finans analizi web/backend tarafında vardır; mobil v1 taşıma yüzeyi henüz tamamlanmamıştır.
+Owner Gemini, OpenAI, Groq veya Ollama seçebilir. Harici provider API key'i SQLite'ta `BETTER_AUTH_SECRET`ten türetilen anahtarla AES-256-GCM şifreli saklanır; public ayar DTO'su yalnız `hasApiKey` döndürür. Ollama için local OpenAI-compatible URL kullanılabilir. AI sohbeti, proje risk analizi ve seçilen ay finans analizi canonical v1 transport’unda da uygulanmıştır. Kalıcı lease/idempotency, NDJSON ve structured presenter kabulü sentetik loopback provider ile geçti; `ai.assistant.v1` available’dır. Gerçek provider/signed native ve iki HTTPS instance kabulü açıktır.
 
 ## Legacy ve planlanan ayrımı
 
@@ -110,13 +116,13 @@ Owner Gemini, OpenAI, Groq veya Ollama seçebilir. Harici provider API key'i SQL
 - **Kodda mevcut:** Device pairing için SQLite schema, challenge/exchange/refresh/revoke endpoint'leri, mobil bearer transport'u ve restore token epoch rotation'ı.
 - **Mevcut:** Mobil için core write ve owner parity'li version-aware `/api/v1` resource yüzeyi.
 - **Kodda mevcut:** Client portal v1 read/revision/profile yüzeyi ve mobil portal API istemcisi.
-- **Doğrulama bekliyor:** Pairing/revoke/restore ve client tenant izolasyonu için gerçek cihaz ve negatif E2E kabul turu; mobil AI assistant taşıması planlanandır.
+- **Doğrulama bekliyor:** Pairing/revoke/restore ve client tenant izolasyonu için gerçek cihaz ve negatif E2E kabul turu; mobil AI taşıması kodda mevcut olup gerçek provider/signed native kabulü açıktır.
 - **Gelecek:** Merkezi kısa kod→domain resolver, multi-instance switching, tam offline mutation ve white-label mağaza binary'leri ilk release kapsamında değildir.
 
 ## En önemli riskler
 
 1. Universal credential/cache izolasyonu henüz iki canlı HTTPS instance ve signed iOS/Android build ile kanıtlanmadı.
-2. Client portal ve device pairing kodu için gerçek cihaz, restore ve tenant izolasyonu kabul kanıtı eksiktir; mobil AI assistant parity'si hâlâ planlanandır.
+2. Client portal ve device pairing kodu için gerçek cihaz, restore ve tenant izolasyonu kabul kanıtı eksiktir; mobil AI transport’u uygulanmıştır; gerçek provider/signed native kabulü açıktır.
 3. Backup'lar kullanıcı dosyalarını, auth verisini ve şifreli AI secret'ını içerir; repository dışı şifreleme/off-site saklama operatör sorumluluğudur.
 4. SQLite tek-replica ve yerel filesystem varsayımları yanlış platform ayarlarıyla kolayca bozulabilir.
 
@@ -128,3 +134,7 @@ Owner Gemini, OpenAI, Groq veya Ollama seçebilir. Harici provider API key'i SQL
 - [[docs/neta-backend-mobile-api-master-plan]]
 - [[docs/roadmaps/platform-master-plan]]
 - [[apps/neta-mobile/README]]
+
+## 2026-09-17 — MOB-9 veri/restore devamı
+
+Release journal sıra/timestamp/SQL hash readiness kontrolü, startup ön/son doğrulaması ve swap öncesi restore integrity/FK/prefix kabulü uygulandı. pnpm mobile:data:check izole SQLite/CLI ve production standalone/loopback HTTP gate’idir: [[docs/mobile/mobile-data-acceptance]]. Signed/native, gerçek pre-upgrade veri, iki canlı HTTPS instance ve store evidence pending kalır; UI/UX en son gelir.

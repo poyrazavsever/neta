@@ -1,9 +1,10 @@
 ---
 tur: operasyon
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-release-acceptance.md
   - README.md
   - package.json
   - apps/neta-app/package.json
@@ -49,6 +50,8 @@ Değişikliğe göre app phase smoke/boundary, i18n integrity/release gate, impo
 - Owner ve client route authorization; offline/error state; logout/cache purge.
 - Backend resource API 404'leri kapanmadan store release yok.
 - Pairing capability yalnız server schema/lifecycle/restore epoch ve negatif testlerle açılır.
+
+Mobilin güncel source/native/store ayrımı ve blocker raporu [[08-operasyon/mobil-yayin|mobil yayın]] sayfasındadır. `pnpm mobile:release:check` kod gate’idir; `pnpm mobile:store:check` source commit ve reviewer/hash’li kabul kaydı ister.
 
 ## Kanıt tarihi uyarısı
 

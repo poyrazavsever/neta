@@ -29,6 +29,7 @@ RUN groupadd --system --gid 1001 nodejs \
 COPY --from=builder /repo/apps/neta-app/.next/standalone ./
 COPY --from=builder /repo/apps/neta-app/scripts ./apps/neta-app/scripts
 COPY --from=builder /repo/apps/neta-app/server/db/migrations ./apps/neta-app/server/db/migrations
+COPY --from=builder /repo/apps/neta-app/server/db/migration-state.mjs ./apps/neta-app/server/db/migration-state.mjs
 COPY --from=builder /repo/node_modules/drizzle-orm ./node_modules/drizzle-orm
 COPY --from=builder /repo/node_modules/better-sqlite3 ./node_modules/better-sqlite3
 COPY --from=builder /repo/node_modules/bindings ./node_modules/bindings

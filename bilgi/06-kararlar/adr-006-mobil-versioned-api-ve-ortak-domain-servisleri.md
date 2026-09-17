@@ -3,10 +3,11 @@ tur: karar
 durum: mevcut
 karar_durumu: kabul-edildi
 onceki_kimlik: K-006
-guncellendi: 2026-09-16
+guncellendi: 2026-09-17
 guven: yuksek
 ozet: "Mobil istemci versioned /api/v1 sözleşmesini, web ve mobil ise aynı domain/application servislerini kullanır."
 kaynaklar:
+  - docs/mobile/mobile-ai-acceptance.md
   - docs/roadmaps/platform-master-plan.md
   - docs/neta-backend-mobile-api-master-plan.md
   - apps/neta-app/server/api/v1
@@ -66,6 +67,8 @@ Mobil istemci version-aware `/api/v1` HTTP sözleşmesini kullanacaktır. Web ac
 Bootstrap/discovery, owner resource read/mutation/parity, pairing ve client portal transport'u `/api/v1` altında kodda mevcuttur. Backend ve mobil shared contract/guard sınırını kullanır; strict input, presenter, JSON 404/405, kalıcı idempotency ve optimistic concurrency uygulanmıştır. Signed cihaz, iki canlı HTTPS instance, pairing restore/revoke ve cross-client izolasyon kabulü ayrı release kanıtı olarak açıktır.
 
 `GET /api/v1/files/:id` owner Bearer/cookie ve scoped client cookie için ortak dosya servisini çağırır; legacy web dosya route'u korunur. Dosya, branding, portal asset ve davet URL'leri discovery/me ile aynı canonical `APP_URL` origin'inden üretilir. Next standalone iç request origin'i veya proxy header'ı dış URL authority'si değildir. HTTP dosya/portal/davet testleri bu origin'i doğrular; iki canlı HTTPS instance kabulü ayrıca gerekir.
+
+2026-09-17 MOB-8 devamı: canonical `/api/v1` chat/session/message NDJSON, project risk ve selected-month finance transport’u mevcut domain/context/provider katmanını kullanır. Shared AI capability matrisi bütün yedi route’u kapsar; `ai.assistant.v1` available’dır. Kalıcı async lease/idempotency ve native actor/generation/refresh/cancel sınırı [[docs/mobile/mobile-ai-acceptance]] kapsamındadır. Legacy web sözleşmeleri korunur; gerçek provider/signed release kabulü açıktır.
 
 ## Yeniden değerlendirme koşulları
 

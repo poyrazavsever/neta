@@ -1,9 +1,10 @@
 ---
 tur: mimari
 durum: mevcut
-guncellendi: 2026-09-16
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-data-acceptance.md
   - apps/neta-app/scripts/migrate.mjs
   - apps/neta-app/server/db/migrations
   - apps/neta-app/package.json
@@ -41,7 +42,7 @@ Drizzle SQL migration'ları `apps/neta-app/server/db/migrations/` altında versi
 
 ## Health bağlantısı
 
-Readiness bugün yalnız `runtime_checks` tablosunun varlığını “migrations applied” sayar. Bu, bütün migration journal'ının beklenen son sürümde olduğunu ayrıntılı olarak doğrulamaz; release smoke ve integrity scriptleri ayrı kanıttır.
+Readiness release journal sıra/timestamp ve SQL hash’lerini __drizzle_migrations ledger’ıyla karşılaştırır. Eksik/duplicate/değiştirilmiş/daha yeni kayıt ve eksik SQL fail closed’dur. Startup migrate boş DB/doğru prefix’i kabul eder; ledger öncesi/sonrası doğrulanır. LF/CRLF eşdeğerliği Windows/Linux taşınabilirliğini korur. Bu tam schema diff değildir. [[docs/mobile/mobile-data-acceptance]] otomatik ve production kabulünü ayırır.
 
 ## Device refresh geçmişi — 0016
 
@@ -57,3 +58,7 @@ Startup migration tek replica varsayımına uyar; iki replica aynı anda upgrade
 - `apps/neta-app/server/db/migrations/`
 - [[docs/self-hosted-redesign/i18n-phase-0/migration-contract]]
 - [[docs/self-hosted-redesign/release/i18n-self-host-upgrade]]
+
+## 2026-09-17 — Ortak kontrol
+
+Startup migrate, readiness ve restore aynı server/db/migration-state.mjs denetimini kullanır. Production standalone hazırlığı journal/SQL dosyalarını paketler.

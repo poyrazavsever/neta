@@ -13,7 +13,7 @@
       "environment": "preview",
       "env": {
         "EXPO_PUBLIC_APP_ENV": "preview",
-        "EXPO_PUBLIC_NETA_ORIGIN": "https://demo.takeneta.com"
+        "EXPO_PUBLIC_NETA_ORIGIN": ""
       }
     },
     "production": {
@@ -21,7 +21,7 @@
       "environment": "production",
       "env": {
         "EXPO_PUBLIC_APP_ENV": "production",
-        "EXPO_PUBLIC_NETA_ORIGIN": "https://demo.takeneta.com"
+        "EXPO_PUBLIC_NETA_ORIGIN": ""
       }
     }
   }

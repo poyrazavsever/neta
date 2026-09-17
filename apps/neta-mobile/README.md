@@ -90,7 +90,14 @@ pnpm audit --prod
 
 `mobile:release:check` includes linting, strict TypeScript, unit tests, localization,
 accessibility, redesign phase gates, native autolinking checks, fork config
-validation, and the production release guard.
+validation, and the production release guard. It checks native source/config and
+autolinking without requiring generated android/ios directories. Use
+`native:verify --platform android` or `--platform ios` after generating native
+projects (and installing Pods on macOS). It does not certify signing or devices.
+
+`pnpm mobile:release:readiness` reports outstanding store evidence;
+`pnpm mobile:store:check` rejects incomplete records before running the code and
+HTTP/data gates. pnpm mobile:data:check verifies backend migration/restore and production standalone readiness on isolated fixtures. See [MOB-9 release acceptance](../../docs/mobile/mobile-release-acceptance.md).
 
 ## Project layout
 
@@ -122,4 +129,7 @@ blockers.
 
 ## License
 
-Neta Mobile is available under the [MIT License](LICENSE).
+Distribution licensing is unresolved: the root README describes a proprietary
+product while the mobile [LICENSE](LICENSE) contains Expo MIT terms. Store
+release remains blocked until the product/license owner records the decision;
+see [MOB-9 acceptance](../../docs/mobile/mobile-release-acceptance.md).

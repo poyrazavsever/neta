@@ -279,3 +279,9 @@ docker compose down
 ```
 
 Production cutover checklist'i dış sisteme erişim, maintenance kararı ve DNS yetkisi gerektirir; fixture provası bu gerçek operasyonun yerine geçmez.
+
+## 2026-09-17 — Migration ledger ve restore preflight
+
+Startup migrate journal timestamp/SQL hash ledger’ını öncesi/sonrası doğrular; bütün migration’lar tamamlanmadan ready 503’tür. LF/CRLF eşdeğerliği kabul edilir; başka SQL değişikliği, missing/duplicate/future kayıt ve eksik artifact reddedilir. Bu tam schema diff değildir.
+
+Restore staging’de manifest/checksum sonrası integrity_check, foreign_key_check ve desteklenen migration prefix’i swap öncesinde doğrulanır. Empty/geçmişsiz/daha yeni/bozuk DB kabul edilmez. Eski backup sonrası forward migration gerekir. Target WAL/SHM varsa app’i durdurun ve matching release/SQLite ile checkpoint/temiz kapanış yapın; sidecar’ları elle silmeyin. [MOB-9 data acceptance](../mobile/mobile-data-acceptance.md) otomatik ve production/native kabulünü ayırır.

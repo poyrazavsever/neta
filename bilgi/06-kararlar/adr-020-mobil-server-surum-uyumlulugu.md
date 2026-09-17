@@ -2,10 +2,11 @@
 tur: karar
 durum: mevcut
 karar_durumu: kabul-edildi
-guncellendi: 2026-09-03
+guncellendi: 2026-09-17
 guven: yuksek
 ozet: "Mobil-server uyumluluğu API major ve server'ın ilan ettiği minimum client SemVer ile belirlenir; aynı v1 içindeki additive alanlar uyumludur."
 kaynaklar:
+  - docs/mobile/mobile-release-acceptance.md
   - apps/neta-app/server/config.ts
   - apps/neta-mobile/src/lib/instance/version.ts
   - docs/roadmaps/platform-master-plan.md
@@ -45,6 +46,8 @@ Bu model bağımsız release temposunu destekler, server operatörüne güvenlik
 
 - Mobil app version geçerli SemVer'dir.
 - V1 runtime guard'ları bilinmeyen additive alanları reddetmez.
+
+2026-09-17 uygulaması prerelease sıralamasını korur: RC stable minimumunu geçmez; build metadata yok sayılır ve malformed minimum fail closed’dur. Kod ve canlı kabul matrisi [[docs/mobile/mobile-server-compatibility]] sayfasındadır.
 
 ## Yeniden değerlendirme koşulları
 

@@ -1,9 +1,11 @@
 ---
 tur: operasyon
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-data-acceptance.md
+  - docs/mobile/mobile-release-acceptance.md
   - apps/neta-app/scripts/restore.mjs
   - docs/self-hosted-redesign/phase-8-import-release.md
   - README.md
@@ -42,9 +44,9 @@ Doğrulanmış DB + upload bundle'ından tek instance'ı, scope/auth/file bütü
 - **Secret kaybı:** DB restore tek başına auth/AI decrypt sürekliliği sağlamaz; matching secret gerekir.
 - **Kısmi upload kaybı:** Sadece DB restore edilmez; eşleşen bundle kullanılır.
 
-## Pairing geleceği
+## Pairing restore davranışı
 
-Device tokenlar uygulandığında restore sonrası token epoch rotate edilmelidir. Aksi halde backup'taki revoke edilmiş token family yeniden aktif olabilir.
+Canonical restore scripti device token epoch’unu başarılı swap sonrasında değiştirir. Eski tokenlar yeniden geçerli olmaz; fresh pairing gerekir. İkinci loopback backend otomatik HTTP kabulü [[docs/mobile/mobile-security-acceptance]] sayfasındadır; signed/native production-like restore kabulü release kaydında açıktır.
 
 ## Açık operasyon kararı
 
@@ -54,3 +56,7 @@ Resmî RPO/RTO, backup retention süresi, encryption mekanizması ve restore reh
 
 - `apps/neta-app/scripts/restore.mjs`
 - [[docs/self-hosted-redesign/phase-8-import-release]]
+
+## Migration/readiness kabulü
+
+Restore staging integrity/FK ve migration prefix’i doğrulanır. Target WAL/SHM varsa cutover durur: app’i durdurun ve matching release/SQLite ile checkpoint/temiz kapanış yapın; sidecar’ları elle silmeyin. Eski backup sonrası forward migration tamamlanana kadar ready 503’tür. [[docs/mobile/mobile-data-acceptance]] yerel/production kabulünü ayırır.

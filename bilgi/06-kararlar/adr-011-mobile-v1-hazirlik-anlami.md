@@ -2,7 +2,7 @@
 tur: karar
 durum: planlanan
 karar_durumu: kabul-edildi
-guncellendi: 2026-09-03
+guncellendi: 2026-09-17
 guven: yuksek
 ozet: "mobile-v1, bootstrap varlığını değil evrensel bağlantı, session ve minimum owner read yüzeyinin birlikte doğrulanmasını ifade eder."
 kaynaklar:
@@ -53,6 +53,8 @@ Aggregate adın gerçek bir kullanıcı yolunu garanti etmesi capability overcla
 
 - Mobil uygulama capability detail listesindeki `planned` durumunu feature-ready kabul etmez.
 - Minimum owner read kapsamı ilk kullanılabilir ürün dilimidir.
+
+2026-09-17 MOB-9 uygulaması source quality ve reviewer/hash’li strict store kabulünü [[06-kararlar/adr-023-mobil-release-kanit-kaydi|ADR-023]] ile ayırır. Release kaydı pending olduğu sürece mobile-v1 açılmaz; kod/autolinking gate’i signed cihaz kanıtı değildir.
 
 ## Yeniden değerlendirme koşulları
 

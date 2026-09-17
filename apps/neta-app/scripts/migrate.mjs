@@ -3,16 +3,20 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { pathToFileURL } from "node:url";
 import { applySqlitePragmas, ensureDataLayout } from "./lib/data-dir.mjs";
+import { assertMigrationState, readMigrationManifest } from "../server/db/migration-state.mjs";
 
 export function runMigrations(databasePath) {
   const config = ensureDataLayout();
   const sqlite = new Database(databasePath ?? config.databasePath);
 
   try {
+    const manifest = readMigrationManifest(config.migrationsDir);
+    assertMigrationState(sqlite, manifest, { allowPending: true, allowEmpty: true });
     applySqlitePragmas(sqlite);
     const db = drizzle({ client: sqlite });
 
     migrate(db, { migrationsFolder: config.migrationsDir });
+    assertMigrationState(sqlite, manifest);
 
     const now = Date.now();
     sqlite

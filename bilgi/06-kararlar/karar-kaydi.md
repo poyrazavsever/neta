@@ -1,10 +1,11 @@
 ---
 tur: karar
 durum: mevcut
-guncellendi: 2026-09-16
+guncellendi: 2026-09-17
 guven: yuksek
 ozet: "Neta mimari kararlarının bağımsız ADR notlarına açılan durum ve yönlendirme indeksi."
 kaynaklar:
+  - docs/mobile/mobile-release-acceptance.md
   - docs/self-hosted-redesign/phase-0-adrs.md
   - docs/self-hosted-redesign/adr-0018-device-pairing.md
   - docs/roadmaps/platform-master-plan.md
@@ -48,6 +49,7 @@ Bu sayfa karar metinlerini toplamaz; her kalıcı karar kendi ADR dosyasında ya
 | [[06-kararlar/adr-020-mobil-server-surum-uyumlulugu\|ADR-020]] | Mobil-server sürüm uyumluluğu | Kabul edildi | Mevcut |
 | [[06-kararlar/adr-021-api-mutation-idempotency-kaydi\|ADR-021]] | API mutation idempotency kaydı | Kabul edildi | Mevcut |
 | [[06-kararlar/adr-022-ui-assets-pipeline\|ADR-022]] | Vault içinde UI assets pipeline | Kabul edildi | Envanter ve arşivleme kodda; tasarım/CI diff planlanan |
+| [[06-kararlar/adr-023-mobil-release-kanit-kaydi\|ADR-023]] | Mobil release kanıt kaydı | Kabul edildi | Yerel gate mevcut; signed/store kabulü açık |
 
 ## Kayıt kuralları
 
@@ -59,4 +61,4 @@ Bu sayfa karar metinlerini toplamaz; her kalıcı karar kendi ADR dosyasında ya
 
 ## Sıradaki numara
 
-Yeni ve bağımsız bir karar için sıradaki kimlik **ADR-023**'dir.
+Yeni ve bağımsız bir karar için sıradaki kimlik **ADR-024**'dir.

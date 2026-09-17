@@ -4,29 +4,49 @@ on:
   pull_request:
     paths:
       - "apps/neta-mobile/**"
-      - "apps/neta-app/app/api/v1/**"
-      - "apps/neta-app/server/api/v1/**"
-      - "apps/neta-app/server/settings/preferences.ts"
-      - "apps/neta-app/server/domain/errors.ts"
+      - "apps/neta-app/app/api/**"
+      - "apps/neta-app/server/**"
+      - "apps/neta-app/scripts/mobile-*.mjs"
+      - "apps/neta-app/scripts/ai-operations.test.mjs"
+      - "apps/neta-app/scripts/device-*.mjs"
+      - "apps/neta-app/scripts/lib/**"
+      - "apps/neta-app/scripts/prepare-standalone.mjs"
+      - "apps/neta-app/scripts/migrate.mjs"
+      - "apps/neta-app/instrumentation.ts"
+      - "apps/neta-app/next.config.ts"
+      - "apps/neta-app/scripts/backup.mjs"
+      - "apps/neta-app/scripts/restore.mjs"
+      - "apps/neta-app/package.json"
       - "packages/**"
       - "docs/mobile/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
+      - "Dockerfile"
       - ".github/workflows/mobile-ci.yml"
   push:
     branches: [main]
     paths:
       - "apps/neta-mobile/**"
-      - "apps/neta-app/app/api/v1/**"
-      - "apps/neta-app/server/api/v1/**"
-      - "apps/neta-app/server/settings/preferences.ts"
-      - "apps/neta-app/server/domain/errors.ts"
+      - "apps/neta-app/app/api/**"
+      - "apps/neta-app/server/**"
+      - "apps/neta-app/scripts/mobile-*.mjs"
+      - "apps/neta-app/scripts/ai-operations.test.mjs"
+      - "apps/neta-app/scripts/device-*.mjs"
+      - "apps/neta-app/scripts/lib/**"
+      - "apps/neta-app/scripts/prepare-standalone.mjs"
+      - "apps/neta-app/scripts/migrate.mjs"
+      - "apps/neta-app/instrumentation.ts"
+      - "apps/neta-app/next.config.ts"
+      - "apps/neta-app/scripts/backup.mjs"
+      - "apps/neta-app/scripts/restore.mjs"
+      - "apps/neta-app/package.json"
       - "packages/**"
       - "docs/mobile/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
+      - "Dockerfile"
       - ".github/workflows/mobile-ci.yml"
 
 permissions:
@@ -38,6 +58,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
@@ -45,15 +67,56 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm contract:check
+      - run: pnpm vault:map:check
+      - run: pnpm vault:check
+      - run: node apps/neta-mobile/scripts/release-readiness-gate.mjs --report > /tmp/neta-release-readiness.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mobile-release-readiness
+          path: /tmp/neta-release-readiness.json
+          if-no-files-found: error
+          retention-days: 14
       - run: pnpm mobile:release:check
         env:
           EXPO_PUBLIC_APP_ENV: production
-          EXPO_PUBLIC_NETA_ORIGIN: https://demo.takeneta.com
+          EXPO_PUBLIC_NETA_ORIGIN: ""
       - run: pnpm --filter @neta/mobile exec expo export --platform ios --output-dir /tmp/neta-mobile-ios
         env:
           EXPO_PUBLIC_APP_ENV: production
-          EXPO_PUBLIC_NETA_ORIGIN: https://demo.takeneta.com
+          EXPO_PUBLIC_NETA_ORIGIN: ""
       - run: pnpm --filter @neta/mobile exec expo export --platform android --output-dir /tmp/neta-mobile-android
         env:
           EXPO_PUBLIC_APP_ENV: production
-          EXPO_PUBLIC_NETA_ORIGIN: https://demo.takeneta.com
+          EXPO_PUBLIC_NETA_ORIGIN: ""
+
+  android-native-config:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @neta/mobile exec expo prebuild --platform android --no-install
+        env:
+          EXPO_PUBLIC_APP_ENV: production
+          EXPO_PUBLIC_NETA_ORIGIN: ""
+      - run: pnpm --filter @neta/mobile native:verify --platform android
+
+  backend-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm mobile:data:check
+      - run: pnpm mobile:security:check
+      - run: pnpm mobile:ai:check

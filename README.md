@@ -122,6 +122,8 @@ Health endpoint'leri:
 - `/api/health/ready`: SQLite, data directory ve migration readiness.
 - `/api/health`: Hafif uyumluluk endpoint'i.
 
+Readiness release journal sıra/timestamp/SQL hash ledger’ını doğrular; eksik veya uyumsuz DB’de 503 verir. İzole migration/restore ve production standalone HTTP kabulü için pnpm mobile:data:check çalıştırın: [MOB-9 veri kabulü](docs/mobile/mobile-data-acceptance.md). Runtime veri/env dosyaları standalone pakete alınmaz; production config host tarafından sağlanır.
+
 Coolify ve Dokploy'da repository'nin `Dockerfile` dosyasını kullanın, internal portu `3000` seçin ve `/app/data` yoluna persistent volume bağlayın. Tek replica kullanın. Ayrıntılı production ve upgrade runbook'u: [Faz 8 import/release rehberi](docs/self-hosted-redesign/phase-8-import-release.md).
 
 ## İlk owner ve müşteri daveti

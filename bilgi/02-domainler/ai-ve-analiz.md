@@ -1,9 +1,10 @@
 ---
 tur: domain
 durum: mevcut
-guncellendi: 2026-09-02
+guncellendi: 2026-09-17
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-ai-acceptance.md
   - apps/neta-app/server/ai
   - apps/neta-app/server/settings/ai.ts
   - apps/neta-app/server/services/domain.ts
@@ -43,7 +44,7 @@ AI ayarı ve chat geçmişi SQLite'tadır. API key AES-256-GCM ile şifrelenir; 
 
 ## API yüzeyi
 
-Web-specific chat/risk/finance route'ları vardır. Mobil client ve native streaming planları bulunsa da `/api/v1/chat`, project-risk veya finance analysis resource API'si mevcut değildir.
+Legacy web-specific route’lar korunur. 2026-09-17’de `/api/v1/chat/sessions`, session messages NDJSON, `/api/v1/projects/:id/risk-analysis` ve `/api/v1/finance/analysis` uygulandı. Explicit DTO, strict input, owner/device read scope ve persistent lease/idempotency kullanılır; `ai.assistant.v1` available’dır. Sentetik loopback provider HTTP kabulü [[docs/mobile/mobile-ai-acceptance]] kapsamındadır; gerçek provider/signed native kabulü ayrıdır.
 
 ## Yetkilendirme
 
@@ -59,7 +60,7 @@ Public ayar yalnız `hasApiKey` döndürür. Provider'a gönderilen içerik inst
 
 ## Sınırlamalar / plan
 
-Provider key rotasyonu için ayrı versioned key yönetimi yoktur. Server-side egress allowlist ve içerik redaction kanıtlanmamıştır. Mobil NDJSON/native streaming adapter ve doğru capability gating planlanandır.
+Provider key rotasyonu için ayrı versioned key yönetimi yoktur. Server-side egress allowlist ve içerik redaction kanıtlanmamıştır. Mobil NDJSON/native streaming ve capability gating kodda mevcuttur; signed gerçek cihaz ve provider/model compatibility kabulü açıktır. Push/notification ayrı ADR gerektirir.
 
 ## Kaynaklar
 

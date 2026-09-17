@@ -2,10 +2,11 @@
 tur: karar
 durum: mevcut
 karar_durumu: kabul-edildi
-guncellendi: 2026-09-04
+guncellendi: 2026-09-17
 guven: yuksek
 ozet: "Retry edilebilir v1 mutation sonuçları actor, method, route ve Idempotency-Key kapsamında SQLite'ta atomik olarak saklanır."
 kaynaklar:
+  - docs/mobile/mobile-ai-acceptance.md
   - apps/neta-app/server/api/v1/mutations.ts
   - apps/neta-app/server/db/schema/runtime.ts
   - apps/neta-app/server/db/migrations/0013_glorious_ben_grimm.sql
@@ -49,6 +50,10 @@ Bu model tek-process/SQLite invariant'ıyla uyumludur, side effect ile replay ka
 - Self-hosted runtime tek yazıcı process ve tek SQLite veritabanı invariant'ını korur.
 - İstemci bir kullanıcı niyeti için ürettiği key'i yalnız aynı payload'ın transport retry'larında yeniden kullanır.
 - Yedi günlük retention, online mobil retry penceresi için yeterlidir; uzun süreli offline queue henüz kapsamda değildir.
+
+## AI async uygulama ayrıntısı (2026-09-17)
+
+AI provider I/O boyunca transaction açık tutulmaz. Aynı mevcut tabloda AI’ye ait pending/failed/completed envelope ve timeout + 30 saniyelik lease bulunur. Claim/user message ve assistant/completed result ayrı kısa immediate transaction’larda atomiktir. Aynı key/payload tamamlandıysa aynı DTO, aktifse 409; farklı payload 409’dur. Failed/expired lease devralınabilir; eski lease’in geç yazısı CAS ile reddedilir. Kullanıcı message ID’si actor/route/key’den deterministik türetilir; failed retry ikinci user message yaratmaz. Owner başına üç aktif lease sınırı uygulanır; shared yedi günlük opportunistic retention korunur. Provider seviyesinde exactly-once ve maliyet garantisi yoktur. Yeni migration gerekmez. Kanıt [[docs/mobile/mobile-ai-acceptance]] ve `server/ai/operations.ts` içindedir.
 
 ## Sınırlar
 

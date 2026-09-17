@@ -18,6 +18,7 @@
     "mobile:contract:test": "node --test server/api/v1/presenters.test.mjs",
     "mobile:security:check": "node --test scripts/device-refresh-migration.test.mjs scripts/device-maintenance.test.mjs scripts/device-replay.test.mjs && node scripts/phase1-auth-smoke.mjs --mobile-security-only",
     "mobile:maintenance:runtime": "node scripts/device-maintenance-runtime-smoke.mjs",
+    "mobile:ai:check": "node --experimental-transform-types --test scripts/ai-operations.test.mjs && node scripts/mobile-ai-smoke.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.mjs",
     "db:backup": "node scripts/backup.mjs",
@@ -53,7 +54,9 @@
     "i18n:backfill": "node scripts/i18n/backfill-content-translations.mjs",
     "i18n:integrity": "node scripts/i18n/check-integrity.mjs",
     "i18n:release-gate": "node scripts/i18n/release-gate.mjs",
-    "mobile:ai:check": "node --experimental-transform-types --test scripts/ai-operations.test.mjs && node scripts/mobile-ai-smoke.mjs"
+    "mobile:data:check": "pnpm mobile:data:test && pnpm mobile:data:production",
+    "mobile:data:test": "node --experimental-transform-types --test scripts/mobile-data-acceptance.test.mjs",
+    "mobile:data:production": "node scripts/mobile-data-production-smoke.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",
