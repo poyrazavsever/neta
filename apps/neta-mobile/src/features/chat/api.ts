@@ -20,13 +20,15 @@ import {
 
 import { NetaClientError, upstreamErrorMessage } from '@/lib/api/errors';
 import { createApiUrl } from '@/lib/api/http';
-import { getNativeAuthHeaders } from '@/lib/auth/native-auth-client';
+import { authenticatedStreamRequest } from '@/lib/auth/native-auth-client';
+import { requireInstanceCapability } from '@/lib/instance/capabilities';
 import type { MeProfile, StoredInstance } from '@/lib/instance/types';
 import { requestResource, type ResourceResult } from '@/lib/resource/api-client';
-import { parseNdjsonChunk } from './stream.ts';
+import { collectResourcePages } from '@/lib/resource/pagination';
+import { consumeChatStream } from './stream.ts';
 
 export function listChatSessions(instance: StoredInstance, user: MeProfile): Promise<ResourceResult<PaginatedResponse<ChatSession>>> {
-  return requestResource(instance, user, { cachePolicy: 'short', parser: parseSessionPage, path: 'chat/sessions', resource: 'chat' });
+  return collectResourcePages(cursor => requestResource(instance, user, { cachePolicy: 'none', filters: { cursor }, parser: parseSessionPage, path: `chat/sessions${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`, resource: 'chat' }));
 }
 
 export function createChatSession(instance: StoredInstance, user: MeProfile, title?: string): Promise<ResourceResult<ChatSession>> {
@@ -38,7 +40,7 @@ export function deleteChatSession(instance: StoredInstance, user: MeProfile, id:
 }
 
 export function listChatMessages(instance: StoredInstance, user: MeProfile, id: string): Promise<ResourceResult<PaginatedResponse<ChatMessage>>> {
-  return requestResource(instance, user, { cachePolicy: 'short', filters: { id }, parser: parseMessagePage, path: `chat/sessions/${encodeURIComponent(id)}/messages`, resource: 'chat' });
+  return collectResourcePages(cursor => requestResource(instance, user, { cachePolicy: 'none', filters: { id, cursor }, parser: parseMessagePage, path: `chat/sessions/${encodeURIComponent(id)}/messages${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`, resource: 'chat' }));
 }
 
 export function analyzeProjectRisk(instance: StoredInstance, user: MeProfile, projectId: string): Promise<ResourceResult<ProjectRiskAnalysis>> {
@@ -54,10 +56,11 @@ export async function streamChatMessage(
   signal: AbortSignal,
   onEvent: (event: ChatStreamEvent) => void,
 ): Promise<ChatMessage> {
-  const authHeaders = await getNativeAuthHeaders(instance.instanceId);
-  const response = await expoFetch(createApiUrl(instance.apiBaseUrl, `chat/sessions/${encodeURIComponent(sessionId)}/messages`), {
+  requireInstanceCapability(instance, 'ai.assistant.v1');
+  const { response, assertCurrent } = await authenticatedStreamRequest(instance, createApiUrl(instance.apiBaseUrl, `chat/sessions/${encodeURIComponent(sessionId)}/messages`), user, {
     body: JSON.stringify(payload),
-    credentials: 'include',
+    timeoutMs: 45_000,
+    transport: expoFetch,
     headers: {
       Accept: 'application/x-ndjson',
       'Accept-Language': user.preferences?.locale ?? instance.defaultLocale,
@@ -66,35 +69,15 @@ export async function streamChatMessage(
       'X-Neta-Client': 'mobile',
       'X-Neta-Client-Version': Constants.expoConfig?.version ?? '0.0.0',
       'X-Neta-Platform': Platform.OS,
-      ...authHeaders,
     },
     method: 'POST',
     signal,
   });
 
-  if (!response.ok) throw streamHttpError(response.status);
+  if (!response.headers.get('content-type')?.includes('application/x-ndjson')) throw new NetaClientError('UPSTREAM_ERROR', 'AI akış türü geçersiz.');
   if (!response.body) throw new NetaClientError('UPSTREAM_ERROR', upstreamErrorMessage('UPSTREAM_ERROR'));
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let remainder = '';
-  let completed: ChatMessage | null = null;
-  while (true) {
-    const part = await reader.read();
-    const parsed = parseNdjsonChunk(remainder, part.done ? decoder.decode() : decoder.decode(part.value, { stream: true }), part.done);
-    remainder = parsed.remainder;
-    for (const event of parsed.events) {
-      if (event.type === 'error') throw new NetaClientError(event.code, upstreamErrorMessage(event.code));
-      if (event.type === 'message.completed') {
-        if (event.message.role !== 'user' && event.message.role !== 'assistant') continue;
-        completed = event.message;
-      }
-      onEvent(event);
-    }
-    if (part.done) break;
-  }
-  if (!completed) throw new NetaClientError('UPSTREAM_ERROR', 'AI akışı tamamlanmadan kesildi.');
-  return completed;
+  return consumeChatStream(response.body, signal, assertCurrent, onEvent);
 }
 
 function parseSessionPage(value: unknown): PaginatedResponse<ChatSession> { if (!isPaginatedResponse(value, isChatSession)) throw contractError('Chat sessions'); return value; }
@@ -106,8 +89,3 @@ function parseMessagePage(value: unknown): PaginatedResponse<ChatMessage> {
 function parseDelete(value: unknown): DeleteResult { if (!isDeleteResult(value)) throw contractError('Chat delete'); return value; }
 function parseRisk(value: unknown): ProjectRiskAnalysis { if (!isProjectRiskAnalysis(value)) throw contractError('Project risk'); return value; }
 function contractError(name: string): NetaClientError { return new NetaClientError('SERVER_ERROR', `${name} API kontratı beklenen formatta değil.`); }
-function streamHttpError(status: number): NetaClientError {
-  if (status === 408 || status === 504) return new NetaClientError('UPSTREAM_TIMEOUT', upstreamErrorMessage('UPSTREAM_TIMEOUT'), status);
-  if (status === 503 || status === 424) return new NetaClientError('SERVICE_UNAVAILABLE', upstreamErrorMessage('SERVICE_UNAVAILABLE'), status);
-  return new NetaClientError('UPSTREAM_ERROR', upstreamErrorMessage('UPSTREAM_ERROR'), status);
-}

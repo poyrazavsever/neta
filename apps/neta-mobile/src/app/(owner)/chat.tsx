@@ -35,6 +35,7 @@ export default function ChatScreen() {
   const composerRef = useRef<TextInput>(null);
   const controllerRef = useRef<AbortController | null>(null);
   const cancelledRef = useRef(false);
+  const sendingRef = useRef(false);
   const streamingAssistantIdRef = useRef<string | null>(null);
   const lastLocalMessageIdsRef = useRef<{ assistantId: string; userId: string } | null>(null);
   const shouldAutoScrollRef = useRef(true);
@@ -63,7 +64,7 @@ export default function ChatScreen() {
   useEffect(() => { const id = setTimeout(() => void loadMessages(), 0); return () => clearTimeout(id); }, [loadMessages]);
 
   const newSession = async () => {
-    if (!isOnline || session.status !== 'authenticated' || session.role !== 'freelancer') return;
+    if (!isOnline || sendingRef.current || session.status !== 'authenticated' || session.role !== 'freelancer') return;
     setIsLoading(true);
     try { const created = (await createChatSession(session.instance, session.user)).data; setActive(created); setMessages([]); await loadSessions(); composerRef.current?.focus(); }
     catch (createError) { setError(toClientError(createError, 'Sohbet oluşturulamadı.')); }
@@ -72,20 +73,22 @@ export default function ChatScreen() {
 
   const removeSession = (item: ChatSession) => Alert.alert('Sohbeti sil', 'Bu sohbet kalıcı olarak silinsin mi?', [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Sil', style: 'destructive', onPress: () => void performDelete(item) }]);
   const performDelete = async (item: ChatSession) => {
-    if (!isOnline || session.status !== 'authenticated' || session.role !== 'freelancer') return;
+    if (!isOnline || sendingRef.current || session.status !== 'authenticated' || session.role !== 'freelancer') return;
     try { await deleteChatSession(session.instance, session.user, item.id); if (active?.id === item.id) { setActive(null); setMessages([]); } await loadSessions(); }
     catch (deleteError) { setError(toClientError(deleteError, 'Sohbet silinemedi.')); }
   };
 
   const send = async (retryRequest?: ChatStreamRequest) => {
-    if (!isOnline || isStreaming || session.status !== 'authenticated' || session.role !== 'freelancer') return;
+    if (!isOnline || sendingRef.current || isStreaming || session.status !== 'authenticated' || session.role !== 'freelancer') return;
+    if (retryRequest?.sessionId && retryRequest.sessionId !== active?.id) { setLastRequest(null); return; }
     const content = retryRequest?.payload.content ?? composer.trim();
     if (!content) { composerRef.current?.focus(); return; }
+    sendingRef.current = true;
     let target = active;
     try {
       if (!target) { target = (await createChatSession(session.instance, session.user)).data; setActive(target); }
       const payload: ChatMessageMutationPayload = retryRequest?.payload ?? { content, sourceLocale: locale };
-      const streamRequest = createChatStreamRequest(payload, retryRequest?.idempotencyKey);
+      const streamRequest = createChatStreamRequest(payload, retryRequest?.idempotencyKey, target.id);
       const { idempotencyKey } = streamRequest;
       const userId = `local-user-${Date.now()}`;
       const userMessage: ChatMessage = { content, createdAt: new Date().toISOString(), id: userId, role: 'user', sourceLocale: locale };
@@ -111,16 +114,16 @@ export default function ChatScreen() {
       } finally { if (flushTimer) clearTimeout(flushTimer); clearTimeout(timeout); controllerRef.current = null; streamingAssistantIdRef.current = null; }
     } catch (sendError) {
       if (!cancelledRef.current) setError(toClientError(sendError, 'AI yanıtı oluşturulamadı.'));
-    } finally { setIsStreaming(false); }
+    } finally { sendingRef.current = false; setIsStreaming(false); }
   };
-  const stop = () => { cancelledRef.current = true; controllerRef.current?.abort(); const assistantId = streamingAssistantIdRef.current; if (assistantId) setMessages((current) => current.filter((message) => message.id !== assistantId || message.content.trim().length > 0)); setIsStreaming(false); };
+  const stop = () => { cancelledRef.current = true; controllerRef.current?.abort(); const assistantId = streamingAssistantIdRef.current; if (assistantId) setMessages((current) => current.filter((message) => message.id !== assistantId || message.content.trim().length > 0)); };
 
   return <Screen contentStyle={styles.screen}><View style={styles.header}>
     <Badge tone="primary">AI</Badge><Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>AI sohbet ve proje riski</Text>
     {!isOnline ? <Toast message="Sohbet ve analiz için internet bağlantısı gerekir." tone="danger" /> : null}
     {error ? <View style={styles.error}><Toast message={error.message} tone="danger" />{lastRequest ? <Button disabled={!isOnline} onPress={() => void send(lastRequest)} variant="secondary">Son mesajı yeniden dene</Button> : null}{error.code === 'SERVICE_UNAVAILABLE' ? <Text style={{ color: colors.textMuted }}>AI sağlayıcı ayarları owner ayarlarından tamamlanmalıdır.</Text> : null}</View> : null}
     <View style={styles.actions}><Button disabled={!isOnline} loading={isLoading} onPress={() => void newSession()}>Yeni sohbet</Button><Button onPress={() => router.push('/project-risk' as Href)} variant="secondary">Proje riski</Button></View>
-    <FlatList accessibilityLabel="Sohbet oturumları" contentContainerStyle={styles.sessionList} data={sessions} horizontal keyExtractor={(item) => item.id} renderItem={({ item }) => <View style={styles.sessionItem}><Pressable accessibilityRole="radio" accessibilityState={{ checked: active?.id === item.id }} onPress={() => setActive(item)} style={[styles.sessionButton, { backgroundColor: active?.id === item.id ? colors.primary : colors.surfaceMuted, borderColor: colors.border }]}><Text numberOfLines={1} style={{ color: active?.id === item.id ? colors.primaryForeground : colors.text }}>{item.title}</Text></Pressable><Button accessibilityLabel={`${item.title} sohbetini sil`} onPress={() => removeSession(item)} variant="ghost">Sil</Button></View>} showsHorizontalScrollIndicator />
+    <FlatList accessibilityLabel="Sohbet oturumları" contentContainerStyle={styles.sessionList} data={sessions} horizontal keyExtractor={(item) => item.id} renderItem={({ item }) => <View style={styles.sessionItem}><Pressable accessibilityRole="radio" accessibilityState={{ checked: active?.id === item.id }} disabled={isStreaming} onPress={() => { if (sendingRef.current) return; setActive(item); setLastRequest(null); lastLocalMessageIdsRef.current = null; }} style={[styles.sessionButton, { backgroundColor: active?.id === item.id ? colors.primary : colors.surfaceMuted, borderColor: colors.border }]}><Text numberOfLines={1} style={{ color: active?.id === item.id ? colors.primaryForeground : colors.text }}>{item.title}</Text></Pressable><Button accessibilityLabel={`${item.title} sohbetini sil`} onPress={() => removeSession(item)} variant="ghost">Sil</Button></View>} showsHorizontalScrollIndicator />
   </View>
   <FlatList accessibilityLabel="Sohbet mesajları" contentContainerStyle={styles.messages} data={messages} initialNumToRender={16} keyExtractor={(item) => item.id} ListEmptyComponent={isLoading ? <Skeleton height={100} /> : <EmptyState title="Mesaj yok" description="Yeni bir sohbet başlat ve mesajını yaz." />} maxToRenderPerBatch={12} onContentSizeChange={() => { if (shouldAutoScrollRef.current) listRef.current?.scrollToEnd({ animated: !reduceMotion && !isStreaming }); }} onScroll={({ nativeEvent, timeStamp }) => { recordScrollFrame('chat-messages', timeStamp); shouldAutoScrollRef.current = isNearChatEnd({ contentHeight: nativeEvent.contentSize.height, offsetY: nativeEvent.contentOffset.y, viewportHeight: nativeEvent.layoutMeasurement.height }); }} ref={listRef} removeClippedSubviews renderItem={({ item }) => <Card accessibilityLiveRegion={item.role === 'assistant' && isStreaming ? 'polite' : 'none'} style={[styles.message, item.role === 'user' && styles.userMessage]}><Text style={[styles.messageRole, { color: colors.textMuted }]}>{item.role === 'user' ? 'Sen' : 'Neta AI'}</Text><Text selectable style={{ color: colors.text }}>{item.content || (isStreaming ? 'Yanıt oluşturuluyor…' : '')}</Text></Card>} scrollEventThrottle={32} windowSize={7} />
   <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={spacing.md}>

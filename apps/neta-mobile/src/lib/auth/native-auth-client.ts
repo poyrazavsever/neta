@@ -193,6 +193,12 @@ export async function authenticatedFileRequest(instance: StoredInstance, url: st
   return authenticatedRequest(instance, url, { method: 'GET' }, fetchResponse, auth.generation);
 }
 
+export async function authenticatedStreamRequest(instance: StoredInstance, url: string, user: MeProfile, options: FetchJsonOptions) {
+  const auth = await bindNativeActor(instance, user);
+  const response = await authenticatedRequest(instance, url, { ...options, allowRedirects: false }, fetchResponse, auth.generation);
+  return { response, assertCurrent: auth.assertCurrent };
+}
+
 async function authenticatedRequest<T>(
   instance: StoredInstance,
   pathOrUrl: string,

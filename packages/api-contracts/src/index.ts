@@ -26,7 +26,7 @@ export const NETA_CAPABILITY_DETAILS = [
   { id: 'instance.locales.admin.v1', version: 1, status: 'available', access: 'freelancer' },
   { id: 'files.v1', version: 1, status: 'available', access: 'freelancer' },
   { id: 'portal.client.v1', version: 1, status: 'available', access: 'client' },
-  { id: 'ai.assistant.v1', version: 1, status: 'planned', access: 'freelancer' },
+  { id: 'ai.assistant.v1', version: 1, status: 'available', access: 'freelancer' },
 ] as const satisfies readonly {
   id: string;
   version: number;
@@ -98,7 +98,7 @@ export const NETA_CAPABILITY_ROUTE_REQUIREMENTS = {
     'GET /api/v1/portal/revisions', 'POST /api/v1/portal/projects/:id/revisions',
     'GET /api/v1/portal/profile', 'PATCH /api/v1/portal/profile',
   ],
-  'ai.assistant.v1': ['GET /api/v1/chat/sessions', 'POST /api/v1/chat/sessions'],
+  'ai.assistant.v1': ['GET /api/v1/chat/sessions', 'POST /api/v1/chat/sessions', 'DELETE /api/v1/chat/sessions/:id', 'GET /api/v1/chat/sessions/:id/messages', 'POST /api/v1/chat/sessions/:id/messages', 'POST /api/v1/projects/:id/risk-analysis', 'POST /api/v1/finance/analysis'],
 } as const satisfies Partial<Record<NetaCapabilityId, readonly string[]>>;
 
 export type NetaColorMode = 'light' | 'dark' | 'system';

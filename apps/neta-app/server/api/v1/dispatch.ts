@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createPortalInvitation, derivePortalInvitationToken, PortalInvitationError } from "@/server/auth/invitations";
 import { requireApiV1Role } from "./auth";
 import { deviceScopesForRoute } from "./device-scopes";
+import { dispatchAi } from "./ai";
 import { parseApiV1Json } from "./input";
 import {
   completeOwnerTask,
@@ -85,6 +86,11 @@ export async function dispatchApiV1(request: Request, path: readonly string[]): 
     const accountRoute = path.join("/") === "me/profile" || path.join("/") === "me/password" ||
       path.join("/") === "me/sessions" || path.length === 3 && path[0] === "me" && path[1] === "sessions";
     const context = await requireApiV1Role(new Headers(request.headers), accountRoute ? ["freelancer", "client"] : ["freelancer"], deviceScopesForRoute(path, request.method));
+    if (path[0] === "chat" || path.join("/") === "finance/analysis" || path[2] === "risk-analysis") {
+      const result = await dispatchAi(request, path, context);
+      if (result) return result;
+      return apiV1NotFound();
+    }
     if (path.join("/") === "pairing/challenges") {
       if (request.method !== "POST") return apiV1MethodNotAllowed(["POST"]);
       return apiV1Success(await createPairingChallenge(context, request, await parseApiV1Json(request, z.unknown())), { status: 201 });

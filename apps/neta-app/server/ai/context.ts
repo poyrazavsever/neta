@@ -38,7 +38,7 @@ export function buildChatContext(
     }))),
     section("Son 30 gün finans", finance.map((item) => ({
       type: item.type,
-      amount: minorToMajor(item.amountMinor),
+      amount: minorToMajor(item.amountMinor, item.currency),
       currency: item.currency,
       category: item.category,
       paymentStatus: item.paymentStatus,
@@ -58,31 +58,32 @@ export function buildFinanceAnalysisContext(
   service: DomainService,
   actor: DomainActor,
   now = new Date(),
+  range?: { month: string },
 ): { hasData: boolean; text: string } {
   const since = daysAgo(now, 30);
-  const transactions = service
+  const allTransactions = service
     .listFinanceTransactions(actor)
-    .filter((item) => item.transactionDate >= since)
-    .slice(0, 200);
-  const totals = new Map<string, { incomeMinor: number; expenseMinor: number }>();
-  for (const transaction of transactions) {
-    const current = totals.get(transaction.currency) ?? { incomeMinor: 0, expenseMinor: 0 };
-    if (transaction.type === "income") current.incomeMinor += transaction.amountMinor;
-    else current.expenseMinor += transaction.amountMinor;
+    .filter((item) => range ? item.transactionDate.startsWith(`${range.month}-`) : item.transactionDate >= since);
+  const transactions = allTransactions.slice(0, 200);
+  const totals = new Map<string, { incomeMinor: bigint; expenseMinor: bigint }>();
+  for (const transaction of allTransactions) {
+    const current = totals.get(transaction.currency) ?? { incomeMinor: BigInt(0), expenseMinor: BigInt(0) };
+    if (transaction.type === "income") current.incomeMinor += BigInt(transaction.amountMinor);
+    else current.expenseMinor += BigInt(transaction.amountMinor);
     totals.set(transaction.currency, current);
   }
 
   return {
     hasData: transactions.length > 0,
     text: capContext([
-      "Kullanıcının son 30 günlük finansal durumu:",
+      range ? `Kullanıcının ${range.month} ayındaki finansal durumu:` : "Kullanıcının son 30 günlük finansal durumu:",
       ...Array.from(totals, ([currency, value]) =>
-        `- ${currency}: gelir ${minorToMajor(value.incomeMinor)}, gider ${minorToMajor(value.expenseMinor)}, net ${minorToMajor(value.incomeMinor - value.expenseMinor)}`,
+        `- ${currency}: gelir ${minorToMajor(value.incomeMinor, currency)}, gider ${minorToMajor(value.expenseMinor, currency)}, net ${minorToMajor(value.incomeMinor - value.expenseMinor, currency)}`,
       ),
-      `- İşlem sayısı: ${transactions.length}`,
+      `- Toplam işlem sayısı: ${allTransactions.length}; detaylar en fazla 200 kayıtla sınırlıdır.`,
       "İşlemler:",
       ...transactions.map((item) =>
-        `- ${item.transactionDate} | ${item.type === "income" ? "Gelir" : "Gider"} | ${clean(item.category) || "Kategorisiz"} | ${minorToMajor(item.amountMinor)} ${item.currency}`,
+        `- ${item.transactionDate} | ${item.type === "income" ? "Gelir" : "Gider"} | ${clean(item.category) || "Kategorisiz"} | ${minorToMajor(item.amountMinor, item.currency)} ${item.currency}`,
       ),
     ].join("\n")),
   };
@@ -105,7 +106,7 @@ export function buildProjectRiskContext(
       `Proje adı: ${clean(project.name)}`,
       `Müşteri: ${project.clientId ? clean(clients.get(project.clientId) ?? "Bilinmiyor") : "Yok"}`,
       `Durum: ${project.status}`,
-      `Bütçe: ${project.budgetAmountMinor == null ? "Bilinmiyor" : minorToMajor(project.budgetAmountMinor)} ${project.currency}`,
+      `Bütçe: ${project.budgetAmountMinor == null ? "Bilinmiyor" : minorToMajor(project.budgetAmountMinor, project.currency)} ${project.currency}`,
       `İlerleme: %${project.progress}`,
       `Başlangıç: ${project.startDate ?? "Bilinmiyor"}`,
       `Bitiş: ${project.dueDate ?? "Bilinmiyor"}`,
@@ -137,8 +138,11 @@ function daysAgo(now: Date, days: number): string {
   return date.toISOString().slice(0, 10);
 }
 
-function minorToMajor(value: number): string {
-  return (value / 100).toFixed(2);
+function minorToMajor(value: number | bigint, currency: string): string {
+  const digits = new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits ?? 2;
+  const amount = BigInt(value); const positive = amount < BigInt(0) ? -amount : amount;
+  const scale = BigInt(10) ** BigInt(digits);
+  return `${amount < BigInt(0) ? "-" : ""}${positive / scale}${digits ? `.${(positive % scale).toString().padStart(digits, "0")}` : ""}`;
 }
 
 function clean(value: string | null | undefined): string {

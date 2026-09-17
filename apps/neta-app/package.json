@@ -52,7 +52,8 @@
     "i18n:v2-phase1-smoke": "node scripts/i18n-v2-phase1-smoke.mjs",
     "i18n:backfill": "node scripts/i18n/backfill-content-translations.mjs",
     "i18n:integrity": "node scripts/i18n/check-integrity.mjs",
-    "i18n:release-gate": "node scripts/i18n/release-gate.mjs"
+    "i18n:release-gate": "node scripts/i18n/release-gate.mjs",
+    "mobile:ai:check": "node --experimental-transform-types --test scripts/ai-operations.test.mjs && node scripts/mobile-ai-smoke.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",

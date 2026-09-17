@@ -38,12 +38,13 @@ for (const route of [
   }
 }
 
-const chatPage = fs.readFileSync(
-  path.join(process.cwd(), "app/(dashboard)/chat/page.tsx"),
-  "utf8",
-);
-if (/\bapiKey\b|\bprovider\b/.test(chatPage)) {
-  violations.push("app/(dashboard)/chat/page.tsx: AI secret/provider leaked to browser code");
+for (const boundary of ["page.tsx", "chat-client.tsx"]) {
+  const file = `app/(dashboard)/chat/${boundary}`;
+  const content = fs.readFileSync(path.join(process.cwd(), file), "utf8");
+  // i18n-provider import paths are unrelated to AI provider selection.
+  if (/\bapiKey\b|(?<![-/])\bprovider\b(?![-/])/.test(content)) {
+    violations.push(`${file}: AI secret/provider leaked to browser code`);
+  }
 }
 
 const chatRoute = fs.readFileSync(
@@ -59,8 +60,8 @@ for (const transportField of ['id:', 'trigger:', 'messageId:']) {
 for (const diagnosticMarker of [
   "describeRequestIssues",
   "x-neta-error-code",
-  "geçerli bir JSON gövdesi",
-  "her mesaj id, role ve parts",
+  "invalid_json",
+  "invalid_message_format",
 ]) {
   assert.ok(
     chatRoute.includes(diagnosticMarker),

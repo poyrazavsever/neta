@@ -100,6 +100,7 @@ async function performResourceRequest<T>(instance: StoredInstance, user: MeProfi
   try {
     ({ data } = await authenticatedJsonRequest<unknown>(instance, createApiUrl(instance.apiBaseUrl, options.path), {
       ...requestOptions,
+      ...(requiredCapability === 'ai.assistant.v1' ? { timeoutMs: 45_000 } : {}),
       missingEndpointMessage:
         'Bu Neta sunucusu bu ekran için gereken mobil API endpoint’ini henüz sunmuyor.',
     }, auth.generation));
@@ -139,6 +140,7 @@ async function performResourceRequest<T>(instance: StoredInstance, user: MeProfi
 }
 
 function capabilityFor(path: string): string | null {
+  if (path.startsWith('chat/') || path === 'finance/analysis' || /projects\/[^/]+\/risk-analysis/.test(path)) return 'ai.assistant.v1';
   if (path.startsWith('portal/')) return 'portal.client.v1';
   if (path === 'device-sessions' || path.startsWith('device-sessions/')) return 'auth.device-pairing.v1';
   if (path.startsWith('finance/')) return 'freelancer.finance.v1';

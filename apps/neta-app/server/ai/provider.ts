@@ -48,7 +48,7 @@ export function getAiRuntime(actor: DomainActor): AiRuntime {
       model = createOpenAI({
         apiKey: "ollama",
         baseURL: config.ollamaBaseUrl,
-      })(modelName);
+      }).chat(modelName);
       break;
     default:
       model = createOpenAI({ apiKey: settings.apiKey ?? "" })(modelName);
@@ -113,7 +113,8 @@ export function normalizeAiError(error: unknown): DomainError {
     }
   }
 
-  console.error("AI provider request failed", error);
+  // Upstream errors may contain prompt text, request headers or provider keys.
+  console.error("AI provider request failed");
   return new DomainError(
     "UPSTREAM_ERROR",
     "AI sağlayıcısına ulaşılamadı. Sağlayıcı ayarlarını kontrol edip tekrar deneyin.",

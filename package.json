@@ -79,7 +79,8 @@
     "ui:assets:capture:mobile": "node tools/ui-assets/capture-mobile.mjs",
     "ui:assets:smoke:mobile": "node tools/ui-assets/native-file-smoke.mjs",
     "ui:assets:gallery": "node tools/ui-assets/gallery.mjs",
-    "ui:assets:check": "node tools/ui-assets/check.mjs"
+    "ui:assets:check": "node tools/ui-assets/check.mjs",
+    "mobile:ai:check": "pnpm --filter @neta/app mobile:ai:check && pnpm --filter @neta/mobile test"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0"
