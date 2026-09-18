@@ -54,7 +54,7 @@ export default function PortalRevisionFormRoute() {
     <FormSheet
       dirty={!saved && form.description !== initial.description}
       onSubmit={() => void submit()}
-      scrollRef={keyboard.scrollRef}
+      contentRef={keyboard.contentRef} onViewportLayout={keyboard.onViewportLayout} scrollRef={keyboard.scrollRef}
       submitDisabled={!isOnline || !projectId || !locale}
       submitLabel="Talebi gönder"
       submitting={loading}

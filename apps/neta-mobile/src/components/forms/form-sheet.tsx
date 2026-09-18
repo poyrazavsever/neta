@@ -8,7 +8,7 @@ import { useTheme } from '@/providers/theme-provider';
 import { spacing } from '@/theme/tokens';
 import { finishPerformanceMeasure, recordPerformanceSample } from '@/lib/performance/metrics';
 
-export function FormSheet({ children, dirty, onSubmit, scrollRef, submitDisabled = false, submitLabel = 'Kaydet', submitting, title }: PropsWithChildren<{ dirty: boolean; onSubmit: () => void; scrollRef: RefObject<ScrollView | null>; submitDisabled?: boolean; submitLabel?: string; submitting: boolean; title: string }>) {
+export function FormSheet({ children, contentRef, dirty, onSubmit, onViewportLayout, scrollRef, submitDisabled = false, submitLabel = 'Kaydet', submitting, title }: PropsWithChildren<{ contentRef: RefObject<View | null>; dirty: boolean; onSubmit: () => void; onViewportLayout?: () => void; scrollRef: RefObject<ScrollView | null>; submitDisabled?: boolean; submitLabel?: string; submitting: boolean; title: string }>) {
   const navigation = useNavigation();
   const { colors } = useTheme();
   useEffect(() => {
@@ -32,9 +32,9 @@ export function FormSheet({ children, dirty, onSubmit, scrollRef, submitDisabled
 
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={[styles.safe, { backgroundColor: colors.background }]}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={0} style={styles.flex}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={0} style={styles.flex}>
         <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}><IconButton icon={{ ios: 'xmark', android: 'close' }} label="Formu kapat" onPress={() => router.back()} /><Text accessibilityRole="header" numberOfLines={2} style={[styles.title, { color: colors.text }]}>{title}</Text><View style={styles.headerSpacer} /></View>
-        <ScrollView automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'} contentContainerStyle={styles.content} contentInsetAdjustmentBehavior="automatic" keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'} keyboardShouldPersistTaps="handled" ref={scrollRef}>{children}</ScrollView>
+        <ScrollView automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'} contentInsetAdjustmentBehavior="automatic" keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'} keyboardShouldPersistTaps="handled" onLayout={onViewportLayout} ref={scrollRef}><View collapsable={false} ref={contentRef} style={styles.content}>{children}</View></ScrollView>
         <View style={[styles.footer, { backgroundColor: colors.surfaceElevated, borderTopColor: colors.border }]}><Button disabled={submitDisabled} loading={submitting} onPress={onSubmit}>{submitLabel}</Button></View>
       </KeyboardAvoidingView>
     </SafeAreaView>

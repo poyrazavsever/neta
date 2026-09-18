@@ -1,6 +1,7 @@
 # Native, performans ve erişilebilirlik kabul matrisi
 
-Son güncelleme: 2026-07-29
+Son güncelleme: 2026-09-18. 2026-07-29 platform sonuçları tarihsel baseline'dır;
+Android form klavyesi aşağıdaki yeni kabul ile ayrıca sınanmıştır.
 
 ## Otomatik ve yerel kanıt
 
@@ -18,7 +19,7 @@ Son güncelleme: 2026-07-29
 | Static accessibility | Source gate | Geçti | `pnpm a11y:check` |
 | Contrast tokens | Unit test | Geçti | light/dark semantic token tests |
 | Reduce motion | Source + unit policy | Geçti | shell/modal animation guards |
-| Keyboard containment | Form primitive | Geçti | KAV + auto insets + focus reveal |
+| Keyboard containment | Android API 36 development, tam Gboard | Geçti | [14 form / 34 alan native görünürlük kabulü](../mobile-keyboard-form-acceptance.md); iOS/signed kabulü ayrı |
 
 ## Haptic matrisi
 

@@ -45,7 +45,7 @@ export default function CalendarEventFormRoute() {
   };
   const remove = async () => { if (!eventId || !version || readOnly || session.status !== 'authenticated' || session.role !== 'freelancer') return; setLoading(true); try { await deleteCalendarEvent(session.instance, session.user, eventId, version); setSaved(true); showToast({ message: 'Etkinlik silindi.', tone: 'success' }); } catch (value) { setError(toClientError(value, 'Etkinlik silinemedi.').message); } finally { setLoading(false); } };
 
-  return <FormSheet dirty={!saved && !loading && !readOnly && JSON.stringify(form) !== baseline} onSubmit={() => void submit()} scrollRef={keyboard.scrollRef} submitDisabled={readOnly} submitLabel={eventId ? 'Değişiklikleri kaydet' : 'Etkinliği oluştur'} submitting={loading} title={eventId ? 'Etkinlik detayı' : 'Yeni etkinlik'}>
+  return <FormSheet dirty={!saved && !loading && !readOnly && JSON.stringify(form) !== baseline} onSubmit={() => void submit()} contentRef={keyboard.contentRef} onViewportLayout={keyboard.onViewportLayout} scrollRef={keyboard.scrollRef} submitDisabled={readOnly} submitLabel={eventId ? 'Değişiklikleri kaydet' : 'Etkinliği oluştur'} submitting={loading} title={eventId ? 'Etkinlik detayı' : 'Yeni etkinlik'}>
     <Text style={[styles.lead, { color: colors.textMuted }]}>Tarih ve saati native seçiciden, ilişkileri kayıt listesinden seç.</Text>
     {readOnly ? <InfoBox description="Bu etkinlik görev veya finans kaydından üretilir. Kaynak kaydı üzerinden düzenlenmelidir." title="Salt okunur etkinlik" tone="info" /> : null}
     {error ? <InfoBox description={error} title="İşlem yapılamadı" tone="danger" /> : null}
