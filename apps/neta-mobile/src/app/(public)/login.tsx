@@ -55,6 +55,7 @@ export default function LoginScreen() {
         <View style={styles.heading}>
           <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>{session.instance?.workspaceName ?? 'Neta’ya giriş yap'}</Text>
           <Text style={[styles.description, { color: colors.textMuted }]}>Email ve şifrenle çalışma alanına devam et.</Text>
+          {session.instance ? <Text selectable style={[styles.serverAddress, { color: colors.textMuted }]}>Sunucu: {session.instance.origin}</Text> : null}
         </View>
         <Card style={styles.form}>
           <View style={styles.row}><Badge tone={session.instance ? 'success' : 'danger'}>{session.instance ? 'Sunucu hazır' : 'Sunucuya ulaşılamadı'}</Badge><ColorModeControl /></View>
@@ -79,5 +80,6 @@ const styles = StyleSheet.create({
   heading: { gap: spacing.sm },
   logo: { height: 64, width: 180 },
   row: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, justifyContent: 'space-between' },
+  serverAddress: { fontSize: 14, lineHeight: 20 },
   title: { fontSize: 34, fontWeight: '900', letterSpacing: -0.8 },
 });

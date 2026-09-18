@@ -132,6 +132,12 @@ async function fetchWithRedirects(
     }
 
     return response;
+  } catch (error) {
+    // Native transports can wrap aborts in an ordinary Error with no abort cause.
+    if (controller.signal.aborted && !options.signal?.aborted) {
+      throw new NetaClientError('TIMEOUT', 'Sunucu zamanında yanıt vermedi.');
+    }
+    throw error;
   } finally {
     clearTimeout(timeout);
     options.signal?.removeEventListener('abort', abort);
@@ -174,9 +180,10 @@ function readSafeApiErrorMessage(value: unknown): string | null {
   return null;
 }
 
-function readApiErrorCode(value: unknown): 'UPSTREAM_ERROR' | 'UPSTREAM_TIMEOUT' | 'SERVICE_UNAVAILABLE' | null {
+function readApiErrorCode(value: unknown): 'AUTH_FAILED' | 'UPSTREAM_ERROR' | 'UPSTREAM_TIMEOUT' | 'SERVICE_UNAVAILABLE' | null {
   if (!isRecord(value)) return null;
   const raw = typeof value.code === 'string' ? value.code : isRecord(value.error) ? value.error.code : null;
+  if (raw === 'INVALID_EMAIL_OR_PASSWORD') return 'AUTH_FAILED';
   return raw === 'UPSTREAM_ERROR' || raw === 'UPSTREAM_TIMEOUT' || raw === 'SERVICE_UNAVAILABLE' ? raw : null;
 }
 

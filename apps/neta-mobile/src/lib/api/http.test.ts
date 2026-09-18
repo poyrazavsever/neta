@@ -4,6 +4,25 @@ import test from 'node:test';
 import { NetaClientError } from './errors.ts';
 import { fetchJson } from './http.ts';
 
+test('reports Better Auth rejected credentials as a localized login failure', async () => {
+  await assert.rejects(fetchJson('https://neta.test/api/auth/sign-in/email', {
+    method: 'POST',
+    transport: async () => Response.json({
+      code: 'INVALID_EMAIL_OR_PASSWORD', message: 'Invalid email or password',
+    }, { status: 401 }),
+  }), (error: unknown) => error instanceof NetaClientError && error.code === 'AUTH_FAILED' &&
+    error.status === 401 && error.message === 'Email veya şifre hatalı.');
+});
+
+test('classifies timeouts even when the native transport loses the abort cause', async () => {
+  await assert.rejects(fetchJson('https://neta.test/api/v1/me', {
+    timeoutMs: 5,
+    transport: async (_url, options) => new Promise<Response>((_resolve, reject) => {
+      options.signal?.addEventListener('abort', () => reject(new Error('fetch failed: cancelled')), { once: true });
+    }),
+  }), (error: unknown) => error instanceof NetaClientError && error.code === 'TIMEOUT');
+});
+
 test('upload transport refuses even same-origin redirects without replaying the body', async () => {
   const calls: RequestInit[] = [];
   await assert.rejects(fetchJson('https://neta.test/api/v1/files', {

@@ -62,6 +62,13 @@ pnpm mobile:android
 Development varsayılanı localhost'tur. Production evrensel build origin'i boş
 bırakır; kullanıcı domain girer veya yöneticinin QR kodunu tarar.
 
+Giriş ekranı aktif sunucu adresini gösterir. Yerel geliştirmeden başka instance'a
+geçmek için **Başka çalışma alanına bağlan** seçeneğiyle HTTPS adresini gir,
+doğrula ve bağlantıyı onayla. **Sunucu hazır** yalnız discovery'nin başarılı
+olduğunu gösterir; hesabı doğrulamaz. Reddedilen giriş **Email veya şifre hatalı.**
+olarak görünür; bağlantı ve zaman aşımı ayrı mesajlarla bildirilir. Hesaplar
+seçilen instance'a aittir.
+
 ## Yapılandırma
 
 Production ortamı zorunludur; origin opsiyoneldir:

@@ -39,7 +39,8 @@ export function upstreamErrorMessage(code: 'UPSTREAM_ERROR' | 'UPSTREAM_TIMEOUT'
   return 'AI yanıtı oluşturulurken sağlayıcı hatası oluştu.';
 }
 
-export function serverErrorMessage(code: 'UPSTREAM_ERROR' | 'UPSTREAM_TIMEOUT' | 'SERVICE_UNAVAILABLE'): string {
+export function serverErrorMessage(code: 'AUTH_FAILED' | 'UPSTREAM_ERROR' | 'UPSTREAM_TIMEOUT' | 'SERVICE_UNAVAILABLE'): string {
+  if (code === 'AUTH_FAILED') return 'Email veya şifre hatalı.';
   return upstreamErrorMessage(code);
 }
 
@@ -56,11 +57,15 @@ export function toClientError(error: unknown, fallbackMessage = 'İşlem tamamla
     return error;
   }
 
-  if (error instanceof Error && error.name === 'AbortError') {
+  if (error instanceof Error && (
+    error.name === 'AbortError' ||
+    (error.message.startsWith('fetch failed: ') && error.cause instanceof Error && error.cause.name === 'AbortError')
+  )) {
     return new NetaClientError('TIMEOUT', 'Sunucu zamanında yanıt vermedi.');
   }
 
-  if (error instanceof TypeError) {
+  // Expo's native FetchError extends Error without setting a distinct name.
+  if (error instanceof TypeError || (error instanceof Error && error.message.startsWith('fetch failed: '))) {
     return new NetaClientError('NETWORK_ERROR', 'Sunucuya ulaşılamadı.');
   }
 

@@ -63,6 +63,13 @@ pnpm mobile:android
 The development default targets localhost. A production universal build leaves
 the origin empty and asks the user to connect a domain or scan the administrator's QR.
 
+The login screen displays the active server origin. To switch from local
+development to another instance, choose **Başka çalışma alanına bağlan**, enter
+its HTTPS origin, validate it, and confirm the connection. **Sunucu hazır** means
+discovery succeeded; it does not validate the account. Rejected credentials are
+reported as **Email veya şifre hatalı.**; network failures and timeouts have
+separate messages. Accounts belong to the selected instance.
+
 ## Configuration
 
 The production environment is required; the origin is optional:
@@ -94,6 +101,16 @@ validation, and the production release guard. It checks native source/config and
 autolinking without requiring generated android/ios directories. Use
 `native:verify --platform android` or `--platform ios` after generating native
 projects (and installing Pods on macOS). It does not certify signing or devices.
+
+After Android prebuild, `pnpm --filter @neta/mobile native:build:android`
+compiles a production, origin-free release APK on Windows or Linux using Java
+and the generated Gradle wrapper JAR. Use `--architecture arm64-v8a` for the
+CI/device ABI or `--architecture x86_64` for an emulator; omitting it builds all
+generated ABIs. The launcher disables dotenv loading and uses two Gradle workers.
+APK output is `android/app/build/outputs/apk/release/app-release.apk`.
+Expo's generated project uses debug signing: this APK validates native compilation
+and is not a signed Play AAB or store acceptance evidence.
+The accessibility source scan uses Node APIs and needs no ripgrep installation.
 
 `pnpm mobile:release:readiness` reports outstanding store evidence;
 `pnpm mobile:store:check` rejects incomplete records before running the code and
