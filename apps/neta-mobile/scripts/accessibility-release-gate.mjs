@@ -1,7 +1,12 @@
-import { readFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { readFileSync, readdirSync } from 'node:fs';
+import path from 'node:path';
 
-const files = execFileSync('rg', ['--files', 'src/app', 'src/components'], { encoding: 'utf8' }).trim().split('\n').filter((file) => /\.tsx$/.test(file));
+const root = new URL('../', import.meta.url);
+const files = ['src/app/', 'src/components/'].flatMap(directory =>
+  readdirSync(new URL(directory, root), { recursive: true, withFileTypes: true })
+    .filter(entry => entry.isFile() && entry.name.endsWith('.tsx'))
+    .map(entry => path.join(entry.parentPath, entry.name)))
+  .sort();
 const failures = [];
 for (const file of files) {
   const source = readFileSync(file, 'utf8');
@@ -12,7 +17,7 @@ for (const file of files) {
   }
 }
 
-const shell = readFileSync('src/components/navigation/app-shell.tsx', 'utf8');
+const shell = readFileSync(new URL('src/components/navigation/app-shell.tsx', root), 'utf8');
 for (const [pattern, message] of [
   [/accessibilityRole="tab"/, 'bottom navigation tab semantiği eksik'],
   [/accessibilityViewIsModal/, 'Others sheet modal focus sınırı eksik'],
