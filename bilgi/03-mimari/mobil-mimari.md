@@ -1,9 +1,10 @@
 ---
 tur: mimari
 durum: mevcut
-guncellendi: 2026-09-17
+guncellendi: 2026-09-18
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-keyboard-form-acceptance.md
   - docs/mobile/mobile-release-acceptance.md
   - docs/mobile/mobile-ai-acceptance.md
   - apps/neta-mobile
@@ -52,6 +53,14 @@ Expo SDK 57, React Native 0.86, React 19, Expo Router, SecureStore, AsyncStorage
 
 ## Mevcut ürün modeli
 
+Giriş ekranı seçili `instance.origin` adresini gösterir; development build'in
+localhost varsayılanı runtime'da başka instance'a bağlanmayı engellemez.
+“Sunucu hazır” discovery kabulüdür, hesap kabulü değildir. Better Auth'un
+`INVALID_EMAIL_OR_PASSWORD` yanıtı mobilde `AUTH_FAILED` ve Türkçe hata mesajına
+çevrilir. Expo native fetch hatalarının düz `Error`/`fetch failed:` biçimi ağ
+hatası olarak tanınır; transport abort nedeni kaybolsa da yerel deadline
+`TIMEOUT` olarak korunur. Kullanıcı iptali HTTP katmanında yeniden sınıflandırılmaz.
+
 Tek resmî binary farklı self-hosted instance'lara runtime'da bağlanabilir. UI ilk sürümde tek aktif instance sunar; registry, auth ve cache `instanceId` ile ayrışır. Connect QR secret taşımaz ve device pairing değildir.
 
 ## Aktif hedef mimari
@@ -93,6 +102,13 @@ Versioned file, appearance, portal asset ve davet URL'leri canonical `APP_URL` k
 2026-09-16 lifecycle devamı: canonical backend Node instrumentation başlangıcında ve saatlik timer ile `device-maintenance.ts` çalıştırır. Expiry/30 gün idle doğrulaması access/refresh request'inde anında yapılır; toplu cleanup request path'inde değildir. Kapalı session 30 gün sonra history cascade ile, challenge expiry'den bir gün sonra silinir; aktif family geçmişi korunur. Restore HTTP kabulü ikinci sentetik loopback backend'de eski token reddi ve fresh pairing'i doğrular. Signed/native ve canlı HTTPS kabulü açık kalır.
 
 2026-09-16 replay devamı: mobil `device-refresh-operation.ts`, Expo Crypto requestId'sini istekten önce instance-scoped SecureStore'a yazar; transient hatada aynı işlem korunur, logout'ta silinir. Backend aynı token/nonce için 30 saniyelik AES-256-GCM şifreli yanıtı yalnız successor güncelse tekrar verir. AAD cihaz/epoch/digest/nonce/expiry'yi bağlar; farklı nonce veya grace dışı reuse family'yi kapatır. Public locator QR/manual yanlış secret denemelerini aynı persistent counter'da birleştirir, beşte kilitler. 0017 eski pending kodları yeniden üretmeyi gerektirir; mevcut oturumları korur. Replay kullanım expiry'si anındadır; fiziksel cleanup startup/saatlik bounded iştedir. Yeni native kripto bağımlılığı development client rebuild gerektirir. Signed/native ve iki canlı HTTPS instance kabulü bu otomasyondan ayrıdır.
+
+## Native form odak ve klavye
+
+2026-09-18: Fabric `measureLayout` sayısal node handle yerine `FormSheet` içindeki `collapsable=false` native View ref'ini kullanır. İçerik koordinatı tekrar odakta sabittir; generation/ref kimliği kontrolü geç kalan ölçümü reddeder. Hook kullanan 17 owner/portal formu ortak contentRef sözleşmesindedir. Android KAV `height`, iOS `padding` davranışındadır. Altı regresyon testi ve Android development tam klavye/alan görünürlük kabulü [[docs/mobile/mobile-keyboard-form-acceptance]] sayfasındadır. Canlı demo catchall yollarının ayrı 500 hatası bu ref düzeltmesiyle kapanmış sayılmaz; portal client/iOS/signed kabulü ayrıdır.
+
+Klavye ilk açılışında viewport küçülmeden clamp edilen scroll offset'i, `keyboardDidShow` sonrası halen odaklı alanın bir frame sonra yeniden ölçülmesiyle düzeltilir. Arka ekranlar için `isFocused` kontrolü vardır; listener ve frame unmount'ta temizlenir.
+ScrollView `onLayout` da odaklı alanı yeniden ölçer; hızlı normal/secure/numeric klavye geçişindeki viewport boyut değişikliği eski scroll clamp'ine bırakılmaz.
 
 ## MOB-9 release sınırı
 

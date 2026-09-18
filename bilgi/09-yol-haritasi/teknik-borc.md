@@ -1,9 +1,10 @@
 ---
 tur: yol-haritasi
 durum: mevcut
-guncellendi: 2026-09-17
+guncellendi: 2026-09-18
 guven: yuksek
 kaynaklar:
+  - docs/mobile/mobile-keyboard-form-acceptance.md
   - docs/mobile/mobile-release-acceptance.md
   - docs/mobile/mobile-ai-acceptance.md
   - docs/neta-backend-mobile-api-master-plan.md
@@ -29,6 +30,7 @@ etiketler:
 
 ## Mobil
 
+- 2026-09-18 canlı demo: journal/security/general/appearance/AI formları yükleme hatası verir. Altı common `/api/v1` GET auth bilgisi olmadan da 500 döner; explicit clients route'u beklenen 401 verir. Yerel canonical backend HTTP kabulü geçer; remote log/deployment tanısı bekler. Native form ref/klavye düzeltmesi bu backend hatasını çözmüş sayılmaz: [[docs/mobile/mobile-keyboard-form-acceptance]].
 - Universal cookie/cache izolasyonu signed iOS/Android ve iki canlı HTTPS instance ile henüz kanıtlanmadı.
 - Mutation/form route'ları ve capability gate kodda bulunur; signed cihaz kabulü açıktır.
 
@@ -43,6 +45,8 @@ etiketler:
 - AI egress/redaction ve gerçek provider/model compatibility/maliyet kabulü açıktır. Chat context journal note içerir; lease recovery provider seviyesinde exactly-once veya maliyet garantisi sağlamaz. Self-hosted push opt-in/relay için ayrı ADR gerekir.
 
 MOB-9 için source/autolinking/config ve release kanıt gate’i hazırdır; signing/provisioning, iki canlı HTTPS/native kabulü, public privacy/support, incident owner ve lisans çözümü pending’dir. Kanıt kaydı [[08-operasyon/mobil-yayin|mobil yayın]] içinde yönlendirilir.
+
+2026-09-18: Son remote Mobile CI’de backend kabulü ve Android config geçer; quality job’unu durduran ripgrep bağımlılığı Node taramasıyla giderildi. Android compile launcher ve CI ARM64 APK derlemesi eklendi; yeni workflow remote sonucu henüz doğrulanmadı. macOS/iOS compile, release imzalı IPA/AAB ve gerçek cihaz kabulü açık kalır. APK debug signing mağaza kabulü yerine geçmez.
 
 ## Dokümantasyon/yönetişim
 

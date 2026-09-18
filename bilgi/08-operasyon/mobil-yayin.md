@@ -1,7 +1,7 @@
 ---
 tur: operasyon
 durum: mevcut
-guncellendi: 2026-09-17
+guncellendi: 2026-09-18
 guven: yuksek
 ozet: "MOB-9 source kalite, native generation, reviewer/hash’li release kanıtı ve açık signing/store operasyon kapıları."
 kaynaklar:
@@ -10,6 +10,7 @@ kaynaklar:
   - docs/mobile/mobile-server-compatibility.md
   - docs/mobile/release/release-candidate.json
   - apps/neta-mobile/scripts/native-release-gate.mjs
+  - apps/neta-mobile/scripts/android-native-build.mjs
   - apps/neta-mobile/scripts/release-readiness-gate.mjs
   - apps/neta-mobile/eas.json
   - .github/workflows/mobile-ci.yml
@@ -51,3 +52,9 @@ Upgrade öncesi image+backup çifti korunur; restore app kapalıyken ayrı targe
 ## Veri kabul gate’i
 
 pnpm mobile:data:check on SQLite/CLI senaryosu ve ayrı production standalone/gerçek loopback HTTP kontrolünü çalıştırır. Backend Mobile CI ve strict store check bu gate’i içerir. Migration-restore evidence otomatik geçti diye reviewer onayına çevrilmez; production-like/signed kabul pending kalır. [[docs/mobile/mobile-data-acceptance]] kapsamı açıklar.
+
+## Android compile ve CI devamı
+
+2026-09-18’de son remote CI’nin backend ve Android config job’larının geçtiği, quality job’unun eksik ripgrep nedeniyle durduğu doğrulandı. A11y taraması Node dosya API’lerine taşındı; boş PATH/package dışı cwd ve nested TSX negatifleri test edilir. Windows/Linux native build launcher generated Gradle wrapper JAR’ıyla production, origin’siz APK derler; CI ARM64 compile adımı eklendi. [[docs/mobile/mobile-release-acceptance]] yerel doğrulama ve remote run sınırını gösterir. Generated debug sertifikalı release APK signed AAB/store kabulü değildir; release kaydı pending kalır.
+
+Yerel Windows/Java 21 ARM64 release APK derlemesi 871 Gradle göreviyle geçti. APK ZIP production environment, gömülü origin yokluğu ve native ARM64/bundle varlığını; apksigner debug sertifikasıyla geçerli imzayı doğrular. Hash/metadata canonical kabul sayfasındadır. 140 mobil test, beş evidence testi ve yeni a11y regresyonu geçer; yeni remote CI ve signed/native cihaz kabulü bekler.

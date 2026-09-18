@@ -1,7 +1,7 @@
 ---
 tur: yol-haritasi
 durum: mevcut
-guncellendi: 2026-09-17
+guncellendi: 2026-09-18
 guven: yuksek
 ozet: "Neta Mobile'ı build-time tek instance istemcisinden güvenli evrensel uygulamaya taşıyan, backend API ve release kapılarıyla birlikte yürütülen uygulama planı."
 kaynaklar:
@@ -32,7 +32,7 @@ etiketler:
 
 # Neta Mobile uygulama planı
 
-> Son güncelleme: **2026-09-17** — MOB-8 AI v1 chat/risk/seçili ay finance transport’u ve sentetik provider kabulü uygulandı. MOB-6/MOB-7 otomatik güvenlik kabulü de geçti. Sıradaki kritik yol MOB-9 release/operasyondur; signed gerçek cihaz, gerçek provider ve iki canlı HTTPS instance kabulü açık kalır.
+> Son güncelleme: **2026-09-18** — MOB-8 AI ve MOB-6/MOB-7 otomatik kabulü uygulandı. Aktif MOB-9 release/operasyon fazında veri/restore kontrolü, Android native build launcher ve CI compile adımı hazırlandı; signed gerçek cihaz, gerçek provider ve iki canlı HTTPS instance kabulü açık kalır.
 
 ## Planın rolü
 
@@ -572,3 +572,7 @@ Bu maddelerden biri kritik yola alınırsa mevcut plan sessizce genişletilmez; 
 ## 2026-09-17 — MOB-9 veri/restore devamı
 
 Release journal sıra/timestamp/SQL hash readiness kontrolü, startup ön/son doğrulaması ve swap öncesi restore integrity/FK/prefix kabulü uygulandı. pnpm mobile:data:check izole SQLite/CLI ve production standalone/loopback HTTP gate’idir: [[docs/mobile/mobile-data-acceptance]]. Signed/native, gerçek pre-upgrade veri, iki canlı HTTPS instance ve store evidence pending kalır; UI/UX en son gelir.
+
+## 2026-09-18 — MOB-9 Android native compile devamı
+
+Windows/Linux Java/Gradle wrapper launcher ve CI ARM64 release APK derlemesi eklendi. Son push remote CI’sinde backend/config job’ları geçti; quality job’undaki ripgrep bağımlılığı Node dosya taraması ve regresyon testiyle giderildi. [[08-operasyon/mobil-yayin|Mobil yayın]] compile/signed kabul ayrımını korur; iOS native, release imzalı IPA/AAB ve canlı cihaz/HTTPS kanıtları açıktır. UI/UX en son kalır.

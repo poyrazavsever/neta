@@ -1,7 +1,7 @@
 ---
 tur: yol-haritasi
 durum: planlanan
-guncellendi: 2026-09-17
+guncellendi: 2026-09-18
 guven: yuksek
 kaynaklar:
   - docs/mobile/mobile-data-acceptance.md
@@ -63,6 +63,8 @@ Owner pairing ve portal transport'u kodda mevcuttur. `pnpm mobile:security:check
 ## 8 — MOB-9 release ve operasyon ← aktif faz
 
 Yerel source/native/fork release gate, origin’siz EAS/CI, SemVer compatibility matrisi ve reviewer/hash/source-commit bağlı release kaydı uygulandı: [[08-operasyon/mobil-yayin|mobil yayın]]. Signed iOS/Android, iki canlı HTTPS instance, production-like migration/restore ve privacy/support/license/incident değerleri kayıtta pending’dir. Otomatik kabul store kanıtı yerine geçmez.
+
+2026-09-18 devamı Android release APK compile launcher ve CI ARM64 native build adımıdır; remote quality job’undaki ripgrep bağımlılığı giderildi. Sonraki dış ortam kabulü macOS/iOS compile, release signing/provisioning ve gerçek cihaz/iki HTTPS instance kanıtıdır. UI/UX çalışması bu işlevsel kabulün ardından en son yürütülür.
 
 ## Release ilkesi
 

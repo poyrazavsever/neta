@@ -1,7 +1,7 @@
 ---
 tur: sistem
 durum: mevcut
-guncellendi: 2026-09-17
+guncellendi: 2026-09-18
 guven: yuksek
 kaynaklar:
   - docs/mobile/mobile-data-acceptance.md
@@ -29,6 +29,8 @@ etiketler:
 2026-09-16 MOB-2–5 denetiminde runtime kimlik izolasyonu, native production auth Origin, auth route/logout döngüsü, relation/core pagination, mutation retry/cache ve versioned dosya download/PDF parity eksikleri giderildi. Ayrıntı [[docs/mobile/mobile-phase-2-5-audit]]. [[assets-pipeline/indeks|UI assets pipeline]] koddan envanter, sentetik screenshot ve kaynak asset arşivi sunar; [[assets-pipeline/ui-ux-guncelleme-plani|görsel güncelleme]] en son planlanır. Bu çalışma signed cihaz/iki HTTPS instance release kapılarını açmaz.
 
 2026-09-17 MOB-9 yerel release hazırlığı source/native gate ve Windows CLI/config düzeltmeleri, origin’siz EAS/CI, SemVer prerelease compatibility ve hash/reviewer/source-commit bağlı kabul kaydı sunar. [[08-operasyon/mobil-yayin|Mobil yayın]] kod gate’iyle signed/live/store kabulünü ayırır; dış ortam maddeleri pending’dir.
+
+2026-09-18 MOB-9 devamında remote CI’nin backend/config başarıları ve quality job’undaki eksik ripgrep hatası doğrulandı. A11y taraması Node dosya API’lerine taşındı; Windows/Linux Android APK launcher ve CI ARM64 native release compile adımı eklendi. Güncel sonuç [[docs/mobile/mobile-release-acceptance]] içindedir; APK compile signed AAB veya cihaz kabulü değildir.
 
 ## Bir bakışta Neta
 

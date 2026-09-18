@@ -302,3 +302,39 @@ Production standalone hazırlığı migration SQL/journal’ını paketler; trac
 Kabul: on veri testi, phase8 import/normalization/file/idempotency/negative/rollback provası, hedef backend ESLint ve production build/TypeScript geçti. Plain/v1 health 200→503→200; gerçek ledger UPDATE bir satırı etkiler, eksik SQL reddedilir ve internal path/hash response’a çıkmaz. Paketlenmiş local data/env yoktur. Windows agent sandbox’ının native alt süreç dosya erişim sınırı nedeniyle son production fixture kabulü otomatik onaylı sandbox dışı aynı sentetik kapsamda çalıştı. Test kendi child process’ini kapatıp generated config/type dosyalarını byte olarak geri yükledi.
 
 Canonical kapsam [[docs/mobile/mobile-data-acceptance]], release runbook, ADR-009, migration/health/operasyon, teknik borç ve mobil roadmap içinde güncellendi. Remote CI/Docker image çalışmış veya gerçek production/signed kabul yapılmış sayılmaz. Migration-restore evidence pending; signed iOS/Android, iki canlı HTTPS, privacy/support/license/incident ve store iç test kapıları açık kalır. UI/UX çalışması en son gelir.
+
+## [2026-09-18] mobil-native-compile | MOB-9 Android release APK ve CI devamı
+
+39c96b9 remote Mobile CI’de backend-acceptance ve android-native-config job’ları başarıyla tamamlandı; quality job’u accessibility scriptindeki spawnSync rg ENOENT nedeniyle durdu. A11y taraması Node dosya API’lerine ve script-root yollarına taşındı. Boş PATH/package dışı cwd, nested TSX, font scaling/Pressable/Touchable negatifleri ve missing shell fail-closed regresyon testi geçti.
+
+Windows/Linux shell’siz Java/executable Gradle wrapper launcher native:build:android komutuna bağlandı. Production environment, boş origin ve dotenv devre dışıdır; iki Gradle worker, isteğe bağlı allowlist ABI vardır. CI Android job’u Java 21, SDK/build-tools 36, NDK 27.1.12297006/CMake 3.22.1 kurulumu ve ARM64 release APK compile içerir. YAML parse edildi; bu yeni workflow remote’da henüz çalışmış sayılmaz.
+
+Yerel Windows/Java 21 ARM64 app:assembleRelease başarılı: 14m 59s, 871 görev. APK 40,881,863 byte, com.neta.mobile 0.1.0/versionCode 1; SHA-256 94b63c6816c5ee10b8930210b1e9ac0ca3a39314665e24b4c5df49b8b8715ba1. APK app.config production ve netaOrigin alanı yok; bundle/ARM64 library’ler var. Apksigner doğrulaması geçer ama Android Debug sertifikasıdır; signed-android AAB kanıtı olarak işaretlenmedi. Derleme üçüncü taraf path/deprecation/metaspace uyarıları içerir; sıfır warning iddiası yoktur.
+
+Kabul: mobile:release:check (lint/TypeScript/140 mobil test/beş evidence testi), yeni a11y regresyonu, Android project/autolinking, hedef script ESLint ve YAML kontrolü geçti. Readiness ready=false; release-candidate.json değiştirilmedi. [[docs/mobile/mobile-release-acceptance]], [[08-operasyon/mobil-yayin|mobil yayın]], ADR-023, mevcut durum ve mobil roadmap senkronlandı. macOS/iOS native compile, release imzalı IPA/AAB, iki canlı HTTPS instance/gerçek cihaz/provider, privacy/support/license/incident ve store iç test kapıları açık. UI/UX en son gelir.
+
+
+## [2026-09-18] mobil-giris | Android development bağlantı ve auth tanılaması
+
+Android development uygulamasının localhost varsayılanına giden istekleri yerel backend loglarında doğrulandı. Runtime onboarding üzerinden demo HTTPS instance doğrulandı ve bağlantı onaylandı; giriş ekranı artık aktif origin'i gösterir. “Sunucu hazır” discovery ile hesap kabulünü ayırır; development varsayılanı ve production origin’siz mimari değiştirilmedi.
+
+Expo SDK 57 native FetchError düz Error/fetch failed biçimiyle genel giriş fallback’ine düşüyordu. Güvenli NETWORK_ERROR dönüşümü eklendi; wrapped AbortError ve native transport abort nedenini kaybettiğinde yerel timeout korunur. HTTP kullanıcı iptali ve redirect güvenlik sınırları korunur. Better Auth INVALID_EMAIL_OR_PASSWORD yanıtı AUTH_FAILED ve Türkçe mesajla sunulur; credential/URL/native exception detayları kullanıcıya taşınmaz.
+
+Kabul: 144 mobil test, TypeScript ve ESLint geçti. Gerçek Android Expo fetch demo health isteği 200/ok; sentetik olmayan hesabın yetkili giriş testi hem doğrudan demo API’de hem emülatör UI’da 401/INVALID_EMAIL_OR_PASSWORD verdi. Bu, hesabın bulunmadığını veya şifrenin hangisi olduğunu kanıtlamaz; yalnız mevcut demo sunucusunun verilen giriş bilgilerini kabul etmediğini gösterir. Demo hesabı oluşturulmadı/değiştirilmedi ve başarılı oturum/signed release kabulü iddia edilmedi. Giriş bilgileri kasa veya kaynak dosyalarına yazılmadı.
+
+[[03-mimari/mobil-mimari|Mobil mimari]] ve iki mobil README bağlantı/giriş ayrımını açıklar. Demo sunucusunun hesap kabulü ayrıca doğrulanmalıdır.
+
+
+Aynı oturumdaki son gerçek UI tekrarında dashboard açıldı. Android native auth client’ın aktif registry instance’ı üzerinden /api/v1/me kabulü origin=https://demo.takeneta.com, authenticated=true, role=freelancer ve demo hesap eşleşmesiyle doğrulandı; token/cookie/profil detayları loglanmadı. Önceki 401 bulgusu ilk denemelerin sonucudur, kalıcı hesap engeli olarak yorumlanmaz. Son durumda development emülatöründe demo girişi başarılıdır; signed/native store veya iki canlı instance kabulü hâlâ ayrı kapıdır.
+
+## [2026-09-18] mobil-form-klavye | Fabric native ref ve gerçek klavye denetimi
+
+Form odak ölçümünün numeric findNodeHandle hedefi RN 0.86 Fabric sözleşmesini karşılamıyordu. FormSheet içinde collapsable=false native içerik View'ı ve zorunlu contentRef kullanıldı; 17 hook formu ve ayrı project-risk primitive bağlantısı güncellendi. İçerik koordinatı tekrar kaydırmada sabit kalır; generation/ref kimliği kontrolü geç kalan callback'i reddeder. Altı yeni regresyon testi eklendi.
+
+Gerçek Android 16/API 36 development emülatöründe donanım klavyesi toolbar'ı tam ekran klavye kabulü sayılmadı. Gboard ekran klavyesi ve stylus tercihleri UI'dan geçici değiştirildi. Tam klavye testi uzun görev/günlük formunda gizlenen alanları ortaya çıkardı: Android KAV height davranışı ve keyboardDidShow sonrası halen odaklı alanın bir frame sonra yeniden ölçümü eklendi. Arka ekran isFocused kontrolü, listener/frame cleanup ve stale ölçüm reddi korunur.
+
+Kabul: 150 mobil test, TypeScript/ESLint ve mobile:release:check geçti. 14 owner formunda 34 native alan, 82 focus etkileşimi; her alan/tekrarlı son alan/hızlı odak native viewport ve klavye sınırlarına göre görünür, üç boş zorunlu form ilk hata odağı başarılı. Yakalanan measureLayout/diğer console error/warning sıfırdır; log bastırılmadı. Deneme formları değiştirilmedi/kaydedilmedi; test tercihleri ve logger geri yüklendi. Client portal/iOS/signed kabulü bu koşudan ayrı kalır.
+
+Ayrı canlı demo sorunu: günlük, güvenlik ve general/appearance/AI ayar formları veri yükleme hatası gösterir. Altı common API GET auth bilgisi olmadan da 500/text/plain verir, explicit clients yolu beklenen 401/JSON verir. Yerel izole SQLite/loopback backend mobile:ai:check ve dört backend unit testi geçer; remote deployment/log erişimi olmadan canlı 500 nedeni veya çözümü iddia edilmez. Canonical kanıt [[docs/mobile/mobile-keyboard-form-acceptance]], mobil mimari/teknik borç ve native a11y matrisi içinde kaydedildi. Credential ve alan değerleri kasa/loglara yazılmadı.
+
+Son ayrım: 34 native alanın 33'ü düzenlenebilir; profile e-posta salt okunur olduğu için klavye açılması beklenmez. Client-activity otomatik ilk odakta kapanan klavye ayrıca native dokunuşla tekrar açıldı ve pozitif klavye yüksekliği/görünürlük doğrulandı. Dört ek focus denemesinde de konsol sıfırdır. ScrollView onLayout yeniden ölçümü normal/secure/numeric hızlı geçişte değişen viewport clamp'ini düzeltir. Son mobile:release:check ve native görünürlük assertion gate'i geçer; Android/Gboard tercihleri eski değerlere, logger normal hâline döndü. Vault 103 Markdown/23 ADR ve sıfır bulguyla sağlıklıdır.

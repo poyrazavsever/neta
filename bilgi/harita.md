@@ -1,7 +1,7 @@
 ---
 tur: sistem
 durum: mevcut
-guncellendi: 2026-09-17
+guncellendi: 2026-09-18
 guven: yuksek
 ozet: "Neta bilgi kasasındaki bütün kalıcı notları tek satırlık özetlerle yönlendiren üretilmiş genel indeks."
 kaynaklar:

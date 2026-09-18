@@ -1,7 +1,7 @@
 ---
 title: MOB-9 mobil release kabulü ve operasyon
 status: local-gates-ready-store-acceptance-open
-last_updated: 2026-09-17
+last_updated: 2026-09-18
 ---
 
 # MOB-9 release kabulü
@@ -89,10 +89,34 @@ Origin’siz iOS/Android JS/Hermes production export üretildi. Android native p
 
 ## CI’nin kanıt sınırı
 
-Mobile CI source/contract/vault quality, origin’siz iOS/Android JS export ve blocker JSON artifact üretir. Ayrı Android job temiz prebuild sonrası native graph gate’i çalıştırır; backend job sentetik security/AI kabulünü çalıştırır. Bu job’lar signing, fiziksel cihaz veya store submit yapmaz. Yeni workflow yürütme sonucu remote CI çalıştıktan sonra doğrulanır; yerel gate sonucu remote CI geçmişi değildir.
+Mobile CI source/contract/vault quality, origin’siz iOS/Android JS export ve blocker JSON artifact üretir. Ayrı Android job temiz prebuild sonrası native graph gate’i ve Java 21 ile ARM64 release APK derlemesini çalıştırır; backend job sentetik data/security/AI kabulünü çalıştırır. Bu job’lar mağaza signing’i, fiziksel cihaz veya store submit yapmaz. Yeni workflow yürütme sonucu remote CI çalıştıktan sonra doğrulanır; yerel gate sonucu remote CI geçmişi değildir.
 
 Kaynaklar: [compatibility](mobile-server-compatibility.md), [security](mobile-security-acceptance.md), [AI](mobile-ai-acceptance.md), [native matrix](redesign-phase-12/native-a11y-matrix.md), [Expo versioning](https://docs.expo.dev/build-reference/app-versions/), [Expo SDK 57](https://docs.expo.dev/versions/v57.0.0/).
 
 ## MOB-9 veri kabul devamı
 
 pnpm mobile:data:check on SQLite/CLI testi ve ayrı production standalone/loopback HTTP kontrolünü çalıştırır; backend CI ve strict store check kapsamındadır. Readiness release ile eşleşmeyen ledger’ı hazır saymaz. Restore staging integrity/FK ve prefix’i swap öncesinde doğrular; WAL/SHM target reddedilir. [Data acceptance](mobile-data-acceptance.md) host/signed kabul ayrımını açıklar. Migration-restore evidence pending kalır.
+
+## 2026-09-18 — Android native derleme ve CI devamı
+
+[39c96b9 CI run](https://github.com/poyrazavsever/neta/actions/runs/35215904117) backend-acceptance ve android-native-config job’larını başarıyla tamamladı; quality job’u erişilebilirlik scriptindeki `spawnSync rg ENOENT` nedeniyle durdu. Tarama Node dosya API’lerine taşındı; package dışı cwd ve boş PATH ile nested TSX/font/Pressable negatifleri regresyon testindedir. Yeni workflow henüz remote’da doğrulanmış sayılmaz.
+
+```sh
+pnpm --filter @neta/mobile exec expo prebuild --platform android --no-install
+pnpm --filter @neta/mobile native:verify --platform android
+pnpm --filter @neta/mobile native:build:android --architecture arm64-v8a
+```
+
+Windows/Linux launcher Java ve SDK 57 executable Gradle wrapper JAR’ını shell kullanmadan çalıştırır; key/passphrase üretmez. Production env, boş origin ve `EXPO_NO_DOTENV=1` ile bundle’a lokal `.env` varsayılanı taşınmaz. İki Gradle worker kullanılır; ABI argümanı allowlist’tir, argümansız generated tüm ABI’lar derlenir. Native proje config’le güncel tutulmalıdır; kişisel native değişiklik varsa prebuild ayrı checkout’ta yapılır.
+
+CI Java 21, platform/build-tools 36, NDK 27.1.12297006 ve CMake 3.22.1’i açıkça kurar. Sürümler mevcut generated/locked native graph ve yerel başarılı configure komutuyla eşleşir; dependency upgrade’inde yeniden doğrulanır. Runner’ın varsayılan NDK/CMake sürümü build otoritesi değildir.
+
+Çıktı `apps/neta-mobile/android/app/build/outputs/apk/release/app-release.apk` altındadır. Generated template release için debug sertifikasını kullanır. Bu APK compile kanıtıdır; `signed-android` gate’i yalnız gerçek release imzalı AAB ve reviewer kabulüyle kapanır. iOS native compile, signed cihazlar ve iki canlı HTTPS instance kabulü açık kalır.
+
+### Yerel sonuç
+
+Windows/Java 21’de Android ARM64 `app:assembleRelease` geçti: 14m 59s, 871 actionable task (839 executed, 32 up-to-date). Kotlin/C++, Metro/Hermes, resource/manifest, DEX ve lintVitalRelease tamamlandı. SDK 36/build-tools 36.0.0, NDK 27.1.12297006, CMake 3.22.1 kullanıldı. Üçüncü taraf deprecated API/uzun path ve Gradle metaspace uyarıları sonucu başarısız yapmadı; warning-free build iddiası yoktur.
+
+APK 40,881,863 byte; `com.neta.mobile`, app 0.1.0/versionCode 1, yalnız arm64-v8a. SHA-256: `94b63c6816c5ee10b8930210b1e9ac0ca3a39314665e24b4c5df49b8b8715ba1`. APK ZIP içindeki `assets/app.config` environment=production, netaOrigin alanı yok; `assets/index.android.bundle` ve ARM64 native library’ler mevcut. `apksigner verify --print-certs` başarılıdır; DN Android Debug, sertifika SHA-256 `fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c`. Bu fingerprint upload/release key kabulü değildir.
+
+Kaynak kalite gate’i 140 mobil test, TypeScript/lint ve beş release evidence testiyle geçti; yeni PATH’siz/package dışı cwd a11y regresyon testi ve Android project/autolinking kontrolü de geçti. YAML üç job ile parse edildi. Readiness ready=false; mevcut record değiştirilmedi. APK `39c96b9` tabanı üzerine bu çalışma ağacından üretildi; candidate freeze veya signed/store kabulü yapılmadı. Yeni CI compile adımı için remote run hâlâ beklenir.

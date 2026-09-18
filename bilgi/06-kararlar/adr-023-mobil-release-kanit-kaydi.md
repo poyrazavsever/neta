@@ -2,7 +2,7 @@
 tur: karar
 durum: mevcut
 karar_durumu: kabul-edildi
-guncellendi: 2026-09-17
+guncellendi: 2026-09-18
 guven: yuksek
 ozet: "Mobil kaynak kalite kapısı ile signed/native/store kabulü ayrı doğrulanır; release kararı source commit ve hash’li, reviewer onaylı kanıt kaydına bağlıdır."
 kaynaklar:
@@ -57,6 +57,8 @@ Reviewer kanıtı gerçek signed candidate üzerinde üretir ve private veri/sı
 ## Etkilenen sistemler ve sonuçlar
 
 Mobile quality, platform native gate, CI blocker artifact ve strict store check aynı release kaydını kullanır. Store hesabı/cihaz/HTTPS kabulü repo otomasyonunun dışında kalır; pending kayıt release’i durdurur.
+
+2026-09-18 uygulama devamı: Android source/config gate’i sonrasında CI Java 21/ARM64 release APK compile çalıştırır; Windows/Linux launcher generated executable wrapper JAR’ını çağırır. Generated debug signing ile APK compile, kararın istediği release imzalı AAB/IPA/reviewer kanıtına çevrilmez. A11y source gate’i ripgrep yerine Node dosya API’leriyle temiz runner’da çalışır.
 
 ## Yeniden değerlendirme koşulları
 
